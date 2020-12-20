@@ -10,6 +10,10 @@ def home():
 def contact_us():
     return render_template('index.html')
 
+@app.route('/manage_ads.html')
+def manage_ads():
+    return render_template('manage_ads.html')
+
 #ERROR 404 Page
 @app.errorhandler(404)
 def page_not_found(e):
