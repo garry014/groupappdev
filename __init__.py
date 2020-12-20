@@ -14,6 +14,10 @@ def contact_us():
 def manage_ads():
     return render_template('manage_ads.html')
 
+@app.route('/advertise')
+def advertise():
+    return render_template('advertise.html')
+
 #ERROR 404 Page
 @app.errorhandler(404)
 def page_not_found(e):

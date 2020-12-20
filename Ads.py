@@ -1,5 +1,5 @@
 class Ads:
-    def __init__(self, image, start_date, end_date):
+    def __init__(self, image, start_date, end_date): #init 3 attributes
         self.__status = "Pending Approval"
         self.__end_date = end_date
         self.__start_date = start_date
