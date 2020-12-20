@@ -52,22 +52,25 @@
             <div class="col-lg-8 col-md-7">
                 <div class="contact-form">
                     <div class="contact-title mb-30">
-                        <h2>Get In Touch</h2>
+                        <h2>Advertise with us, at only a small fees</h2>
                     </div>
                     <form class="contact-form-style" id="contact-form" action="assets/php/mail.php" method="post">
                         <div class="row">
                             <div class="col-lg-6">
-                                <input name="name" placeholder="Name*" type="text">
+                                <label for="startdate">Start Date:*</label>
+                                <input type="date" id="startdate" name="startdate">
                             </div>
                             <div class="col-lg-6">
-                                <input name="email" placeholder="Email*" type="email">
+                                <label for="enddate">End Date:*</label>
+                                <input type="date" id="enddate" name="enddate">
                             </div>
                             <div class="col-lg-12">
-                                <input name="subject" placeholder="Subject*" type="text">
+                                <label for="image">Image:*</label>
+                                <input name="image" id="image"  type="text">
                             </div>
                             <div class="col-lg-12">
-                                <textarea name="message" placeholder="Your Message*"></textarea>
-                                <button class="submit" type="submit">SEND</button>
+                                Cost:
+                                <button class="submit" type="submit" style="float: right;">Check Out</button>
                             </div>
                         </div>
                     </form>
@@ -77,4 +80,14 @@
         </div>
     </div>
 </div>
+
+{% block scripts %}
+<script type="text/javascript">
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementsByName("startdate")[0].setAttribute('min', today);
+    document.getElementsByName("enddate")[0].setAttribute('min', today);
+    document.getElementById("startdate").value = today;
+    document.getElementById("enddate").value = today;
+</script>
+{% endblock %}
 {% endblock %}

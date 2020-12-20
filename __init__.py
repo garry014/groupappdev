@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect
-
+from Forms import createAd
 app = Flask(__name__)
 
 @app.route('/')
@@ -14,8 +14,11 @@ def contact_us():
 def manage_ads():
     return render_template('manage_ads.html')
 
-@app.route('/advertise')
+@app.route('/advertise', methods=['GET', 'POST'])
 def advertise():
+    if request.method == 'POST' and createAd.validate():
+        if createAd().validate_on_submit():
+            print("Pass")
     return render_template('advertise.html')
 
 #ERROR 404 Page
