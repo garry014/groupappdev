@@ -2,6 +2,8 @@
 {% block title %}TailorNow{% endblock %}
 
 {% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
 <div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
     <div class="container">
         <div class="breadcrumb-content text-center">
@@ -58,7 +60,7 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <label for="startdate">Start Date:*</label>
-                                <input type="date" id="startdate" name="startdate">
+                                {{ render_field(form.startdate, class="form-control") }}
                             </div>
                             <div class="col-lg-6">
                                 <label for="enddate">End Date:*</label>
@@ -85,7 +87,7 @@
 <script type="text/javascript">
     var today = new Date().toISOString().split('T')[0];
     document.getElementsByName("startdate")[0].setAttribute('min', today);
-    document.getElementsByName("enddate")[0].setAttribute('min', today);
+    //document.getElementsByName("enddate")[0].setAttribute('min', today);
     document.getElementById("startdate").value = today;
     document.getElementById("enddate").value = today;
 </script>
