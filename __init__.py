@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect
-from Forms import CreateAd
+from Forms import *
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -19,9 +20,9 @@ def advertise():
     error = None
     create_ad = CreateAd(request.form)
     if request.method == 'POST' and create_ad.validate(): #
-        print(create_ad.startdate.data)
-        if (create_ad.startdate.data > create_ad.enddate.data):
-            error = "This is an error"
+        #max_end_date =
+        if (create_ad.startdate.data > create_ad.enddate.data): #Compare start and end dates.
+            error = "End date cannot be earlier than start date"
         else:
             print("This is running")
             return redirect(url_for('home'))
