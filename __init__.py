@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect
-from Forms import createAd
+from Forms import CreateAd
 app = Flask(__name__)
 
 @app.route('/')
@@ -16,10 +16,14 @@ def manage_ads():
 
 @app.route('/advertise', methods=['GET', 'POST'])
 def advertise():
-    if request.method == 'POST' and createAd.validate():
-        if createAd().validate_on_submit():
+    create_ad = CreateAd(request.form)
+    if request.method == 'POST' and create_ad.validate():
+        if CreateAd().validate_on_submit():
             print("Pass")
-    return render_template('advertise.html')
+        else:
+            print("This is running")
+            return redirect(url_for('index'))
+    return render_template('advertise.html', form=create_ad)
 
 #ERROR 404 Page
 @app.errorhandler(404)
