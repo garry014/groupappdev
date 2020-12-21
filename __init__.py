@@ -16,17 +16,17 @@ def manage_ads():
 
 @app.route('/advertise', methods=['GET', 'POST'])
 def advertise():
+    error = None
     create_ad = CreateAd(request.form)
     if request.method == 'POST' and create_ad.validate(): #
         print(create_ad.startdate.data)
-        CreateAd().compare_dates()
         if (create_ad.startdate.data > create_ad.enddate.data):
-            pass
+            error = "This is an error"
         else:
             print("This is running")
             return redirect(url_for('home'))
 
-    return render_template('advertise.html', form=create_ad)
+    return render_template('advertise.html', form=create_ad, error = error)
 
 #ERROR 404 Page
 @app.errorhandler(404)
