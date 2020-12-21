@@ -6,7 +6,7 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route('/index')
+@app.route('/index.html')
 def contact_us():
     return render_template('index.html')
 
@@ -17,12 +17,15 @@ def manage_ads():
 @app.route('/advertise', methods=['GET', 'POST'])
 def advertise():
     create_ad = CreateAd(request.form)
-    if request.method == 'POST' and create_ad.validate():
-        if CreateAd().validate_on_submit():
-            print("Pass")
+    if request.method == 'POST' and create_ad.validate(): #
+        print(create_ad.startdate.data)
+        CreateAd().compare_dates()
+        if (create_ad.startdate.data > create_ad.enddate.data):
+            pass
         else:
             print("This is running")
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
+
     return render_template('advertise.html', form=create_ad)
 
 #ERROR 404 Page
