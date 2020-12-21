@@ -19,8 +19,7 @@ def manage_ads():
 def advertise():
     error = None
     create_ad = CreateAd(request.form)
-    if request.method == 'POST' and create_ad.validate(): #
-        #max_end_date =
+    if request.method == 'POST' and create_ad.validate():
         if (create_ad.startdate.data > create_ad.enddate.data): #Compare start and end dates.
             error = "End date cannot be earlier than start date"
         else:
