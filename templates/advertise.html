@@ -56,27 +56,23 @@
                     <div class="contact-title mb-30">
                         <h2>Advertise with us, at only a small fees</h2>
                     </div>
-                    <form class="contact-form-style" id="contact-form" action="" method="post">
+                    <form class="contact-form-style" action="" method="post">
                         <div class="row">
                             <div class="col-lg-6">
                                 {{ render_field(form.startdate, class="form-control") }}
                             </div>
                             <div class="col-lg-6">
                                 {{ render_field(form.enddate, class="form-control") }}
-<<<<<<< HEAD
                                 {% if error %}
                                     <div class="text-danger">Error: {{ error }}</div>
                                 {% endif %}
-=======
->>>>>>> parent of b486dc6... wtform sucks
                             </div>
                             <div class="col-lg-12">
-                                <label for="image">Image:*</label>
-                                <input name="image" id="image"  type="text">
+                                <input name="subject" placeholder="Subject*" type="text">
                             </div>
                             <div class="col-lg-12">
-                                Cost:
-                                <button class="submit" type="submit" style="float: right;">Check Out</button>
+                                <textarea name="message" placeholder="Your Message*"></textarea>
+                                <button class="submit" type="submit" style="float: right;">SEND</button>
                             </div>
                         </div>
                     </form>
