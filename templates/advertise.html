@@ -63,12 +63,14 @@
                             </div>
                             <div class="col-lg-6">
                                 {{ render_field(form.enddate, class="form-control") }}
-                                {% if error %}
-                                    <br>Error: {{ error }}
-                                {% endif %}
                             </div>
                             <div class="col-lg-12">
                                 {{ render_field(form.image, class="form-control") }}
+                            </div>
+                            <div class="danger">
+                                {% if error %}
+                                    Error: {{ error }}
+                                {% endif %}
                             </div>
                             <div class="col-lg-12">
                                 <textarea name="message" placeholder="Your Message*"></textarea>
