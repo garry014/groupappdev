@@ -34,22 +34,19 @@ def advertise():
         else:
             print("This is running")
             if 'image' not in request.files:
-                error = 'Something went wrong.'
+                error = 'Something went wrong, please refresh page.'
             file = request.files['image']
             if file.filename == '':
                 error = 'Please upload a file.'
-            if not allowed_file(file.filename):
-                error = 'The file uploaded has to be in either '
-                for i in ALLOWED_EXTENSIONS:
-                    error = error + i + ', '
+            elif not allowed_file(file.filename):
+                error = 'The file format must be in jpg, jpeg, png or gif.'
             elif file:
                 app.config['UPLOAD_FOLDER'] = './static/uploads/ads/'
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                directlink = 'uploads/ads/'+filename
                 os.rename('static/uploads/ads/'+filename, 'static/uploads/ads/'+'10.jpg')
                 return redirect(url_for('manage_ads'))
-                #return redirect(url_for('static', filename=directlink))
+                #return redirect(url_for('static', filename=backoflink))
     return render_template('advertise.html', form=create_ad, error = error)
 
 #ERROR 404 Not Found Page

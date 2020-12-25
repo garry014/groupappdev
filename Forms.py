@@ -1,5 +1,3 @@
-import re
-import os
 from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, validators
 from wtforms.fields.html5 import DateField
 
@@ -18,9 +16,4 @@ class CreateAd(Form):
     max_date = get_max_date(90)
     startdate = DateField('Start Date:*', render_kw={'min': min_date, 'max': max_date, 'value': min_date}, validators=[validators.DataRequired()])
     enddate = DateField('End Date:*', render_kw={'min': min_date, 'max': max_date}, validators=[validators.DataRequired()])
-    #Changes
     image = FileField('Advertisement Image (capped at 16MB):*')
-
-    def validate_image(form, field):
-        if field.data:
-            field.data = re.sub(r'[^a-z0-9_.-]', '_', field.data)
