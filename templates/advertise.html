@@ -65,16 +65,15 @@
                                 {{ render_field(form.enddate, class="form-control") }}
                             </div>
                             <div class="col-lg-12">
-                                {{ render_field(form.image, class="form-control") }}
+                                {{ render_field(form.image, class="form-control", oninput="filesize(this);") }}
                             </div>
                             <div class="danger">
                                 {% if error %}
-                                    Error: {{ error }}
+                                    <div class="text-danger">Error: {{ error }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-lg-12">
-                                <textarea name="message" placeholder="Your Message*"></textarea>
-                                <button class="submit" type="submit" style="float: right;">SEND</button>
+                                <button class="submit" type="submit" style="float: right;">Make Payment</button>
                             </div>
                         </div>
                     </form>
@@ -84,5 +83,6 @@
         </div>
     </div>
 </div>
+
 
 {% endblock %}

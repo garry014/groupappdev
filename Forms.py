@@ -19,7 +19,7 @@ class CreateAd(Form):
     startdate = DateField('Start Date:*', render_kw={'min': min_date, 'max': max_date, 'value': min_date}, validators=[validators.DataRequired()])
     enddate = DateField('End Date:*', render_kw={'min': min_date, 'max': max_date}, validators=[validators.DataRequired()])
     #Changes
-    image = FileField('Advertisement Image:*')
+    image = FileField('Advertisement Image (capped at 16MB):*')
 
     def validate_image(form, field):
         if field.data:
