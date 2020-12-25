@@ -56,7 +56,7 @@ def advertise():
 
                 username = "TailorNow" #Testing username
 
-                ad = Ads.Ads(str(count_id) + file_extension[1], create_ad.startdate.data,
+                ad = Ads.Ads(str(count_id) + file_extension[1], username, create_ad.startdate.data,
                                create_ad.enddate.data)
                 ad.set_ad_id(count_id)
                 ads_dict[ad.get_ad_id()] = ad

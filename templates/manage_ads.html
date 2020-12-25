@@ -38,7 +38,9 @@
                                     <td class="ad-thumbnail">
                                         <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
                                     </td>
-                                    <td class="product-name"><a href="#">Product Name</a></td>
+                                    <td class="product-name">
+                                        <a href="#">{{ ad.get_store_name() }}</a>
+                                    </td>
                                     <td class="product-price-cart">
                                         {{ ad.get_start_date() }}
                                     </td>
