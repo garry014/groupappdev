@@ -1,9 +1,16 @@
 class Ads:
     def __init__(self, image, start_date, end_date): #init 3 attributes
-        self.__status = "Pending Approval"
+        self.__ad_id = 0
+        self.__image = image
         self.__end_date = end_date
         self.__start_date = start_date
-        self.__image = image
+        self.__status = "Pending Approval"
+
+    def get_ad_id(self):
+        return self.__ad_id
+
+    def set_ad_id(self, ad_id):
+        self.__ad_id = ad_id
 
     def get_image(self):
         return self.__image
@@ -27,4 +34,10 @@ class Ads:
         return self.__end_date
 
     def set_end_date(self, status):
+        self.__status = status
+
+    def get_status(self):
+        return self.__status
+
+    def set_status(self, status):
         self.__status = status
