@@ -84,9 +84,7 @@ def manage_ads():
     for key in ads_dict:
         ad = ads_dict.get(key)
         ads_list.append(ad)
-    #test code
-    for ad in ads_list:
-        print(ad.get_ad_id())
+
     return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list)
 
 #ERROR 404 Not Found Page
