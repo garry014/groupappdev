@@ -45,7 +45,7 @@ def advertise():
                 try:
                     ads_dict = db['Ads']
                 except:
-                    print("Error in retrieving Ads from storage.db.")
+                    return redirect(url_for('dberror'))
 
                 count_id = len(ads_dict) + 1
 
@@ -86,7 +86,7 @@ def manage_ads():
         ads_dict = db['Ads']
         db.close()
     except:
-        print("Unable to open ads.db")
+        return redirect(url_for('dberror'))
 
     ads_list = []
     for key in ads_dict:
@@ -98,15 +98,22 @@ def manage_ads():
 @app.route('/deleteAd/<int:id>', methods=['POST'])
 def delete_ad(id):
     ads_dict = {}
-    db = shelve.open('ads.db', 'w')
-    ads_dict = db['Ads']
-
-    ads_dict.pop(id)
-
-    db['Ads'] = ads_dict
-    db.close()
-
-    return redirect(url_for('manage_ads'))
+    try:
+        db = shelve.open('ads.db', 'w')
+        ads_dict = db['Ads']
+    except:
+        return redirect(url_for('dberror'))
+    else:
+        for i in ALLOWED_EXTENSIONS:
+            directpath = 'static/uploads/ads/'+ str(id) + '.' + i
+            if os.path.exists(directpath):
+                os.remove(directpath)
+        ads_dict.pop(id)
+        db['Ads'] = ads_dict
+        if os.path.exists("demofile.txt"):
+            os.remove("demofile.txt")
+        db.close()
+        return redirect(url_for('manage_ads'))
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
@@ -117,6 +124,11 @@ def page_not_found(e):
 @app.errorhandler(413)
 def error413(error):
     return render_template('413.html'), 413
+
+#Database error
+@app.route('/dberror')
+def db_error():
+    return render_template('dberror.html')
 
 if __name__ == '__main__':
     app.debug = True

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}File size is too big{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Database Error</li>
+            </ul>
+        </div>
+    </div>
+</div><div class="error-area pt-40 pb-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8 text-center">
+                <div class="error">
+                    <h2>Sorry, our database is currently down.</h2>
+                    <p>We were not able to proceed due to a database error. Please try again later.</p>
+                    <input type="button" value="Go back to the previous page" onclick="history.back(-1)" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
