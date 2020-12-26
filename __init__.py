@@ -77,7 +77,7 @@ def advertise():
                 #return redirect(url_for('static', filename=backoflink))
     return render_template('advertise.html', form=create_ad, error = error)
 
-@app.route('/manage_ads.html')
+@app.route('/manage_ads')
 def manage_ads():
     ads_dict = {}
     username = "Admin" #Test Script
@@ -94,6 +94,19 @@ def manage_ads():
         ads_list.append(ad)
 
     return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list, username=username)
+
+@app.route('/deleteAd/<int:id>', methods=['POST'])
+def delete_user(id):
+    ads_dict = {}
+    db = shelve.open('ads.db', 'w')
+    ads_dict = db['Ads']
+
+    ads_dict.pop(id)
+
+    db['Ads'] = ads_dict
+    db.close()
+
+    return redirect(url_for('manage_ads'))
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
