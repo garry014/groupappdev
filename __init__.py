@@ -40,18 +40,22 @@ def advertise():
                 error = 'The file format must be in jpg, jpeg, png or gif.'
             elif file: #All validations done at this stage
                 ads_dict = {}
-                db = shelve.open('ads.db', 'c')
-
                 try:
+                    db = shelve.open('ads.db', 'c')
                     ads_dict = db['Ads']
                 except:
-                    return redirect(url_for('dberror'))
+                    print("Error in opening DB")#return redirect(url_for('dberror'))
 
-                count_id = len(ads_dict) + 1
+                try:
+                    count_id = max(ads_dict, key=int) + 1
+                except:
+                    count_id = 1 #if no dictionary exist, set id as 1
 
                 #Image Handling
                 app.config['UPLOAD_FOLDER'] = './static/uploads/ads/'
                 filename = secure_filename(file.filename)
+                if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 file_extension = os.path.splitext(filename) # get file type
                 os.rename('static/uploads/ads/'+filename, 'static/uploads/ads/'+ str(count_id) + file_extension[1])
@@ -86,8 +90,7 @@ def manage_ads():
         ads_dict = db['Ads']
         db.close()
     except:
-        return redirect(url_for('dberror'))
-
+        print("Db error")
     ads_list = []
     for key in ads_dict:
         ad = ads_dict.get(key)
@@ -102,7 +105,7 @@ def delete_ad(id):
         db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('db_error'))
     else:
         for i in ALLOWED_EXTENSIONS:
             directpath = 'static/uploads/ads/'+ str(id) + '.' + i
@@ -127,7 +130,7 @@ def error413(error):
 
 #Database error
 @app.route('/dberror')
-def db_error():
+def dberror():
     return render_template('dberror.html')
 
 if __name__ == '__main__':

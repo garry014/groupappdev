@@ -17,6 +17,15 @@
 <div class="cart-main-area pt-90 pb-100">
     <div class="container">
         <h3 class="cart-page-title">Your Advertisements</h3>
+        <div>
+          {% if count == 0 %}
+          <p>There are no advertisements.</p>
+          {% elif count == 1 %}
+          <p>There is 1 advertisement.</p>
+          {% else %}
+          <p>There are {{ count }} advertisements.</p>
+          {% endif %}
+        </div>
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                 <form action="#">
@@ -57,35 +66,35 @@
                                     <td class="product-remove">
                                         <a href="#"><i class="fa fa-pencil"></i></a>
                                         <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST">
-                                        <button style="border:none; background: none;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}" type="button"><i class="fa fa-times"></i></button>
-                                        <!-- The Modal -->
-                                        <div class="modal" id="myModal_{{ad.get_ad_id()}}">
-                                          <div class="modal-dialog">
-                                            <div class="modal-content">
+                                            <button type="button" style="border:none; background: none;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
+                                            <!-- The Modal -->
+                                            <div class="modal" id="myModal_{{ad.get_ad_id()}}">
+                                              <div class="modal-dialog">
+                                                <div class="modal-content">
 
-                                              <!-- Modal Header -->
-                                              <div class="modal-header">
-                                                <h4 class="modal-title">Delete Confirmation</h4>
-                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                  <!-- Modal Header -->
+                                                  <div class="modal-header">
+                                                    <h4 class="modal-title">Delete Confirmation</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                  </div>
+
+                                                  <!-- Modal body -->
+                                                  <div class="modal-body">
+                                                      <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
+                                                    Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
+                                                  </div>
+
+                                                  <!-- Modal footer -->
+                                                  <div class="modal-footer">
+                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                      <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
+                                                  </div>
+
+                                                </div>
                                               </div>
-
-                                              <!-- Modal body -->
-                                              <div class="modal-body">
-                                                  <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
-                                                Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
-                                              </div>
-
-                                              <!-- Modal footer -->
-                                              <div class="modal-footer">
-                                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                  <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
-                                              </div>
-
                                             </div>
-                                          </div>
-                                        </div>
                                         </form>
-                                   </td>
+                                    </td>
                                 </tr>
                             {% elif username == ad.get_store_name() %}
 
