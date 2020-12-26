@@ -96,7 +96,7 @@ function updateCost() {
   enddate = new Date(enddate.split('-')[2],enddate.split('-')[1]-1,enddate.split('-')[0]);
   var timeDiff = Math.abs(enddate.getTime() - startdate.getTime());
   var cost = (Math.ceil(timeDiff / (1000*60*60*24*365)) + 1) * 25;
-  document.getElementById("cost").innerHTML = cost;
+  document.getElementById("cost").innerHTML = cost;//{{ cost }}
 }
 </script>
 

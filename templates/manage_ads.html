@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}TailorNow{% endblock %}
+{% block title %}Manage Advertisements{% endblock %}
 
 {% block content %}
 <div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
@@ -16,7 +16,7 @@
 </div>
 <div class="cart-main-area pt-90 pb-100">
     <div class="container">
-        <h3 class="cart-page-title">Your cart items</h3>
+        <h3 class="cart-page-title">Your Advertisements</h3>
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                 <form action="#">
@@ -34,6 +34,7 @@
                             </thead>
                             <tbody>
                             {% for ad in ads_list %}
+                            {% if username == 'Admin' %}
                                 <tr>
                                     <td class="ad-thumbnail">
                                         <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
@@ -48,13 +49,46 @@
                                         {{ ad.get_end_date() }}
                                     </td>
                                     <td class="product-subtotal">
-                                        {{ ad.get_status() }}
+                                        <p style="color:red; font-weight: bold;">{% if ad.get_status() == 'Pending Approval' %}{{ ad.get_status() }}</p>
+                                        <p style="color:red">{% elif ad.get_status() == 'Expired' %}{{ ad.get_status() }}</p>
+                                        <p style="color:green">{% else %}{{ ad.get_status() }}</p>
+                                        {% endif %}
                                     </td>
                                     <td class="product-remove">
                                         <a href="#"><i class="fa fa-pencil"></i></a>
                                         <a href="#"><i class="fa fa-times"></i></a>
                                    </td>
                                 </tr>
+                            {% elif username == ad.get_store_name() %}
+                                <tr>
+                                    <td class="ad-thumbnail">
+                                        <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
+                                    </td>
+                                    <td class="product-name">
+                                        <a href="#">{{ ad.get_store_name() }}</a>
+                                    </td>
+                                    <td class="product-price-cart">
+                                        {{ ad.get_start_date() }}
+                                    </td>
+                                    <td class="product-quantity">
+                                        {{ ad.get_end_date() }}
+                                    </td>
+                                    <td class="product-subtotal">
+                                        <p style="color:red; font-weight: bold;">{% if ad.get_status() == 'Pending Approval' %}{{ ad.get_status() }}</p>
+                                        <p style="color:red">{% elif ad.get_status() == 'Expired' %}{{ ad.get_status() }}</p>
+                                        <p style="color:green">{% else %}{{ ad.get_status() }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="product-remove">
+                                        <form action="" method="POST">
+                                            <a href="javascript:{}" onclick="document.getElementById('my_form').submit(); return false;"><i class="fa fa-pencil"></i></a>
+
+
+                                        </form>
+                                        <a href="#"><i class="fa fa-times"></i></a>
+                                   </td>
+                                </tr>
+                            {% endif %}
                             {% endfor %}
                             </tbody>
                         </table>

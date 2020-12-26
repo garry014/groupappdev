@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Request
 from Forms import *
 import os, shelve, Ads
+from datetime import date
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -24,10 +25,12 @@ def contact_us():
 def advertise():
     error = None
     create_ad = CreateAd(request.form)
+
     if request.method == 'POST' and create_ad.validate():
         if (create_ad.startdate.data > create_ad.enddate.data): #Compare start and end dates.
             error = "End date cannot be earlier than start date"
         else:
+
             if 'image' not in request.files:
                 error = 'Something went wrong, please refresh page.'
             file = request.files['image']
@@ -54,7 +57,11 @@ def advertise():
                 os.rename('static/uploads/ads/'+filename, 'static/uploads/ads/'+ str(count_id) + file_extension[1])
                 #End of Image Handling
 
-                username = "TailorNow" #Testing username
+                username = "Ah Tiong" #Testing username
+
+                # Cost Calculation
+                delta = create_ad.enddate.data - create_ad.startdate.data
+                cost = delta.days * 25
 
                 ad = Ads.Ads(str(count_id) + file_extension[1], username, create_ad.startdate.data,
                                create_ad.enddate.data)
@@ -73,6 +80,7 @@ def advertise():
 @app.route('/manage_ads.html')
 def manage_ads():
     ads_dict = {}
+    username = "Admin" #Test Script
     try:
         db = shelve.open('ads.db', 'r')
         ads_dict = db['Ads']
@@ -85,7 +93,7 @@ def manage_ads():
         ad = ads_dict.get(key)
         ads_list.append(ad)
 
-    return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list)
+    return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list, username=username)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
