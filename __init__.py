@@ -96,7 +96,7 @@ def manage_ads():
     return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list, username=username)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
-def delete_user(id):
+def delete_ad(id):
     ads_dict = {}
     db = shelve.open('ads.db', 'w')
     ads_dict = db['Ads']

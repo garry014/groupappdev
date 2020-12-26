@@ -6,7 +6,7 @@ from datetime import timedelta
 def get_today(): #Get today's date
     return datetime.today().strftime('%Y-%m-%d')
 
-def get_max_date(Days): #Get the date to the max days a user can select.
+def get_max_date(Days): #Get the date to the max days a user can select. Have to feed in number of days.
     max_date = datetime.now() + timedelta(days=Days)
     max_date = max_date.strftime('%Y-%m-%d')
     return max_date
