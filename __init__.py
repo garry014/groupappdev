@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Request
 from Forms import *
 import os, shelve, Ads
-from datetime import date
+from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -82,7 +82,7 @@ def advertise():
     return render_template('advertise.html', form=create_ad, error = error)
 
 @app.route('/manage_ads')
-def manage_ads():
+def manage_ads(): #Tidy up codes.
     ads_dict = {}
     try:
         db = shelve.open('ads.db', 'r')
@@ -96,9 +96,27 @@ def manage_ads():
         ads_list.append(ad)
 
     count = 0
+    expired_list = []
     for ad in ads_list:
         if username == ad.get_store_name():
             count += 1
+        enddate_str = str(ad.get_end_date())
+        enddate = dt.strptime(enddate_str, "%Y-%m-%d")
+        if enddate < datetime.now() and ad.get_status() != "Rejected":
+            expired_list.append(ad.get_ad_id())
+
+    for id in expired_list:
+        try:
+            ads_dict = {}
+            db = shelve.open('ads.db', 'w')
+            ads_dict = db['Ads']
+        except:
+            return redirect(url_for('db_error'))
+        ad = ads_dict.get(id)
+        ad.set_status("Expired")
+        db['Ads'] = ads_dict
+        db.close()
+
     if username == "Admin":
         count = len(ads_list)
 
