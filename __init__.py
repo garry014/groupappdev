@@ -95,12 +95,19 @@ def manage_ads():
         ad = ads_dict.get(key)
         ads_list.append(ad)
 
+    count = 0
+    for ad in ads_list:
+        if username == ad.get_store_name():
+            count += 1
+    if username == "Admin":
+        count = len(ads_list)
 
-    return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list, username=username)
+
+    return render_template('manage_ads.html', count=count, ads_list=ads_list, username=username)
 
 @app.route('/updateAd/<int:id>/<int:updatewhat>/', methods=['GET', 'POST'])
 def updateAd(id, updatewhat):
-    update_ad = CreateAd(request.form)
+    update_ad = UpdateAd(request.form)
     if updatewhat == 1: #Update Status only
         try:
             ads_dict = {}
@@ -145,6 +152,8 @@ def updateAd(id, updatewhat):
             ad = ads_dict.get(id)
             update_ad.startdate.data = ad.get_start_date()
             update_ad.enddate.data = ad.get_end_date()
+            if username == "Admin":
+                update_ad.status.data = ad.get_status()
         return render_template('updateAd.html', form=update_ad, username=username)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
