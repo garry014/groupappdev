@@ -64,6 +64,12 @@
                             <div class="col-lg-6">
                                 {{ render_field(form.enddate, class="form-control", onchange="updateCost()") }}
                             </div>
+                            <div class="col-lg-6">
+                                {% if username == "Admin" %}
+                                    {{ render_field(form.status, class="form-control") }}
+                                    <br>
+                                {% endif %}
+                            </div>
                             <div class="col-lg-12">
                                 {{ render_field(form.image, class="form-control") }}
                             </div>

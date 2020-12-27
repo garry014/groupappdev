@@ -5,6 +5,8 @@ from datetime import date
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
+username = "Admin" #Test Script
+
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #File upload size cap 16MB
@@ -61,8 +63,6 @@ def advertise():
                 os.rename('static/uploads/ads/'+filename, 'static/uploads/ads/'+ str(count_id) + file_extension[1])
                 #End of Image Handling
 
-                username = "Ah Tiong" #Testing username
-
                 # Cost Calculation
                 delta = create_ad.enddate.data - create_ad.startdate.data
                 cost = delta.days * 25
@@ -84,7 +84,6 @@ def advertise():
 @app.route('/manage_ads')
 def manage_ads():
     ads_dict = {}
-    username = "Admin" #Test Script
     try:
         db = shelve.open('ads.db', 'r')
         ads_dict = db['Ads']
@@ -102,7 +101,7 @@ def manage_ads():
 @app.route('/updateAd/<int:id>/<int:updatewhat>/', methods=['GET', 'POST'])
 def updateAd(id, updatewhat):
     update_ad = CreateAd(request.form)
-    if updatewhat == 1:
+    if updatewhat == 1: #Update Status only
         try:
             ads_dict = {}
             db = shelve.open('ads.db', 'w')
@@ -114,55 +113,39 @@ def updateAd(id, updatewhat):
         db['Ads'] = ads_dict
         db.close()
         return redirect(url_for('manage_ads'))
-
-    if request.method == 'POST' and update_ad.validate():
-        try:
-            ads_dict = {}
-            db = shelve.open('ads.db', 'w')
-            ads_dict = db['Ads']
-        except:
-            return redirect(url_for('db_error'))
-
-        ad = ads_dict.get(id)
-        ad.set_start_date(update_ad.startdate.data)
-        ad.set_end_date(update_ad.enddate.data)
-
-        db['Ads'] = ads_dict
-        db.close()
-        return redirect(url_for('manage_ads'))
     else:
-        try:
-            ads_dict = {}
-            db = shelve.open('ads.db', 'r')
-            ads_dict = db['Ads']
+        if request.method == 'POST' and update_ad.validate():
+            try:
+                ads_dict = {}
+                db = shelve.open('ads.db', 'w')
+                ads_dict = db['Ads']
+            except:
+                return redirect(url_for('db_error'))
+
+            ad = ads_dict.get(id)
+            ad.set_start_date(update_ad.startdate.data)
+            ad.set_end_date(update_ad.enddate.data)
+            if username == "Admin":
+                ad.set_status(update_ad.status.data)
+            else:
+                ad.set_status("Pending Approval")
+
+            db['Ads'] = ads_dict
             db.close()
-        except:
-            return redirect(url_for('db_error'))
+            return redirect(url_for('manage_ads'))
+        else:
+            try:
+                ads_dict = {}
+                db = shelve.open('ads.db', 'r')
+                ads_dict = db['Ads']
+                db.close()
+            except:
+                return redirect(url_for('db_error'))
 
-        ad = ads_dict.get(id)
-        update_ad.startdate.data = ad.get_start_date()
-        update_ad.enddate.data = ad.get_end_date()
-    return render_template('updateAd.html', form=update_ad)
-
-# @app.route('/updateAd/<int:id>/<str:updatewhat>', methods=['GET', 'POST'])
-# def updateAdStatus(id, updatewhat):
-#     print("this is running")
-#     update_ad = CreateAd(request.form)
-#     if request.method == 'POST' and update_ad.validate():
-#         try:
-#             ads_dict = {}
-#             db = shelve.open('ads.db', 'w')
-#             ads_dict = db['Ads']
-#         except:
-#             return redirect(url_for('db_error'))
-#
-#         if updatewhat == "status":
-#             ad = ads_dict.get(id)
-#             ad.set_status("Approved")
-#
-#         db['Ads'] = ads_dict
-#         db.close()
-#     return redirect(url_for('manage_ads'))
+            ad = ads_dict.get(id)
+            update_ad.startdate.data = ad.get_start_date()
+            update_ad.enddate.data = ad.get_end_date()
+        return render_template('updateAd.html', form=update_ad, username=username)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
 def delete_ad(id):
