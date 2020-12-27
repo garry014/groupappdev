@@ -43,62 +43,62 @@
                             </thead>
                             <tbody>
                             {% for ad in ads_list %}
-                            {% if username == 'Admin' %}
-                                <tr>
-                                    <td class="ad-thumbnail">
-                                        <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
-                                    </td>
-                                    <td class="product-name">
-                                        <a href="#">{{ ad.get_store_name() }}</a>
-                                    </td>
-                                    <td class="product-price-cart">
-                                        {{ ad.get_start_date() }}
-                                    </td>
-                                    <td class="product-quantity">
-                                        {{ ad.get_end_date() }}
-                                    </td>
-                                    <td class="product-subtotal">
-                                        <p style="color:red; font-weight: bold;">{% if ad.get_status() == 'Pending Approval' %}{{ ad.get_status() }}</p>
-                                        <p style="color:red">{% elif ad.get_status() == 'Expired' %}{{ ad.get_status() }}</p>
-                                        <p style="color:green">{% else %}{{ ad.get_status() }}</p>
-                                        {% endif %}
-                                    </td>
-                                    <td class="product-remove">
-                                        <a href="#"><i class="fa fa-pencil"></i></a>
-                                        <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST">
-                                            <button type="button" style="border:none; background: none;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
-                                            <!-- The Modal -->
-                                            <div class="modal" id="myModal_{{ad.get_ad_id()}}">
-                                              <div class="modal-dialog">
-                                                <div class="modal-content">
+                                {% if username == 'Admin' %}
+                                    <tr>
+                                        <td class="ad-thumbnail">
+                                            <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
+                                        </td>
+                                        <td class="product-name">
+                                            <a href="#">{{ ad.get_store_name() }}</a>
+                                        </td>
+                                        <td class="product-price-cart">
+                                            {{ ad.get_start_date() }}
+                                        </td>
+                                        <td class="product-quantity">
+                                            {{ ad.get_end_date() }}
+                                        </td>
+                                        <td class="product-subtotal">
+                                            <p style="color:red; font-weight: bold;">{% if ad.get_status() == 'Pending Approval' %}{{ ad.get_status() }}</p>
+                                            <p style="color:red">{% elif ad.get_status() == 'Expired' %}{{ ad.get_status() }}</p>
+                                            <p style="color:green">{% else %}{{ ad.get_status() }}</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="product-remove">
+                                            <a href="/updateAd/{{ad.get_ad_id()}}"><i class="fa fa-pencil"></i></a>
+                                            <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST">
+                                                <button type="button" style="border:none; background: none;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
+                                                <!-- The Modal -->
+                                                <div class="modal" id="myModal_{{ad.get_ad_id()}}">
+                                                  <div class="modal-dialog">
+                                                    <div class="modal-content">
 
-                                                  <!-- Modal Header -->
-                                                  <div class="modal-header">
-                                                    <h4 class="modal-title">Delete Confirmation</h4>
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                      <!-- Modal Header -->
+                                                      <div class="modal-header">
+                                                        <h4 class="modal-title">Delete Confirmation</h4>
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                      </div>
+
+                                                      <!-- Modal body -->
+                                                      <div class="modal-body">
+                                                          <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
+                                                        Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
+                                                      </div>
+
+                                                      <!-- Modal footer -->
+                                                      <div class="modal-footer">
+                                                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                          <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
+                                                      </div>
+
+                                                    </div>
                                                   </div>
-
-                                                  <!-- Modal body -->
-                                                  <div class="modal-body">
-                                                      <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
-                                                    Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
-                                                  </div>
-
-                                                  <!-- Modal footer -->
-                                                  <div class="modal-footer">
-                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                      <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
-                                                  </div>
-
                                                 </div>
-                                              </div>
-                                            </div>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% elif username == ad.get_store_name() %}
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% elif username == ad.get_store_name() %}
 
-                            {% endif %}
+                                {% endif %}
                             {% endfor %}
                             </tbody>
                         </table>

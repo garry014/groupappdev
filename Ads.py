@@ -34,8 +34,8 @@ class Ads:
     def get_end_date(self):
         return self.__end_date
 
-    def set_end_date(self, status):
-        self.__status = status
+    def set_end_date(self, end_date):
+        self.__end_date = end_date
 
     def get_status(self):
         return self.__status

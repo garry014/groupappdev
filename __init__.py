@@ -96,7 +96,40 @@ def manage_ads():
         ad = ads_dict.get(key)
         ads_list.append(ad)
 
+
     return render_template('manage_ads.html', count=len(ads_list), ads_list=ads_list, username=username)
+
+@app.route('/updateAd/<int:id>/', methods=['GET', 'POST'])
+def updateAd(id):
+    update_ad = CreateAd(request.form)
+    if request.method == 'POST' and update_ad.validate():
+        try:
+            ads_dict = {}
+            db = shelve.open('ads.db', 'w')
+            ads_dict = db['Ads']
+        except:
+            return redirect(url_for('db_error'))
+
+        ad = ads_dict.get(id)
+        ad.set_start_date(update_ad.startdate.data)
+        ad.set_end_date(update_ad.enddate.data)
+
+        db['Ads'] = ads_dict
+        db.close()
+        return redirect(url_for('manage_ads'))
+    else:
+        try:
+            ads_dict = {}
+            db = shelve.open('ads.db', 'r')
+            ads_dict = db['Ads']
+            db.close()
+        except:
+            return redirect(url_for('db_error'))
+
+        ad = ads_dict.get(id)
+        update_ad.startdate.data = ad.get_start_date()
+        update_ad.enddate.data = ad.get_end_date()
+    return render_template('updateAd.html', form=update_ad)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
 def delete_ad(id):
