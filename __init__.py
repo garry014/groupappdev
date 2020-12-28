@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Admin" #Test Script
+username = "Admin"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
