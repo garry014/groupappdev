@@ -19,7 +19,7 @@
         <h3 class="cart-page-title">Your Advertisements</h3>
         <div>
           {% if count == 0 %}
-          <p>There are no advertisements. <a href="/advertise">Click here to create.</a></p>
+          <p>You do not have any advertisements. <a href="/advertise">Click here to create.</a></p>
           {% elif count == 1 %}
           <p>There is 1 advertisement.</p>
           {% else %}
@@ -27,6 +27,7 @@
           {% endif %}
         </div>
         <div class="row">
+            {% if count >= 1 %}
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                     <div class="table-content table-responsive cart-table-content">
                         <table>
@@ -42,65 +43,61 @@
                             </thead>
                             <tbody>
                             {% for ad in ads_list %}
-                                {% if username == 'Admin' %}
-                                    <tr>
-                                    <td class="ad-thumbnail">
-                                        <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
-                                    </td>
-                                    <td class="product-name">
-                                        <a href="#">{{ ad.get_store_name() }}</a>
-                                    </td>
-                                    <td class="product-price-cart">
-                                        {{ ad.get_start_date() }}
-                                    </td>
-                                    <td class="product-quantity">
-                                        {{ ad.get_end_date() }}
-                                    </td>
-                                    <td class="product-subtotal">
-                                        {% if ad.get_status() == 'Pending Approval' %}<p style="color:red; font-weight: bold;">{{ ad.get_status() }}</p>
-                                        {% elif ad.get_status() == 'Approved' %}<p style="color:green;">{{ ad.get_status() }}</p>
-                                        {% else %}<p style="color:red">{{ ad.get_status() }}</p>
-                                        {% endif %}
-                                    </td>
-                                    <td class="product-remove">
-                                        <a href="/updateAd/{{ad.get_ad_id()}}/0"><i class="fa fa-pencil"></i></a>
-                                        {% if (username == 'Admin') and (ad.get_status() != 'Approved') %}
-                                            <a href="/updateAd/{{ad.get_ad_id()}}/1"><i class="fa fa-check"></i></a>
-                                        {% endif %}
-                                        <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST" style="display: inline-block;">
-                                            <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
-                                            <!-- The Modal -->
-                                            <div class="modal" id="myModal_{{ad.get_ad_id()}}">
-                                              <div class="modal-dialog">
-                                                <div class="modal-content">
+                                <tr>
+                                <td class="ad-thumbnail">
+                                    <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a>
+                                </td>
+                                <td class="product-name">
+                                    <a href="#">{{ ad.get_store_name() }}</a>
+                                </td>
+                                <td class="product-price-cart">
+                                    {{ ad.get_start_date() }}
+                                </td>
+                                <td class="product-quantity">
+                                    {{ ad.get_end_date() }}
+                                </td>
+                                <td class="product-subtotal">
+                                    {% if ad.get_status() == 'Pending Approval' %}<p style="color:red; font-weight: bold;">{{ ad.get_status() }}</p>
+                                    {% elif ad.get_status() == 'Approved' %}<p style="color:green;">{{ ad.get_status() }}</p>
+                                    {% else %}<p style="color:red">{{ ad.get_status() }}</p>
+                                    {% endif %}
+                                </td>
+                                <td class="product-remove">
+                                    <a href="/updateAd/{{ad.get_ad_id()}}/0"><i class="fa fa-pencil"></i></a>
+                                    {% if (username == 'Admin') and (ad.get_status() != 'Approved') %}
+                                        <a href="/updateAd/{{ad.get_ad_id()}}/1"><i class="fa fa-check"></i></a>
+                                    {% endif %}
+                                    <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST" style="display: inline-block;">
+                                        <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
+                                        <!-- The Modal -->
+                                        <div class="modal" id="myModal_{{ad.get_ad_id()}}">
+                                          <div class="modal-dialog">
+                                            <div class="modal-content">
 
-                                                  <!-- Modal Header -->
-                                                  <div class="modal-header">
-                                                    <h4 class="modal-title">Delete Confirmation</h4>
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                  </div>
-
-                                                  <!-- Modal body -->
-                                                  <div class="modal-body">
-                                                      <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
-                                                    Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
-                                                  </div>
-
-                                                  <!-- Modal footer -->
-                                                  <div class="modal-footer">
-                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                      <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
-                                                  </div>
-
-                                                </div>
+                                              <!-- Modal Header -->
+                                              <div class="modal-header">
+                                                <h4 class="modal-title">Delete Confirmation</h4>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
                                               </div>
-                                            </div>
-                                        </form>
-                                    </td>
-                                    </tr>
-                                {% elif username == ad.get_store_name() %}
 
-                                {% endif %}
+                                              <!-- Modal body -->
+                                              <div class="modal-body">
+                                                  <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="200" height="121"></a><br>
+                                                Are you sure you want to delete {{ad.get_store_name()}} advertisement from {{ad.get_start_date()}} to {{ad.get_end_date()}}?
+                                              </div>
+
+                                              <!-- Modal footer -->
+                                              <div class="modal-footer">
+                                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                  <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </form>
+                                </td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
@@ -119,6 +116,7 @@
                         </div>
                     </div>
                 </div>
+            {% endif %}
             </div>
         </div>
     </div>

@@ -32,7 +32,6 @@ def advertise():
         if (create_ad.startdate.data > create_ad.enddate.data): #Compare start and end dates.
             error = "End date cannot be earlier than start date"
         else:
-
             if 'image' not in request.files:
                 error = 'Something went wrong, please refresh page.'
             file = request.files['image']
@@ -79,17 +78,17 @@ def advertise():
 
                 return redirect(url_for('manage_ads'))
                 #return redirect(url_for('static', filename=backoflink))
-    return render_template('advertise.html', form=create_ad, error = error)
+    return render_template('advertise.html', form=create_ad, error=error)
 
 @app.route('/manage_ads')
-def manage_ads(): #Tidy up codes.
-    ads_dict = {}
+def manage_ads():
     try:
-        db = shelve.open('ads.db', 'r')
+        ads_dict = {}
+        db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
-        db.close()
     except:
-        print("Db error")
+        return redirect(url_for('db_error'))
+
     ads_list = []
     for key in ads_dict:
         ad = ads_dict.get(key)
@@ -97,31 +96,28 @@ def manage_ads(): #Tidy up codes.
 
     count = 0
     expired_list = []
+    show_ads_list = []
     for ad in ads_list:
         if username == ad.get_store_name():
             count += 1
+            show_ads_list.append(ad)
         enddate_str = str(ad.get_end_date())
         enddate = dt.strptime(enddate_str, "%Y-%m-%d")
         if enddate < datetime.now() and ad.get_status() != "Rejected":
             expired_list.append(ad.get_ad_id())
 
     for id in expired_list:
-        try:
-            ads_dict = {}
-            db = shelve.open('ads.db', 'w')
-            ads_dict = db['Ads']
-        except:
-            return redirect(url_for('db_error'))
         ad = ads_dict.get(id)
         ad.set_status("Expired")
         db['Ads'] = ads_dict
-        db.close()
+    db.close()
 
     if username == "Admin":
         count = len(ads_list)
+        show_ads_list = []
+        show_ads_list = ads_list
 
-
-    return render_template('manage_ads.html', count=count, ads_list=ads_list, username=username)
+    return render_template('manage_ads.html', count=count, ads_list=show_ads_list, username=username)
 
 @app.route('/updateAd/<int:id>/<int:updatewhat>/', methods=['GET', 'POST'])
 def updateAd(id, updatewhat):
@@ -138,7 +134,7 @@ def updateAd(id, updatewhat):
         db['Ads'] = ads_dict
         db.close()
         return redirect(url_for('manage_ads'))
-    else:
+    else: #Update All
         if request.method == 'POST' and update_ad.validate():
             try:
                 ads_dict = {}
@@ -155,6 +151,28 @@ def updateAd(id, updatewhat):
             else:
                 ad.set_status("Pending Approval")
 
+            if 'image' not in request.files:
+                error = 'Something went wrong, please refresh page.'
+            file = request.files['image']
+            if file.filename != '' and not allowed_file(file.filename):
+                error = 'The file format must be in jpg, jpeg, png or gif.'
+            elif file: #All validations done at this stage
+                # Image Handling
+                app.config['UPLOAD_FOLDER'] = './static/uploads/ads/'
+                filename = secure_filename(file.filename)
+                print("Validation checked")
+                oldfile = os.path.join(app.config['UPLOAD_FOLDER'], str(ad.get_image()))
+                if os.path.exists(oldfile):
+                    os.remove(oldfile)
+                    print("Old img should be deleted.")
+                if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file_extension = os.path.splitext(filename)  # get file type
+                os.rename('static/uploads/ads/' + filename, 'static/uploads/ads/' + str(ad.get_ad_id()) + file_extension[1])
+                ad.set_image(str(ad.get_ad_id()) + file_extension[1])
+                # End of Image Handling
             db['Ads'] = ads_dict
             db.close()
             return redirect(url_for('manage_ads'))
@@ -189,8 +207,6 @@ def delete_ad(id):
                 os.remove(directpath)
         ads_dict.pop(id)
         db['Ads'] = ads_dict
-        if os.path.exists("demofile.txt"):
-            os.remove("demofile.txt")
         db.close()
         return redirect(url_for('manage_ads'))
 
