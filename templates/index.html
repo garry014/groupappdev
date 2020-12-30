@@ -4,17 +4,13 @@
 {% block content %}
 <div class="slider-area">
     <div class="slider-active owl-carousel nav-style-1">
-        <div class="single-slider-2 slider-height-2 d-flex align-items-center bg-img" style="background-image:url(static/uploads/ads/1.png);">
+        <div class="single-slider-2 slider-height-2 d-flex align-items-center bg-img" style="background-image:url({{ url_for('static',filename='uploads/ads/1.png') }});">
             <div class="container">
                 <div class="row">
                     <div class="col-xl-6 col-lg-7 col-md-8 col-12 ml-auto">
                         <div class="slider-content-3 slider-animated-1 text-center">
-                            <h3 class="animated">Stylish</h3>
-                            <h1 class="animated">Male Clothes</h1>
-                            <p class="animated">30% off Summer Vacation</p>
-                            <div class="slider-btn btn-hover">
-                                <a class="animated" href="shop.html">SHOP NOW</a>
-                            </div>
+                            <h3 class="animated">TailorNow</h3>
+                            <h1 class="animated">On-demand tailoring services.</h1>
                         </div>
                     </div>
                 </div>
@@ -44,7 +40,7 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="support-wrap mb-30 support-1">
                     <div class="support-icon">
-                        <img class="animated" src="assets/img/icon-img/support-1.png" alt="">
+                        <img class="animated" src="{{ url_for('static',filename='img/icon-img/support-1.png') }}" alt="">
                     </div>
                     <div class="support-content">
                         <h5>Free Shipping</h5>
@@ -55,7 +51,7 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="support-wrap mb-30 support-2">
                     <div class="support-icon">
-                        <img class="animated" src="assets/img/icon-img/support-2.png" alt="">
+                        <img class="animated" src="{{ url_for('static',filename='img/icon-img/support-2.png') }}" alt="">
                     </div>
                     <div class="support-content">
                         <h5>Support 24/7</h5>
@@ -66,7 +62,7 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="support-wrap mb-30 support-3">
                     <div class="support-icon">
-                        <img class="animated" src="assets/img/icon-img/support-3.png" alt="">
+                        <img class="animated" src="{{ url_for('static',filename='img/icon-img/support-3.png') }}" alt="">
                     </div>
                     <div class="support-content">
                         <h5>Money Return</h5>
@@ -77,7 +73,7 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="support-wrap mb-30 support-4">
                     <div class="support-icon">
-                        <img class="animated" src="assets/img/icon-img/support-4.png" alt="">
+                        <img class="animated" src="{{ url_for('static',filename='img/icon-img/support-4.png') }}" alt="">
                     </div>
                     <div class="support-content">
                         <h5>Order Discount</h5>
