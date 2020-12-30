@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Ah Tiong"  #Test Script
+username = "Admin"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -22,7 +22,20 @@ def home():
 
 @app.route('/index.html')
 def contact_us():
-    return render_template('index.html')
+    try:
+        ads_dict = {}
+        db = shelve.open('ads.db', 'r')
+        ads_dict = db['Ads']
+        db.close()
+    except:
+        return redirect(url_for('db_error'))
+
+    ads_list = []
+    for key in ads_dict:
+        ad = ads_dict.get(key)
+        ads_list.append(ad)
+
+    return render_template('index.html', ads_list=ads_list)
 
 @app.route('/advertise', methods=['GET', 'POST'])
 def advertise():
