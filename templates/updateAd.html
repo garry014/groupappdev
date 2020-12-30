@@ -66,8 +66,11 @@
                             </div>
                             <div class="col-lg-6">
                                 {% if username == "Admin" %}
+                                    <label for="status">Status</label>
                                     {{ render_field(form.status, class="form-control") }}
                                     <br>
+                                {% else %}
+                                    {{ render_field(form.status, class="form-control", style="display:none;") }}
                                 {% endif %}
                             </div>
                             <div class="col-lg-12">

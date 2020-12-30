@@ -19,4 +19,4 @@ class CreateAd(Form):
     image = FileField('Advertisement Image (capped at 16MB):*')
 
 class UpdateAd(CreateAd):
-    status = SelectField('Status',choices=[('Rejected', 'Rejected'), ('Approved', 'Approved'), ('Expired', 'Expired')])
+    status = SelectField('', choices=[('Rejected', 'Rejected'), ('Approved', 'Approved'), ('Expired', 'Expired')])
