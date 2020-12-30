@@ -67,8 +67,13 @@ def advertise():
                 delta = create_ad.enddate.data - create_ad.startdate.data
                 cost = delta.days * 25
 
+                if(create_ad.adtext.data == None):
+                    adtext = ' '
+                else:
+                    adtext = create_ad.adtext.data
+
                 ad = Ads.Ads(str(count_id) + file_extension[1], username, create_ad.startdate.data,
-                               create_ad.enddate.data)
+                               create_ad.enddate.data, adtext)
                 ad.set_ad_id(count_id)
                 ads_dict[ad.get_ad_id()] = ad
                 db['Ads'] = ads_dict
@@ -147,6 +152,7 @@ def updateAd(id, updatewhat):
             ad = ads_dict.get(id)
             ad.set_start_date(update_ad.startdate.data)
             ad.set_end_date(update_ad.enddate.data)
+            ad.set_adtext(update_ad.adtext.data)
             if username == "Admin":
                 ad.set_status(update_ad.status.data)
             else:
@@ -189,6 +195,8 @@ def updateAd(id, updatewhat):
             ad = ads_dict.get(id)
             update_ad.startdate.data = ad.get_start_date()
             update_ad.enddate.data = ad.get_end_date()
+
+            update_ad.adtext.data = ad.get_adtext()
             if username == "Admin":
                 update_ad.status.data = ad.get_status()
         return render_template('updateAd.html', form=update_ad, username=username)

@@ -1107,6 +1107,10 @@ option {
 input:focus {
   background: transparent; }
 
+form label {
+    font-weight:bold;
+}
+
 textarea {
   resize: vertical;
   background: #eceff8;

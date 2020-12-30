@@ -76,6 +76,9 @@
                             <div class="col-lg-12">
                                 {{ render_field(form.image, class="form-control") }}
                             </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.adtext, class="form-control") }}
+                            </div>
                             <div class="col-lg-9">
                                 {% if error %}
                                     <div class="text-danger">Error: {{ error }}</div>

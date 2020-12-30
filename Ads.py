@@ -1,10 +1,11 @@
 class Ads:
-    def __init__(self, image, store_name, start_date, end_date): #init 3 attributes
+    def __init__(self, image, store_name, start_date, end_date, adtext): #init 5 attributes
         self.__ad_id = 0
         self.__image = image
         self.__store_name = store_name
         self.__end_date = end_date
         self.__start_date = start_date
+        self.__adtext = adtext
         self.__status = "Pending Approval"
 
     def get_ad_id(self):
@@ -48,3 +49,9 @@ class Ads:
 
     def set_store_name(self, store_name):
         self.__store_name = store_name
+
+    def get_adtext(self):
+        return self.__adtext
+
+    def set_adtext(self, adtext):
+        self.__adtext = adtext

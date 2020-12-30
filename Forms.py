@@ -17,6 +17,7 @@ class CreateAd(Form):
     startdate = DateField('Start Date:*', render_kw={'min': min_date, 'max': max_date, 'value': min_date}, validators=[validators.DataRequired()])
     enddate = DateField('End Date:*', render_kw={'min': min_date, 'max': max_date}, validators=[validators.DataRequired()])
     image = FileField('Advertisement Image (capped at 16MB):*')
+    adtext = StringField('Advertisement Text: (capped at 30 characters/optional)', [validators.Length(max=30)])
 
 class UpdateAd(CreateAd):
     status = SelectField('', choices=[('Rejected', 'Rejected'), ('Approved', 'Approved'), ('Expired', 'Expired')])
