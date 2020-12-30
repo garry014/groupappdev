@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, validators
+from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, validators, DecimalField
 from wtforms.fields.html5 import DateField
 
 from datetime import datetime
@@ -21,3 +21,7 @@ class CreateAd(Form):
 
 class UpdateAd(CreateAd):
     status = SelectField('', choices=[('Rejected', 'Rejected'), ('Approved', 'Approved'), ('Expired', 'Expired')])
+
+class CreateProduct(Form):
+    name = StringField('Name:*', [validators.Length(min=1, max=150), validators.DataRequired()])
+    price = DecimalField('Price:*')

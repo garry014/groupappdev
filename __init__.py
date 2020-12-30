@@ -257,6 +257,10 @@ def createcustomeracct():
 
     return render_template('CustRegister.html', form=createcustacct)
 
+@app.route('/catalogue')
+def catalogue():
+    return render_template('catalogue.html')
+
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
 def page_not_found(e):
