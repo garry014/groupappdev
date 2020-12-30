@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Request
 from Forms import *
-import os, shelve, Ads
+from cregform import *
+import os, shelve, Ads, CustRegister
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
@@ -209,6 +210,31 @@ def delete_ad(id):
         db['Ads'] = ads_dict
         db.close()
         return redirect(url_for('manage_ads'))
+
+@app.route('/CustRegister', methods=['GET', 'POST'])
+def createcustomeracct():
+    createcustacct = createCust(request.form)
+
+    if request.method == 'POST' and createcustacct.validate():
+        try:
+            custDict = {}
+            cdb = shelve.open('cust.db', 'c')
+            custDict = cdb['cust']
+        except:
+            print("error reading cust.db")
+
+        custacct = CustRegister.CustRegister(createcustacct.city.data, createcustacct.email.data,
+                                             createcustacct.password.data, createcustacct.firstname.data,
+                                             createcustacct.lastname.data, createcustacct.number.data)
+
+        cdb[createcustacct.email.data] = custacct
+        cdb['CustRegister'] = custDict
+
+        cdb.close()
+
+        return redirect(url_for('CustLogin'))
+
+    return render_template('CustRegister.html', form=createcustacct)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
