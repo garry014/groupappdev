@@ -264,10 +264,6 @@ def createcustomeracct():
 
     return render_template('CustRegister.html', form=createcustacct)
 
-@app.route('/catalogue')
-def catalogue():
-    return render_template('catalogue.html')
-
 @app.route('/addproduct', methods=['GET', 'POST'])
 def add_product():
     create_prod = CreateProduct(request.form)
@@ -293,14 +289,6 @@ def add_product():
                 for product in catalogue_dict[username]:
                     if product.get_id() >= count_id:
                         count_id = product.get_id() + 1
-                        print(count_id)
-
-            #print(count_id)
-
-            # try:
-            #     count_id = max(catalogue_dict, key=int) + 1
-            # except:
-            #     count_id = 0  # if no dictionary exist, set id as 1
 
             # Image Handling
             app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + username + '/'
@@ -321,11 +309,23 @@ def add_product():
             else:
                 catalogue_dict[username] = [prod]
 
-            print(catalogue_dict)
             db['Catalogue'] = catalogue_dict
+            db.close()
+            return redirect(url_for('catalogue'))
 
 
     return render_template('addproduct.html', form=create_prod, error=error)
+
+@app.route('/catalogue')
+def catalogue():
+    catalogue_dict = {}
+    try:
+        db = shelve.open('catalogue.db', 'r')
+        catalogue_dict = db['Catalogue']
+    except:
+        return redirect(url_for('dberror'))
+
+    return render_template('catalogue.html', catalogue_list=catalogue_dict[username], username=username)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
