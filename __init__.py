@@ -37,7 +37,9 @@ def home_page():
 
     show_ads_list = []
     for ad in ads_list:
-        if ad.get_status() == "Approved":
+        startdate_str = str(ad.get_end_date())
+        startdate = dt.strptime(startdate_str, "%Y-%m-%d")
+        if startdate >= datetime.now() and ad.get_status() == "Approved":
             show_ads_list.append(ad)
 
     return render_template('index.html', show_ads_list=show_ads_list)
