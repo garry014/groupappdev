@@ -16,13 +16,13 @@ class Store:
         self.__store_catalouge = store_catalouge
 
 class Catalouge:
-    def __init__(self, id, name, price, image, description, reviews):
+    def __init__(self, id, name, price, image, description): #init 5
         self.__id = id
         self.__name = name
         self.__price = price
         self.__image = image
         self.__description = description
-        self.__reviews = reviews
+        self.__reviews = 0
 
     def get_id(self):
         return self.__id

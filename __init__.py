@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, Request
 from Forms import *
 from cregform import *
-import os, shelve, Ads, CustRegister
+import os, pathlib, shelve, Ads, CustRegister, Catalogue
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Admin"  #Test Script
+username = "Ah Tiong"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -267,6 +267,65 @@ def createcustomeracct():
 @app.route('/catalogue')
 def catalogue():
     return render_template('catalogue.html')
+
+@app.route('/addproduct', methods=['GET', 'POST'])
+def add_product():
+    create_prod = CreateProduct(request.form)
+    error = None
+    if request.method == 'POST' and create_prod.validate():
+        if 'image' not in request.files:
+            error = 'Something went wrong, please refresh page.'
+        file = request.files['image']
+        if file.filename == '':
+            error = 'Please upload a file.'
+        elif not allowed_file(file.filename):
+            error = 'The file format must be in jpg, jpeg, png or gif.'
+        elif file:  # All validations done at this stage
+            catalogue_dict = {}
+            try:
+                db = shelve.open('catalogue.db', 'c')
+                catalogue_dict = db['Catalogue']
+            except:
+                print("Error in opening DB")  # return redirect(url_for('dberror'))
+
+            count_id = 0
+            if username in catalogue_dict: #Set count_id to the max number of the store
+                for product in catalogue_dict[username]:
+                    if product.get_id() >= count_id:
+                        count_id = product.get_id() + 1
+                        print(count_id)
+
+            #print(count_id)
+
+            # try:
+            #     count_id = max(catalogue_dict, key=int) + 1
+            # except:
+            #     count_id = 0  # if no dictionary exist, set id as 1
+
+            # Image Handling
+            app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + username + '/'
+            filename = secure_filename(file.filename)
+            pathlib.Path(app.config['UPLOAD_FOLDER']).mkdir(parents=True, exist_ok=True) #Create shop directory if does nt exist.
+            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_extension = os.path.splitext(filename)  # get file type
+            os.rename(app.config['UPLOAD_FOLDER'] + filename, app.config['UPLOAD_FOLDER'] +str(count_id) + file_extension[1])
+            # End of Image Handling
+
+            prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data,
+                                       str(count_id) + file_extension[1], create_prod.description.data)
+
+            if username in catalogue_dict:
+                catalogue_dict[username].append(prod)
+            else:
+                catalogue_dict[username] = [prod]
+
+            print(catalogue_dict)
+            db['Catalogue'] = catalogue_dict
+
+
+    return render_template('addproduct.html', form=create_prod, error=error)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
