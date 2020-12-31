@@ -6,7 +6,6 @@
         <h3 class="cart-page-title">Your store items</h3>
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                <form action="#">
                     <div class="table-content table-responsive cart-table-content">
                         <table>
                             <thead>
@@ -33,7 +32,34 @@
                                     <td class="product-subtotal">{{ product.get_reviews()*5 }} stars</td>
                                     <td class="product-remove">
                                         <a href="#"><i class="fa fa-pencil"></i></a>
-                                        <a href="#"><i class="fa fa-times"></i></a>
+                                        <form action="{{url_for('delete_product', id=product.get_id(), name='Ah Tiong')}}" method="POST" style="display: inline-block;">
+                                        <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{product.get_id()}}"><i class="fa fa-times"></i></button>
+                                        <!-- The Modal -->
+                                        <div class="modal" id="myModal_{{product.get_id()}}">
+                                          <div class="modal-dialog">
+                                            <div class="modal-content">
+
+                                              <!-- Modal Header -->
+                                              <div class="modal-header">
+                                                <h4 class="modal-title">Delete Confirmation</h4>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              </div>
+
+                                              <!-- Modal body -->
+                                              <div class="modal-body">
+                                                Are you sure you want to delete {{product.get_name()}}?
+                                              </div>
+
+                                              <!-- Modal footer -->
+                                              <div class="modal-footer">
+                                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                  <button type="submit" value="Delete" class="btn btn-danger">Delete</button>
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </form>
                                    </td>
                                 </tr>
                             {% endfor %}
@@ -53,7 +79,6 @@
                             </div>
                         </div>
                     </div>
-                </form>
             </div>
         </div>
 </div>

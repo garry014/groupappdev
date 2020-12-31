@@ -327,6 +327,25 @@ def catalogue():
 
     return render_template('catalogue.html', catalogue_list=catalogue_dict[username], username=username)
 
+@app.route('/deleteProduct/<name>/<int:id>', methods=['POST'])
+def delete_product(name, id):
+    catalogue_dict = {}
+    try:
+        db = shelve.open('catalogue.db', 'w')
+        catalogue_dict = db['Catalogue']
+    except:
+        return redirect(url_for('db_error'))
+    else:
+        for product in catalogue_dict[name]:
+            if product.get_id() == id:
+                catalogue_dict[name].remove(product)
+                directpath = 'static/uploads/shops/' + name + '/' + product.get_image()
+                if os.path.exists(directpath):
+                    os.remove(directpath)
+        db['Catalogue'] = catalogue_dict
+        db.close()
+        return redirect(url_for('catalogue'))
+
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
 def page_not_found(e):
