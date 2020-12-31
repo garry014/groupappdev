@@ -4,8 +4,7 @@
 {% block content %}
 <div class="slider-area">
     <div class="slider-active owl-carousel nav-style-1">
-        {% for ad in ads_list %}
-        {% if ad.get_status() == "Approved" %}
+        {% for ad in show_ads_list %}
         <div class="single-slider-2 slider-height-2 d-flex align-items-center bg-img" style="background-image:url({{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }});">
             <div class="container">
                 <div class="row">
@@ -22,9 +21,7 @@
                 </div>
             </div>
         </div>
-        {% endif %}
         {% endfor %}
-
     </div>
 </div>
 <div class="suppoer-area pt-100 pb-60">
