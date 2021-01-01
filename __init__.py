@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Ah Tiong Tailor"  #Test Script
+username = "Chong Boon Market Tailor"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -407,6 +407,33 @@ def updateProduct(name, id):
 
 
     return render_template('updateProduct.html', form=update_prod)
+
+@app.route('/viewshops')
+def view_shops():
+    catalogue_dict = {}
+    try:
+        db = shelve.open('catalogue.db', 'r')
+        catalogue_dict = db['Catalogue']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+
+    shop_dict = {}
+    for key, value in catalogue_dict.items():
+        total_review = 0
+        best_disc = 0
+        for item in value:
+            total_review += item.get_reviews()
+            if item.get_discount() > best_disc:
+                best_disc = item.get_discount()
+        shop_dict[key] = [total_review, best_disc]
+
+    return render_template('viewshops.html', shop_dict=shop_dict)
+
+@app.route('/view/<name>', methods=['GET', 'POST'])
+def viewstore(name, id):
+    shop_dict = {}
+    return render_template('viewstore.html', shop_dict=shop_dict)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
