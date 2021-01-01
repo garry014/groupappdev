@@ -358,7 +358,6 @@ def updateProduct(name, id):
             catalogue_dict = db['Catalogue']
         except:
             return redirect(url_for('dberror'))
-
         for product in catalogue_dict[name]:
             if product.get_id() == id:
                 product.set_name(update_prod.name.data)
