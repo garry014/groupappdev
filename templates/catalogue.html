@@ -3,9 +3,11 @@
 
 {% block content %}
 <div class="cart-main-area pt-90 pb-100">
+    <div class="container">
         <h3 class="cart-page-title">Your store items</h3>
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                {% if catalogue_list|length >= 1 %}
                     <div class="table-content table-responsive cart-table-content">
                         <table>
                             <thead>
@@ -13,6 +15,7 @@
                                     <th>Image</th>
                                     <th>Name</th>
                                     <th>Price</th>
+                                    <th>Discounts</th>
                                     <th>Description</th>
                                     <th>Reviews</th>
                                     <th>action</th>
@@ -22,17 +25,18 @@
                             {% for product in catalogue_list %}
                                 <tr>
                                     <td class="product-thumbnail">
-                                        <a href="{{ url_for('static',filename='uploads/shops/'+username+'/'+product.get_image()) }}"><img src="{{ url_for('static',filename='uploads/shops/'+username+'/'+product.get_image()) }}" alt="{{ product.get_image() }}" width="230" height="121"></a>
+                                        <a href="{{ url_for('static',filename='uploads/shops/'+username+'/'+product.get_image()) }}"><img src="{{ url_for('static',filename='uploads/shops/'+username+'/'+product.get_image()) }}" alt="{{ product.get_image() }}" width="100" height="100"></a>
                                     </td>
                                     <td class="product-name"><a href="#">{{ product.get_name() }}</a></td>
                                     <td class="product-price-cart"><span class="amount">${{ product.get_price() }}</span></td>
+                                    <td class="product-subtotal">{{ product.get_discount() }}</td>
                                     <td class="product-quantity">
                                         {{ product.get_description() }}
                                     </td>
                                     <td class="product-subtotal">{{ product.get_reviews()*5 }} stars</td>
                                     <td class="product-remove">
-                                        <a href="#"><i class="fa fa-pencil"></i></a>
-                                        <form action="{{url_for('delete_product', id=product.get_id(), name='Ah Tiong')}}" method="POST" style="display: inline-block;">
+                                        <a href="/updateProduct/Ah Tiong Tailor/{{product.get_id()}}"><i class="fa fa-pencil"></i></a>
+                                        <form action="{{url_for('delete_product', id=product.get_id(), name='Ah Tiong Tailor')}}" method="POST" style="display: inline-block;">
                                         <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{product.get_id()}}"><i class="fa fa-times"></i></button>
                                         <!-- The Modal -->
                                         <div class="modal" id="myModal_{{product.get_id()}}">
@@ -66,14 +70,13 @@
                             </tbody>
                         </table>
                     </div>
+                {% else %}
+                You do not have any products/services.
+                {% endif %}
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="cart-shiping-update-wrapper">
-                                <div class="cart-shiping-update">
-                                    <a href="#">Continue Shopping</a>
-                                </div>
+                            <div class="cart-shiping-update-wrapper" style="float:right;">
                                 <div class="cart-clear">
-                                    <button>Update Shopping Cart</button>
                                     <a href="addproduct">Add Item</a>
                                 </div>
                             </div>
@@ -81,6 +84,21 @@
                     </div>
             </div>
         </div>
+    </div>
 </div>
+
+<script>
+// Ensure page refreshes from server and not browser cache.
+    $.ajax({
+        url: window.location.href,
+        headers: {
+            "Pragma": "no-cache",
+            "Expires": -1,
+            "Cache-Control": "no-cache"
+        }
+    }).done(function () {
+        window.location.reload(true);
+    });
+</script>
 
 {% endblock %}

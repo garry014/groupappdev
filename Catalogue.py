@@ -1,25 +1,9 @@
-class Store:
-    def __init__(self, store_name, store_catalouge): #Init 2 variables
-        self.__store_name = store_name
-        self.__store_catalouge = store_catalouge
-
-    def get_store_name(self):
-        return self.__store_name
-
-    def set_store_name(self, store_name):
-        self.__store_name = store_name
-
-    def get_store_catalouge(self):
-        return self.__store_catalouge
-
-    def set_store_catalouge(self, store_catalouge):
-        self.__store_catalouge = store_catalouge
-
 class Catalouge:
-    def __init__(self, id, name, price, image, description): #init 5
+    def __init__(self, id, name, price, discount, image, description): #init 6
         self.__id = id
         self.__name = name
         self.__price = price
+        self.__discount = discount
         self.__image = image
         self.__description = description
         self.__reviews = 0
@@ -59,3 +43,9 @@ class Catalouge:
 
     def set_reviews(self, reviews):
         self.__reviews = reviews
+
+    def get_discount(self):
+        return self.__discount
+
+    def set_discount(self, discount):
+        self.__discount = discount

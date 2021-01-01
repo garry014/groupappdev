@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, DecimalField, validators
+from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, DecimalField, IntegerField, validators
 from wtforms.fields.html5 import DateField
 
 from datetime import datetime
@@ -26,4 +26,5 @@ class CreateProduct(Form):
     name = StringField('Name:*', [validators.Length(min=5, max=150), validators.DataRequired()])
     price = DecimalField('Price:* (Exclude $ sign)')
     image = FileField('Image:*')
+    discount = IntegerField("Discounts:* (0 for N.A)")
     description = TextAreaField('Description:')

@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Ah Tiong"  #Test Script
+username = "Ah Tiong Tailor"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -187,11 +187,9 @@ def updateAd(id, updatewhat):
                 # Image Handling
                 app.config['UPLOAD_FOLDER'] = './static/uploads/ads/'
                 filename = secure_filename(file.filename)
-                print("Validation checked")
                 oldfile = os.path.join(app.config['UPLOAD_FOLDER'], str(ad.get_image()))
                 if os.path.exists(oldfile):
                     os.remove(oldfile)
-                    print("Old img should be deleted.")
                 if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
                     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -301,7 +299,7 @@ def add_product():
             os.rename(app.config['UPLOAD_FOLDER'] + filename, app.config['UPLOAD_FOLDER'] +str(count_id) + file_extension[1])
             # End of Image Handling
 
-            prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data,
+            prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
                                        str(count_id) + file_extension[1], create_prod.description.data)
 
             if username in catalogue_dict:
@@ -322,8 +320,12 @@ def catalogue():
     try:
         db = shelve.open('catalogue.db', 'r')
         catalogue_dict = db['Catalogue']
+        db.close()
     except:
         return redirect(url_for('dberror'))
+
+    if username not in catalogue_dict:
+        return redirect(url_for('add_product'))
 
     return render_template('catalogue.html', catalogue_list=catalogue_dict[username], username=username)
 
@@ -345,6 +347,67 @@ def delete_product(name, id):
         db['Catalogue'] = catalogue_dict
         db.close()
         return redirect(url_for('catalogue'))
+
+@app.route('/updateProduct/<name>/<int:id>', methods=['GET', 'POST'])
+def updateProduct(name, id):
+    update_prod = CreateProduct(request.form)
+    if request.method == 'POST' and update_prod.validate():
+        try:
+            catalogue_dict = {}
+            db = shelve.open('catalogue.db', 'w')
+            catalogue_dict = db['Catalogue']
+        except:
+            return redirect(url_for('dberror'))
+
+        for product in catalogue_dict[name]:
+            if product.get_id() == id:
+                product.set_name(update_prod.name.data)
+                product.set_price(update_prod.price.data)
+                product.set_discount(update_prod.discount.data)
+                product.set_description(update_prod.description.data)
+                if 'image' not in request.files:
+                    error = 'Something went wrong, please refresh page.'
+                file = request.files['image']
+                if file.filename != '' and not allowed_file(file.filename):
+                    error = 'The file format must be in jpg, jpeg, png or gif.'
+                elif file:  # All validations done at this stage
+                    # Image Handling
+                    app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + name + '/'
+                    filename = secure_filename(file.filename)
+                    oldfile = os.path.join(app.config['UPLOAD_FOLDER'], str(product.get_image()))
+                    if os.path.exists(oldfile):
+                        os.remove(oldfile)
+                    if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file_extension = os.path.splitext(filename)  # get file type
+                    os.rename(app.config['UPLOAD_FOLDER'] + filename,
+                              app.config['UPLOAD_FOLDER'] + str(product.get_id()) + file_extension[1])
+                    product.set_image(str(product.get_id()) + file_extension[1])
+                    # End of Image Handling
+                db['Catalogue'] = catalogue_dict
+                db.close()
+                return redirect(url_for('catalogue'))
+
+
+    else:
+        catalogue_dict = {}
+        try:
+            db = shelve.open('catalogue.db', 'r')
+            catalogue_dict = db['Catalogue']
+            db.close()
+        except:
+            return redirect(url_for('dberror'))
+
+        for product in catalogue_dict[name]:
+            if product.get_id() == id:
+                update_prod.name.data = product.get_name()
+                update_prod.price.data = product.get_price()
+                update_prod.discount.data = product.get_discount()
+                update_prod.description.data = product.get_description()
+
+
+    return render_template('updateProduct.html', form=update_prod)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
