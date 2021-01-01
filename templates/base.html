@@ -32,14 +32,9 @@
 {% block content %}
 {% endblock %}
 
-{% block footer %}
-    {% include 'includes/_footer.html' %}
-{% endblock %}
-
 {% block scripts %}
 <!-- All JS is here
 ============================================ -->
-
 <!-- jQuery JS -->
 <script src="{{url_for('static',filename='js/vendor/jquery-v3.4.1.min.js')}}"></script>
 <!-- Popper JS -->
@@ -55,4 +50,7 @@
 {% endblock %}
 </body>
 
+{% block footer %}
+    {% include 'includes/_footer.html' %}
+{% endblock %}
 </html>
