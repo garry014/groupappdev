@@ -28,3 +28,6 @@ class CreateProduct(Form):
     image = FileField('Image:*')
     discount = IntegerField("Discounts:* (0 for N.A)")
     description = TextAreaField('Description:')
+
+class SearchItem(Form):
+    search = StringField('', render_kw={'placeholder': 'Store Name'})

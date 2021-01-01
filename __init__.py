@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Chong Boon Market Tailor"  #Test Script
+username = "Ah Tong Tailor"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -408,8 +408,9 @@ def updateProduct(name, id):
 
     return render_template('updateProduct.html', form=update_prod)
 
-@app.route('/viewshops')
+@app.route('/viewshops', methods=['GET' ,'POST'])
 def view_shops():
+    error = None
     catalogue_dict = {}
     try:
         db = shelve.open('catalogue.db', 'r')
@@ -418,7 +419,7 @@ def view_shops():
     except:
         return redirect(url_for('dberror'))
 
-    shop_dict = {}
+    shop_dict = {} #Key: [Total Review, Most Discounted Item]
     for key, value in catalogue_dict.items():
         total_review = 0
         best_disc = 0
@@ -428,7 +429,25 @@ def view_shops():
                 best_disc = item.get_discount()
         shop_dict[key] = [total_review, best_disc]
 
-    return render_template('viewshops.html', shop_dict=shop_dict)
+    search_item = SearchItem(request.form)
+    if request.method == 'POST' and search_item.search.data != '':
+        shop_dict = {}
+        for key, value in catalogue_dict.items():
+            if search_item.search.data.lower()[:5] == key.lower()[:5]:
+                for item in value:
+                    total_review += item.get_reviews()
+                    if item.get_discount() > best_disc:
+                        best_disc = item.get_discount()
+                shop_dict[key] = [total_review, best_disc]
+
+        if not shop_dict: #Checks for empty dict
+            error = "Sorry! We could not find the store you are looking for, try searching another store or changing your filter requirements."
+
+        return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, error=error)
+
+
+    return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, error=error)
+
 
 @app.route('/view/<name>', methods=['GET', 'POST'])
 def viewstore(name, id):
