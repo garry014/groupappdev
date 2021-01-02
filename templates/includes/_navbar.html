@@ -100,7 +100,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li><a href="shop.html">Collection</a></li>
+                            <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
                             <li><a href="#"> Pages <i class="fa fa-angle-down"></i></a>
                                 <ul class="submenu">
                                     <li><a href="about.html">about us</a></li>
@@ -283,7 +283,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li><a href="shop.html">Collection</a></li>
+                        <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
                         <li><a href="#">Pages</a>
                             <ul>
                                 <li><a href="about.html">about us</a></li>
@@ -296,12 +296,12 @@
                                 <li><a href="404.html">404 page </a></li>
                             </ul>
                         </li>
-                        <li><a href="blog.html">Blog</a>
+                        <li><a href="#">Manage</a>
                             <ul>
-                                <li><a href="blog.html">blog standard</a></li>
-                                <li><a href="blog-no-sidebar.html">blog no sidebar</a></li>
-                                <li><a href="blog-right-sidebar.html">blog right sidebar</a></li>
-                                <li><a href="blog-details.html">blog details 1</a></li>
+                                <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
+                                <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
+                                <li><a href="{{ url_for('advertise') }}">Advertise</a></li>
+                                <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
                                 <li><a href="blog-details-2.html">blog details 2</a></li>
                                 <li><a href="blog-details-3.html">blog details 3</a></li>
                             </ul>

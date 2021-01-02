@@ -430,10 +430,11 @@ def view_shops():
         shop_dict[key] = [total_review, best_disc]
 
     search_item = SearchItem(request.form)
-    if request.method == 'POST' and search_item.search.data != '':
+    if request.method == 'POST':
+        print("script initiated")
         shop_dict = {}
         for key, value in catalogue_dict.items():
-            if search_item.search.data.lower()[:5] == key.lower()[:5]:
+            if search_item.search.data != '' and search_item.search.data.lower()[:5] == key.lower()[:5]:
                 for item in value:
                     total_review += item.get_reviews()
                     if item.get_discount() > best_disc:
@@ -450,9 +451,21 @@ def view_shops():
 
 
 @app.route('/view/<name>', methods=['GET', 'POST'])
-def viewstore(name, id):
-    shop_dict = {}
-    return render_template('viewstore.html', shop_dict=shop_dict)
+def viewstore(name):
+    catalogue_dict = {}
+    disc_price_dict = {}
+    try:
+        db = shelve.open('catalogue.db', 'r')
+        catalogue_dict = db['Catalogue']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+    #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
+
+    if name not in catalogue_dict:
+        return redirect(url_for('view_shops'))
+
+    return render_template('viewstore.html', shop_dict=catalogue_dict[name], name=name)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)

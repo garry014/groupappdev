@@ -42,12 +42,12 @@
                                 <div class="col-xl-6 col-md-6 col-lg-6 col-sm-6">
                                     <div class="product-wrap mb-25 scroll-zoom">
                                         <div class="product-img">
-                                            <a href="#">
-                                                <img class="default-img" src="{{ url_for('static',filename='uploads/shops/' + key + '/' + 'Ah Tiong Tailor.jpg') }}" alt="">
+                                            <a href="{{ url_for('viewstore', name=key) }}">
+                                                <img class="default-img" src="{{ url_for('static',filename='uploads/shops/' + key + '/' + 'Ah Tong Tailor.jpg') }}" alt="">
                                                 <!--  <img class="hover-img" src="{{url_for('static',filename='uploads/Ah Tiong Tailor1.jpg')}}" alt=""> -->
                                             </a>
                                             {% if value[1] > 0 %}
-                                                <span class="pink">{{ value[1] }}%</span>
+                                                <span class="pink">-{{ value[1] }}%</span>
                                             {% endif %}
                                             <div class="product-action">
                                                 <div class="pro-same-action pro-wishlist">
@@ -62,8 +62,9 @@
                                             </div>
                                         </div>
                                         <div class="product-content text-center">
-                                            <h3><a href="product-details.html">T- Shirt And Jeans</a></h3>
+                                            <h3><a href="product-details.html">{{ key }}</a></h3>
                                             <div class="product-rating">
+                                                {{ value[0] }} stars
                                                 <i class="fa fa-star-o yellow"></i>
                                                 <i class="fa fa-star-o yellow"></i>
                                                 <i class="fa fa-star-o yellow"></i>
@@ -112,7 +113,7 @@
                             <ul>
                                 <li>
                                     <div class="sidebar-widget-list-left">
-                                        <input type="checkbox"> <a href="#">On Sale <span>4</span> </a>
+                                        <input type="checkbox" method="post"> <a href="#">On Sale <span>4</span> </a>
                                         <span class="checkmark"></span>
                                     </div>
                                 </li>
