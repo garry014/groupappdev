@@ -13,7 +13,7 @@
                             <h3 class="animated">{% if ad.get_store_name() == "Admin" %}
                               TailorNow
                               {% else %}
-                              <a href="#">{{ ad.get_store_name() }}</a>
+                              <a href="{{ url_for('viewstore', name=ad.get_store_name()) }}">{{ ad.get_store_name() }}</a>
                               {% endif %}</h3>
                             <h1 class="animated">{{ ad.get_adtext() }}</h1>
                         </div>
