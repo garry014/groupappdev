@@ -35,8 +35,8 @@
                                     </td>
                                     <td class="product-subtotal">{{ product.get_reviews()*5 }} stars</td>
                                     <td class="product-remove">
-                                        <a href="/updateProduct/Ah Tiong Tailor/{{product.get_id()}}"><i class="fa fa-pencil"></i></a>
-                                        <form action="{{url_for('delete_product', id=product.get_id(), name='Ah Tiong Tailor')}}" method="POST" style="display: inline-block;">
+                                        <a href="/updateProduct/{{username}}/{{product.get_id()}}"><i class="fa fa-pencil"></i></a>
+                                        <form action="{{url_for('delete_product', id=product.get_id(), name=username)}}" method="POST" style="display: inline-block;">
                                         <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{product.get_id()}}"><i class="fa fa-times"></i></button>
                                         <!-- The Modal -->
                                         <div class="modal" id="myModal_{{product.get_id()}}">

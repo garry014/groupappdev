@@ -66,7 +66,7 @@ def advertise():
                     db = shelve.open('ads.db', 'c')
                     ads_dict = db['Ads']
                 except:
-                    print("Error in opening DB")#return redirect(url_for('dberror'))
+                    error = "Internal error of opening database."
 
                 try:
                     count_id = max(ads_dict, key=int) + 1
@@ -192,7 +192,6 @@ def updateAd(id, updatewhat):
                     os.remove(oldfile)
                 if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
                     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 file_extension = os.path.splitext(filename)  # get file type
                 os.rename('static/uploads/ads/' + filename, 'static/uploads/ads/' + str(ad.get_ad_id()) + file_extension[1])
@@ -274,13 +273,16 @@ def add_product():
             error = 'Please upload a file.'
         elif not allowed_file(file.filename):
             error = 'The file format must be in jpg, jpeg, png or gif.'
+        # elif create_prod.q1.data != '' and create_prod.q1category.data != 'textbox':
+        #     if len(create_prod.flist1.data) < 1:
+        #         error = 'Please create at least one choice for each question.'
         elif file:  # All validations done at this stage
             catalogue_dict = {}
             try:
                 db = shelve.open('catalogue.db', 'c')
                 catalogue_dict = db['Catalogue']
             except:
-                print("Error in opening DB")  # return redirect(url_for('dberror'))
+                error = "Error in opening DB"
 
             count_id = 0
             if username in catalogue_dict: #Set count_id to the max number of the store
@@ -299,8 +301,12 @@ def add_product():
             os.rename(app.config['UPLOAD_FOLDER'] + filename, app.config['UPLOAD_FOLDER'] +str(count_id) + file_extension[1])
             # End of Image Handling
 
+            qns = ''
+            if create_prod.q1.data != '' and len(create_prod.flist1.data) > 1:
+                qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.q1category.data, create_prod.flist1.data)
+
             prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
-                                       str(count_id) + file_extension[1], create_prod.description.data)
+                                       str(count_id) + file_extension[1], create_prod.description.data, qns)
 
             if username in catalogue_dict:
                 catalogue_dict[username].append(prod)
@@ -364,11 +370,20 @@ def updateProduct(name, id):
                 product.set_price(update_prod.price.data)
                 product.set_discount(update_prod.discount.data)
                 product.set_description(update_prod.description.data)
+                qns = ''
+                if update_prod.q1.data != '' and len(update_prod.flist1.data) > 1:
+                    qns = Catalogue.Customiseable(update_prod.q1.data, update_prod.q1category.data,
+                                                  update_prod.flist1.data)
+                product.set_custom(qns)
+
                 if 'image' not in request.files:
                     error = 'Something went wrong, please refresh page.'
                 file = request.files['image']
                 if file.filename != '' and not allowed_file(file.filename):
                     error = 'The file format must be in jpg, jpeg, png or gif.'
+                # elif update_prod.q1.data != '' and update_prod.q1category.data != 'textbox':
+                #     if len(update_prod.flist1.data) < 1:
+                #         error = 'Please create at least one choice for each question.'
                 elif file:  # All validations done at this stage
                     # Image Handling
                     app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + name + '/'
@@ -384,6 +399,7 @@ def updateProduct(name, id):
                               app.config['UPLOAD_FOLDER'] + str(product.get_id()) + file_extension[1])
                     product.set_image(str(product.get_id()) + file_extension[1])
                     # End of Image Handling
+
                 db['Catalogue'] = catalogue_dict
                 db.close()
                 return redirect(url_for('catalogue'))
@@ -404,6 +420,11 @@ def updateProduct(name, id):
                 update_prod.price.data = product.get_price()
                 update_prod.discount.data = product.get_discount()
                 update_prod.description.data = product.get_description()
+
+                custom = product.get_custom()
+                if custom != '':
+                    update_prod.q1.data = custom.get_question()
+                    update_prod.q1category.data = custom.get_choices()
 
 
     return render_template('updateProduct.html', form=update_prod)
@@ -431,7 +452,6 @@ def view_shops():
 
     search_item = SearchItem(request.form)
     if request.method == 'POST':
-        print("script initiated")
         shop_dict = {}
         for key, value in catalogue_dict.items():
             if search_item.search.data != '' and search_item.search.data.lower()[:5] == key.lower()[:5]:

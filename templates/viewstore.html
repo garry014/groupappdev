@@ -7,9 +7,12 @@
         <div class="breadcrumb-content text-center">
             <ul>
                 <li>
-                    <a href="index.html">Home</a>
+                    <a href="{{ url_for('home_page') }}">Home</a>
                 </li>
-                <li class="active">Shop </li>
+                <li>
+                    <a href="{{ url_for('view_shops') }}">View Shops</a>
+                </li>
+                <li class="active">{{ name }}</li>
             </ul>
         </div>
     </div>

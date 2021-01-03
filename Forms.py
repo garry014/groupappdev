@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, DecimalField, IntegerField, validators
+from wtforms import Form, StringField, RadioField, SelectField, TextAreaField, FileField, DecimalField, IntegerField, FieldList, BooleanField, validators
 from wtforms.fields.html5 import DateField
 
 from datetime import datetime
@@ -28,6 +28,15 @@ class CreateProduct(Form):
     image = FileField('Image:*')
     discount = IntegerField("Discounts:* (0 for N.A)")
     description = TextAreaField('Description:')
+    q1 = StringField('Question 1:')
+    q1category = RadioField('Category', [validators.DataRequired()], choices=[('textbox', 'Textbox - Open-ended question'), ('radiobtn', 'Radio Button - Single Choice Selection'), ('checkbox', 'Check boxes - Multiple Choice Selection')], default='textbox')
+    flist1 = FieldList(StringField())
+    # q2 = StringField('Question 1:')
+    # q2category = RadioField('Category', [validators.DataRequired()],
+    #                         choices=[('textbox', 'Textbox - Open-ended field for customer'),
+    #                                  ('radiobtn', 'Radio Button - Single Choice Selection'),
+    #                                  ('checkbox', 'Check boxes - Multiple Choice Selection')], default='')
+    # flist2 = FieldList(StringField())
 
 class SearchItem(Form):
     search = StringField('', render_kw={'placeholder': 'Store Name'})
