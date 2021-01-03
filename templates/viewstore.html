@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}View Items{% endblock %}
+{% block title %}View Items - {{ name }}{% endblock %}
 
 {% block content %}
 <div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
@@ -31,72 +31,12 @@
                                 <option value="">In stock</option>
                             </select>
                         </div>
-                        <p>Showing 1–12 of 20 result</p>
                     </div>
                     <div class="filter-active">
-                        <a href="#"><i class="fa fa-plus"></i> filter</a>
+                        <p>Showing 1–12 of 20 result</p>
                     </div>
                 </div>
-                <div class="product-filter-wrapper">
-                    <div class="row">
-                        <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-30">
-                            <div class="product-filter">
-                                <h5>Sort by</h5>
-                                <ul class="sort-by">
-                                    <li><a href="#">Default</a></li>
-                                    <li><a href="#">Popularity</a></li>
-                                    <li><a href="#">Average rating</a></li>
-                                    <li><a href="#">Newness</a></li>
-                                    <li><a href="#">Price: Low to High</a></li>
-                                    <li><a href="#">Price: High to Low</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-30">
-                            <div class="product-filter">
-                                <h5>color filters</h5>
-                                <ul class="color-filter">
-                                    <li><input type="checkbox" value=""> <a href="#">Black</a></li>
-                                    <li><input type="checkbox" value=""> <a href="#">Brown</a></li>
-                                    <li><input type="checkbox" value=""> <a href="#">Orange</a></li>
-                                    <li><input type="checkbox" value=""> <a href="#">red</a></li>
-                                    <li><input type="checkbox" value=""> <a href="#">Yellow</a></li>
-                                    <li><input type="checkbox" value=""> <a href="#">purple</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-30">
-                            <div class="product-filter">
-                                <h5>product tags</h5>
-                                <div class="product-tags">
-                                    <ul>
-                                        <li><a href="#">New</a></li>
-                                        <li><a href="#">brand</a></li>
-                                        <li><a href="#">black</a></li>
-                                        <li><a href="#">white</a></li>
-                                        <li><a href="#">chire</a></li>
-                                        <li><a href="#">table</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-30">
-                            <div class="product-filter">
-                                <h5>Filter by price</h5>
-                                <div class="price-filter mt-25">
-                                    <div class="price-slider-amount">
-                                        <input type="text" id="amount" name="price"  placeholder="Add Your Price" />
-                                    </div>
-                                    <div id="slider-range"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="shop-bottom-area">
                     <div class="row">
                         <!-- Start of Product List -->
@@ -104,7 +44,7 @@
                         <div class="col-xl-4 col-md-6 col-lg-4 col-sm-6">
                             <div class="product-wrap mb-25 scroll-zoom">
                                 <div class="product-img">
-                                    <a href="#">
+                                    <a data-toggle="modal" data-target="#modal{{ product.get_id() }}">
                                         <img class="default-img" src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}">
                                         <img class="hover-img" src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}">
                                     </a>
@@ -112,19 +52,13 @@
                                     <span class="pink">-{{ product.get_discount() }}%</span>
                                     {% endif %}
                                     <div class="product-action">
-                                        <div class="pro-same-action pro-wishlist">
-                                            <a title="Wishlist" href="#"><i class="pe-7s-like"></i></a>
-                                        </div>
-                                        <div class="pro-same-action pro-cart">
-                                            <a title="Add To Cart" href="#"><i class="pe-7s-cart"></i> Add to cart</a>
-                                        </div>
-                                        <div class="pro-same-action pro-quickview">
-                                            <a title="Quick View" href="#" data-toggle="modal" data-target="#exampleModal"><i class="pe-7s-look"></i></a>
+                                        <div class="pro-same-action pro-cart" style="width:100%;">
+                                            <a title="Add To Cart" data-toggle="modal" data-target="#modal{{ product.get_id() }}"><i class="pe-7s-cart"></i> Add to cart</a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="product-content text-center">
-                                    <h3><a href="product-details.html">{{ product.get_name() }}</a></h3>
+                                    <h3><a data-toggle="modal" data-target="#modal{{ product.get_id() }}">{{ product.get_name() }}</a></h3>
                                     <div class="product-rating">
                                         {{ product.get_reviews() }} stars
                                         <i class="fa fa-star-o yellow"></i>
@@ -161,7 +95,8 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog">
+{% for product in shop_dict %}
+<div class="modal fade" id="modal{{product.get_id()}}" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -172,7 +107,7 @@
                     <div class="col-md-5 col-sm-12 col-xs-12">
                         <div class="tab-content quickview-big-img">
                             <div id="pro-1" class="tab-pane fade show active">
-                                <img src="assets/img/product/quickview-l1.jpg" alt="">
+                                <img src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}">
                             </div>
                             <div id="pro-2" class="tab-pane fade">
                                 <img src="assets/img/product/quickview-l2.jpg" alt="">
@@ -188,7 +123,7 @@
                         <!-- Thumbnail Image End -->
                         <div class="quickview-wrap mt-15">
                             <div class="quickview-slide-active owl-carousel nav nav-style-1" role="tablist">
-                                <a class="active" data-toggle="tab" href="#pro-1"><img src="assets/img/product/quickview-s1.jpg" alt=""></a>
+                                <a class="active" data-toggle="tab" href="#pro-1"><img src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}"></a>
                                 <a data-toggle="tab" href="#pro-2"><img src="assets/img/product/quickview-s2.jpg" alt=""></a>
                                 <a data-toggle="tab" href="#pro-3"><img src="assets/img/product/quickview-s3.jpg" alt=""></a>
                                 <a data-toggle="tab" href="#pro-4"><img src="assets/img/product/quickview-s2.jpg" alt=""></a>
@@ -197,10 +132,14 @@
                     </div>
                     <div class="col-md-7 col-sm-12 col-xs-12">
                         <div class="product-details-content quickview-content">
-                            <h2>Products Name Here</h2>
+                            <h2>{{product.get_name()}}</h2>
                             <div class="product-details-price">
-                                <span>$18.00 </span>
-                                <span class="old">$20.00 </span>
+                                {% if product.get_discount() > 0 %}
+                                    <span>$ {{ '%0.2f'|format(product.get_price()|float * ((100 - product.get_discount())/100)) }}</span>
+                                    <span class="old">$ {{ product.get_price() }}</span>
+                                {% else %}
+                                    <span>$ {{ product.get_price() }}</span>
+                                {% endif %}
                             </div>
                             <div class="pro-details-rating-wrap">
                                 <div class="pro-details-rating">
@@ -210,16 +149,10 @@
                                     <i class="fa fa-star-o"></i>
                                     <i class="fa fa-star-o"></i>
                                 </div>
-                                <span>3 Reviews</span>
+                                <span>{{ product.get_reviews() }} Reviews</span>
                             </div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisic elit eiusm tempor incidid ut labore et dolore magna aliqua. Ut enim ad minim venialo quis nostrud exercitation ullamco</p>
-                            <div class="pro-details-list">
-                                <ul>
-                                    <li>- 0.5 mm Dail</li>
-                                    <li>- Inspired vector icons</li>
-                                    <li>- Very modern style  </li>
-                                </ul>
-                            </div>
+                            <p>{{ product.get_description() }}</p>
+                            <br>
                             <div class="pro-details-size-color">
                                 <div class="pro-details-color-wrap">
                                     <span>Color</span>
@@ -249,7 +182,7 @@
                             </div>
                             <div class="pro-details-quality">
                                 <div class="cart-plus-minus">
-                                    <input class="cart-plus-minus-box" type="text" name="qtybutton" value="2">
+                                    <input class="cart-plus-minus-box" type="text" name="qtybutton" value="1">
                                 </div>
                                 <div class="pro-details-cart btn-hover">
                                     <a href="#">Add To Cart</a>
@@ -261,31 +194,6 @@
                                     <a href="#"><i class="pe-7s-shuffle"></i></a>
                                 </div>
                             </div>
-                            <div class="pro-details-meta">
-                                <span>Categories :</span>
-                                <ul>
-                                    <li><a href="#">Minimal,</a></li>
-                                    <li><a href="#">Furniture,</a></li>
-                                    <li><a href="#">Electronic</a></li>
-                                </ul>
-                            </div>
-                            <div class="pro-details-meta">
-                                <span>Tag :</span>
-                                <ul>
-                                    <li><a href="#">Fashion, </a></li>
-                                    <li><a href="#">Furniture,</a></li>
-                                    <li><a href="#">Electronic</a></li>
-                                </ul>
-                            </div>
-                            <div class="pro-details-social">
-                                <ul>
-                                    <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-pinterest-p"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -293,5 +201,6 @@
         </div>
     </div>
 </div>
+{% endfor %}
 
 {% endblock %}
