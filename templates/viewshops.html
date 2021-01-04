@@ -43,7 +43,7 @@
                                     <div class="product-wrap mb-25 scroll-zoom">
                                         <div class="product-img">
                                             <a href="{{ url_for('viewstore', name=key) }}">
-                                                <img class="default-img" src="{{ url_for('static',filename='uploads/shops/' + key + '/' + 'Ah Tong Tailor.jpg') }}" alt="">
+                                                <img class="default-img" src="{{ url_for('static',filename='uploads/shops/' + key + '/' + key +'.jpg') }}" alt="">
                                                 <!--  <img class="hover-img" src="{{url_for('static',filename='uploads/Ah Tiong Tailor1.jpg')}}" alt=""> -->
                                             </a>
                                             {% if value[1] > 0 %}
@@ -56,7 +56,7 @@
                                             </div>
                                         </div>
                                         <div class="product-content text-center">
-                                            <h3><a href="product-details.html">{{ key }}</a></h3>
+                                            <h3><a href="{{ url_for('viewstore', name=key) }}">{{ key }}</a></h3>
                                             <div class="product-rating">
                                                 {{ value[0] }} stars
                                                 <i class="fa fa-star-o yellow"></i>
@@ -64,9 +64,6 @@
                                                 <i class="fa fa-star-o yellow"></i>
                                                 <i class="fa fa-star-o"></i>
                                                 <i class="fa fa-star-o"></i>
-                                            </div>
-                                            <div class="product-price">
-                                                <span>$ 60.00</span>
                                             </div>
                                         </div>
                                     </div>

@@ -36,6 +36,9 @@
                         <p>Showing 1–12 of 20 result</p>
                     </div>
                 </div>
+                {% if shop_dict|length == 0 %}
+                    <div>Whoops, it looks like this store has creased operations, or is currently taking a break. Please visit other stores in the meantime!</div>
+                {% endif %}
 
                 <div class="shop-bottom-area">
                     <div class="row">
@@ -154,17 +157,11 @@
                             <p>{{ product.get_description() }}</p>
                             <br>
                             <div class="pro-details-size-color">
+                                {% if product.get_custom() != "" %}
                                 <div class="pro-details-color-wrap">
-                                    <span>Color</span>
+                                    <span>{{ product.get_custom().get_question() }}</span>
                                     <div class="pro-details-color-content">
-                                        <ul>
-                                            <li class="blue"></li>
-                                            <li class="maroon active"></li>
-                                            <li class="gray"></li>
-                                            <li class="green"></li>
-                                            <li class="yellow"></li>
-                                            <li class="white"></li>
-                                        </ul>
+                                        {{ product.get_custom().get_choices() }}
                                     </div>
                                 </div>
                                 <div class="pro-details-size">
@@ -179,6 +176,7 @@
                                         </ul>
                                     </div>
                                 </div>
+                                {% endif %}
                             </div>
                             <div class="pro-details-quality">
                                 <div class="cart-plus-minus">

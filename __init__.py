@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Ah Tong Tailor"  #Test Script
+username = "Yi Kah Tailor Centre"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -303,7 +303,7 @@ def add_product():
 
             qns = ''
             if create_prod.q1.data != '' and len(create_prod.flist1.data) > 1:
-                qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.q1category.data, create_prod.flist1.data)
+                qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.flist1.data, create_prod.q1category.data)
 
             prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
                                        str(count_id) + file_extension[1], create_prod.description.data, qns)
@@ -372,8 +372,8 @@ def updateProduct(name, id):
                 product.set_description(update_prod.description.data)
                 qns = ''
                 if update_prod.q1.data != '' and len(update_prod.flist1.data) > 1:
-                    qns = Catalogue.Customiseable(update_prod.q1.data, update_prod.q1category.data,
-                                                  update_prod.flist1.data)
+                    qns = Catalogue.Customiseable(update_prod.q1.data, update_prod.flist1.data,
+                                                  update_prod.q1category.data)
                 product.set_custom(qns)
 
                 if 'image' not in request.files:
