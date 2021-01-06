@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, Request
 from Forms import *
 from cregform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue
+import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "Yi Kah Tailor Centre"  #Test Script
+username = "das"  #Test Script
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -486,6 +486,62 @@ def viewstore(name):
         return redirect(url_for('view_shops'))
 
     return render_template('viewstore.html', shop_dict=catalogue_dict[name], name=name)
+
+
+@app.route('/contact/<name>', methods=['GET', 'POST'])
+def contact(name):
+    create_chat = CreateChat(request.form)
+    if request.method == 'POST' and create_chat.validate():
+        chat_dict = {}
+        try:
+            db = shelve.open('chat.db', 'c')
+            chat_dict = db['Chats']
+        except:
+            print("Internal error of opening database.")
+
+        try:
+            count_id = max(chat_dict, key=int) + 1
+        except:
+            count_id = 1  # if no dictionary exist, set id as 1
+
+        msg_from = ""
+        if username != "":
+            msg_from = username
+        else:
+            msg_from = create_chat.email.data
+
+        message = Chat.Message(create_chat.message.data, msg_from, dt.now())
+        chat = Chat.Chat(count_id, msg_from, name)
+        chat.set_messages(message)
+        dchat = {}
+        chat_dict[count_id] = chat
+        print(chat_dict)
+
+        db['Chats'] = chat_dict
+        db.close()
+
+        return redirect(url_for('chat_page', chatid=count_id))
+    return render_template('contact.html', form=create_chat)
+
+@app.route('/chat/<int:chatid>', methods=['GET', 'POST'])
+def chat_page(chatid):
+    #if request.method == 'POST' and create_chat.validate():
+    #else:
+    chat_dict = {}
+    try:
+        db = shelve.open('chat.db', 'r')
+        chat_dict = db['Chats']
+    except:
+        return redirect(url_for('dberror'))
+
+    user_chat = {}
+    current_chat = ""
+    for chat in chat_dict:
+        if chat_dict[chat].get_sender() == username:
+            user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
+
+    return render_template('chat.html', user_chat=user_chat, chatid=chatid)
+
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)

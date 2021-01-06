@@ -40,3 +40,7 @@ class CreateProduct(Form):
 
 class SearchItem(Form):
     search = StringField('', render_kw={'placeholder': 'Store Name'})
+
+class CreateChat(Form):
+    email = StringField('',  validators=[validators.Email()]) #validators.DataRequired(),
+    message = TextAreaField('How may we help you today? Please provide details of the issue.*', validators=[validators.DataRequired()])
