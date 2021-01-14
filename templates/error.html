@@ -10,7 +10,7 @@
                 <li>
                     <a href="index.html">Home</a>
                 </li>
-                <li class="active">Database Error</li>
+                <li class="active">{{ title }} Error</li>
             </ul>
         </div>
     </div>
@@ -19,8 +19,8 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-8 text-center">
                 <div class="error">
-                    <h2>Sorry, our database is currently down.</h2>
-                    <p>We were not able to proceed due to a database error. Please try again later.</p>
+                    <h2>{{ title }} Error</h2>
+                    <p>{{ message }}</p>
                     <input type="button" value="Go back to the previous page" onclick="history.back(-1)" />
                 </div>
             </div>

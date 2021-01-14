@@ -37,7 +37,11 @@
                                     <a href="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}"><img src="{{ url_for('static',filename='/uploads/ads/'+ad.get_image()) }}" alt="ad.get_image()" width="230" height="121"></a>
                                 </td>
                                 <td class="product-name">
-                                    <a href="#">{{ ad.get_store_name() }}</a>
+                                    {% if ad.get_store_name() == 'Admin' %}
+                                    {{ ad.get_store_name() }}
+                                    {% else %}
+                                    <a href="{{url_for('viewstore', name=ad.get_store_name() )}}">{{ ad.get_store_name() }}</a>
+                                    {% endif %}
                                 </td>
                                 <td class="product-price-cart">
                                     {{ ad.get_start_date() }}
@@ -55,12 +59,12 @@
                                     {% endif %}
                                 </td>
                                 <td class="product-remove">
-                                    <a href="/updateAd/{{ad.get_ad_id()}}/0"><i class="fa fa-pencil"></i></a>
+                                    <a href="/updateAd/{{ad.get_ad_id()}}/0"><i class="fa fa-pencil" title="Update this advertisement"></i></a>
                                     {% if (username == 'Admin') and (ad.get_status() != 'Approved') %}
-                                        <a href="/updateAd/{{ad.get_ad_id()}}/1"><i class="fa fa-check"></i></a>
+                                        <a href="/updateAd/{{ad.get_ad_id()}}/1"><i class="fa fa-check" title="Approve this advertisement"></i></a>
                                     {% endif %}
                                     <form action="{{url_for('delete_ad', id=ad.get_ad_id())}}" method="POST" style="display: inline-block;">
-                                        <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times"></i></button>
+                                        <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{ad.get_ad_id()}}"><i class="fa fa-times" style="color: red;" title="Delete this advertisement"></i></button>
                                         <!-- The Modal -->
                                         <div class="modal" id="myModal_{{ad.get_ad_id()}}">
                                           <div class="modal-dialog">

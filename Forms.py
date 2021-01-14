@@ -6,13 +6,18 @@ from datetime import timedelta
 def get_today(): #Get today's date
     return datetime.today().strftime('%Y-%m-%d')
 
+def get_tommorrow():
+    tmr = datetime.now() + timedelta(days=1)
+    tmr = tmr.strftime('%Y-%m-%d')
+    return tmr
+
 def get_max_date(Days): #Get the date to the max days a user can select. Have to feed in number of days.
     max_date = datetime.now() + timedelta(days=Days)
     max_date = max_date.strftime('%Y-%m-%d')
     return max_date
 
 class CreateAd(Form):
-    min_date = get_today()
+    min_date = get_tommorrow()
     max_date = get_max_date(90)
     startdate = DateField('Start Date:*', render_kw={'min': min_date, 'max': max_date, 'value': min_date}, validators=[validators.DataRequired()])
     enddate = DateField('End Date:*', render_kw={'min': min_date, 'max': max_date}, validators=[validators.DataRequired()])
@@ -41,6 +46,8 @@ class CreateProduct(Form):
 class SearchItem(Form):
     search = StringField('', render_kw={'placeholder': 'Store Name'})
 
-class CreateChat(Form):
+class SendMsg(Form):
+    message = StringField('', validators=[validators.DataRequired()])
+
+class CreateChat(SendMsg):
     email = StringField('',  validators=[validators.Email()]) #validators.DataRequired(),
-    message = TextAreaField('How may we help you today? Please provide details of the issue.*', validators=[validators.DataRequired()])

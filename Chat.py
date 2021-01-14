@@ -1,10 +1,11 @@
-class Chat:
+class Chat: #{id: Class(Chat .... [Class(Message)]}
     def __init__(self, id, sender, recipient): #init 3
         self.__id = id
         self.__sender = sender
         self.__recipient = recipient
         self.__messages = []
-        self.__status = "Pending"
+        self.__sender_status = "Pending"
+        self.__recipient_status = ""
 
     def get_id(self):
         return self.__id
@@ -24,11 +25,17 @@ class Chat:
     def set_recipient(self, recipient):
         self.__recipient = recipient
 
-    def get_status(self):
-        return self.__status
+    def get_sender_status(self):
+        return self.__sender_status
 
-    def set_status(self, status):
-        self.__status = status
+    def set_sender_status(self, sender_status):
+        self.__sender_status = sender_status
+
+    def get_recipient_status(self):
+        return self.__recipient_status
+
+    def set_recipient_status(self, recipient_status):
+        self.__recipient_status = recipient_status
 
     def get_messages(self):
         return self.__messages

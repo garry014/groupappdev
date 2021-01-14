@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-username = "das"  #Test Script
+username = "Admin"  #Test Scriptdas
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -104,6 +104,7 @@ def advertise():
 
                 return redirect(url_for('manage_ads'))
                 #return redirect(url_for('static', filename=backoflink))
+
     return render_template('advertise.html', form=create_ad, error=error)
 
 @app.route('/manage_ads')
@@ -129,7 +130,7 @@ def manage_ads():
             show_ads_list.append(ad)
         enddate_str = str(ad.get_end_date())
         enddate = dt.strptime(enddate_str, "%Y-%m-%d")
-        if enddate < datetime.now() and ad.get_status() != "Rejected":
+        if enddate <= datetime.now() and ad.get_status() != "Rejected":
             expired_list.append(ad.get_ad_id())
 
     for id in expired_list:
@@ -328,7 +329,7 @@ def catalogue():
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error'), errorid=0)
 
     if username not in catalogue_dict:
         return redirect(url_for('add_product'))
@@ -342,7 +343,7 @@ def delete_product(name, id):
         db = shelve.open('catalogue.db', 'w')
         catalogue_dict = db['Catalogue']
     except:
-        return redirect(url_for('db_error'))
+        return redirect(url_for('general_error'), errorid=0)
     else:
         for product in catalogue_dict[name]:
             if product.get_id() == id:
@@ -363,7 +364,7 @@ def updateProduct(name, id):
             db = shelve.open('catalogue.db', 'w')
             catalogue_dict = db['Catalogue']
         except:
-            return redirect(url_for('dberror'))
+            return redirect(url_for('general_error'), errorid=0)
         for product in catalogue_dict[name]:
             if product.get_id() == id:
                 product.set_name(update_prod.name.data)
@@ -412,7 +413,7 @@ def updateProduct(name, id):
             catalogue_dict = db['Catalogue']
             db.close()
         except:
-            return redirect(url_for('dberror'))
+            return redirect(url_for('general_error'), errorid=0)
 
         for product in catalogue_dict[name]:
             if product.get_id() == id:
@@ -438,7 +439,7 @@ def view_shops():
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error'), errorid=0)
 
     shop_dict = {} #Key: [Total Review, Most Discounted Item]
     for key, value in catalogue_dict.items():
@@ -479,7 +480,7 @@ def viewstore(name):
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error'), errorid=0)
     #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
 
     if name not in catalogue_dict:
@@ -510,7 +511,7 @@ def contact(name):
         else:
             msg_from = create_chat.email.data
 
-        message = Chat.Message(create_chat.message.data, msg_from, dt.now())
+        message = Chat.Message(create_chat.message.data, msg_from, dt.today().strftime("%d %b %Y %H:%M")) # | %A
         chat = Chat.Chat(count_id, msg_from, name)
         chat.set_messages(message)
         dchat = {}
@@ -525,22 +526,78 @@ def contact(name):
 
 @app.route('/chat/<int:chatid>', methods=['GET', 'POST'])
 def chat_page(chatid):
-    #if request.method == 'POST' and create_chat.validate():
-    #else:
+    send_msg = SendMsg(request.form)
+    if request.method == 'POST':
+        chat_dict = {}
+        try:
+            db = shelve.open('chat.db', 'w')
+            chat_dict = db['Chats']
+        except:
+            return redirect(url_for('general_error'), errorid=0)
+
+        if send_msg.validate():
+            if username != "":
+                msg_from = username
+            else:
+                msg_from = chat_dict[chatid].get_sender()
+
+            if chat_dict[chatid].get_sender() == username:
+                chat_dict[chatid].set_sender_status("Replied")
+                chat_dict[chatid].set_recipient_status("Unreplied")
+            else:
+                chat_dict[chatid].set_sender_status("Unreplied")
+
+            message = Chat.Message(send_msg.message.data, msg_from, dt.today().strftime("%d %b %Y %H:%M"))
+            chat_dict[chatid].set_messages(message)
+        db['Chats'] = chat_dict
+        db.close()
+
+        return redirect(url_for('chat_page', chatid=chatid))
+    else:
+        chat_dict = {}
+        try:
+            db = shelve.open('chat.db', 'r')
+            chat_dict = db['Chats']
+            db.close()
+        except:
+            return redirect(url_for('general_error'), errorid=0)
+
+        user_chat = {}
+        for chat in chat_dict:
+            print(chat_dict[chat].get_recipient())
+            if chat_dict[chat].get_sender() == username:
+                user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
+            elif chat_dict[chat].get_recipient() == username:
+                user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
+            print(chat_dict[chat].get_recipient_status(), chat_dict[chat].get_sender_status())
+
+        if username == "Admin":
+            user_chat = chat_dict
+
+    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=username)
+
+@app.route('/chat/<action>/<int:id>', methods=['GET', 'POST'])
+def update_chatstatus(action, id):
     chat_dict = {}
     try:
-        db = shelve.open('chat.db', 'r')
+        db = shelve.open('chat.db', 'w')
         chat_dict = db['Chats']
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error'), errorid=0)
+    else:
+        if action == "resolved":
+            chat_dict[id].set_recipient_status("Resolved")
+        elif action == "delete":
+            if username == "Admin":
+                chat_dict.pop(id)
+            elif username == chat_dict[id].get_recipient:
+                chat_dict[id].set_recipient_status("Hidden")
+            else:
+                chat_dict[id].set_sender_status("Hidden")
 
-    user_chat = {}
-    current_chat = ""
-    for chat in chat_dict:
-        if chat_dict[chat].get_sender() == username:
-            user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
-
-    return render_template('chat.html', user_chat=user_chat, chatid=chatid)
+        db['Chats'] = chat_dict
+        db.close()
+        return redirect(url_for('chat_page', chatid=id))
 
 
 #ERROR 404 Not Found Page
@@ -553,10 +610,21 @@ def page_not_found(e):
 def error413(error):
     return render_template('413.html'), 413
 
-#Database error
-@app.route('/dberror')
-def dberror():
-    return render_template('dberror.html')
+@app.route('/error/<int:errorid>', methods=['GET', 'POST'])
+def general_error(errorid):
+    title = ""
+    message = ""
+    if errorid == 0: #Database Error
+        title = "Database"
+        message = "We were not able to proceed due to a database error. Please try again later."
+    elif errorid == 1: #Permission Error
+        title = "Permission"
+        message = "You do not have sufficient permission to access the information. Please contact our support if you think we made a mistake."
+    else:
+        title = "Unknown"
+        message = "Something went wrong, please try again later."
+
+    return render_template('error.html', title=title, message=message)
 
 if __name__ == '__main__':
     app.debug = True
