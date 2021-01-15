@@ -56,7 +56,7 @@
                 </div>
               </div>
               {% else %}
-              <a href="{{url_for('chat_page', chatid=user_chat[msg].get_id())}}">
+              <a href="{{url_for('chat_page', chat='inbox', chatid=user_chat[msg].get_id())}}">
               <div class="chat_list">
                 <div class="chat_people">
                   <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
@@ -80,13 +80,19 @@
           <div class="mesgs">
             <div class="heading_msg">
               {{ user_chat[chatid].get_recipient() }}
-              {% if username == user_chat[chatid].get_recipient_status() %}
+              {% if username == user_chat[chatid].get_recipient() %}
                 {% if user_chat[chatid].get_recipient_status() != "Resolved" %}
                   <a href="/chat/resolved/{{ chatid }}" title="Mark as resolved"><i class="fa fa-check"></i> Mark as Resolved</a>
                 {% endif %}
-
               {% endif %}
-              <i class="fa fa-archive" aria-hidden="true"></i>
+
+              {% if (user_chat[chatid].get_sender == username) and (user_chat[chatid].get_sender_status() != "Archive") %}
+              <a href="/chat/archive/{{ chatid }}" title="Mark as archive" style="float: right;"><i class="fa fa-archive"></i> Archive</a>
+              {% elif (user_chat[chatid].get_recipient == username) and (user_chat[chatid].get_recipient_status() != "Archive") %}
+              <a href="/chat/archive/{{ chatid }}" title="Mark as archive" style="float: right;"><i class="fa fa-archive"></i> Archive</a>
+              {% endif %}
+
+
               <form action="{{url_for('update_chatstatus', action='delete', id=chatid)}}" method="POST" style="display: inline-block; float: right;">
                   <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{chatid}}"><i class="fa fa-trash-o" style="font-size: 18px;" title="Delete this chat"></i></button>
                   <!-- The Modal -->
@@ -178,7 +184,7 @@
             <div class="inbox_chat">
               {% for msg in user_chat %}
 
-              <a href="{{url_for('chat_page', chatid=user_chat[msg].get_id())}}">
+              <a href="{{url_for('chat_page', chat='inbox', chatid=user_chat[msg].get_id())}}">
               <div class="chat_list">
                 <div class="chat_people">
                   <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>

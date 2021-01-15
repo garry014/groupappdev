@@ -521,12 +521,13 @@ def contact(name):
         db['Chats'] = chat_dict
         db.close()
 
-        return redirect(url_for('chat_page', chatid=count_id))
+        return redirect(url_for('chat_page', chat="inbox", chatid=count_id))
     return render_template('contact.html', form=create_chat)
 
-@app.route('/chat/<int:chatid>', methods=['GET', 'POST'])
-def chat_page(chatid):
+@app.route('/<string:chat>/<int:chatid>', methods=['GET', 'POST'])
+def chat_page(chat, chatid):
     send_msg = SendMsg(request.form)
+    chat = chat
     if request.method == 'POST':
         chat_dict = {}
         try:
@@ -552,7 +553,7 @@ def chat_page(chatid):
         db['Chats'] = chat_dict
         db.close()
 
-        return redirect(url_for('chat_page', chatid=chatid))
+        return redirect(url_for('chat_page', chat="inbox", chatid=chatid))
     else:
         chat_dict = {}
         try:
@@ -563,13 +564,19 @@ def chat_page(chatid):
             return redirect(url_for('general_error'), errorid=0)
 
         user_chat = {}
-        for chat in chat_dict:
-            print(chat_dict[chat].get_recipient())
-            if chat_dict[chat].get_sender() == username:
-                user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
-            elif chat_dict[chat].get_recipient() == username:
-                user_chat[chat_dict[chat].get_id()] = chat_dict[chat]
-            print(chat_dict[chat].get_recipient_status(), chat_dict[chat].get_sender_status())
+        for item in chat_dict:
+            if chat == "inbox":
+                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
+                    user_chat[chat_dict[item].get_id()] = chat_dict[item]
+                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() != "Archive":
+                    user_chat[chat_dict[item].get_id()] = chat_dict[item]
+            elif chat == "archive":
+                if chat_dict[item].get_sender() == username  and chat_dict[item].get_sender_status() == "Archive":
+                    user_chat[chat_dict[item].get_id()] = chat_dict[item]
+                elif chat_dict[item].get_recipient() == username  and chat_dict[item].get_recipient_status() == "Archive":
+                    user_chat[chat_dict[item].get_id()] = chat_dict[item]
+            else:
+                return redirect(url_for('general_error', errorid=2))
 
         if username == "Admin":
             user_chat = chat_dict
@@ -594,10 +601,18 @@ def update_chatstatus(action, id):
                 chat_dict[id].set_recipient_status("Hidden")
             else:
                 chat_dict[id].set_sender_status("Hidden")
+        elif action == "archive":
+            if username == chat_dict[id].get_recipient:
+                chat_dict[id].set_recipient_status("Archive")
+            else:
+                chat_dict[id].set_sender_status("Archive")
 
         db['Chats'] = chat_dict
         db.close()
-        return redirect(url_for('chat_page', chatid=id))
+
+        if action != "archive":
+            action = "inbox"
+        return redirect(url_for('chat_page', chat=action ,chatid=id))
 
 
 #ERROR 404 Not Found Page
@@ -619,6 +634,9 @@ def general_error(errorid):
         message = "We were not able to proceed due to a database error. Please try again later."
     elif errorid == 1: #Permission Error
         title = "Permission"
+        message = "You do not have sufficient permission to access the information. Please contact our support if you think we made a mistake."
+    elif errorid == 2: #Path not accessible Error
+        title = "Path Not Accessible"
         message = "You do not have sufficient permission to access the information. Please contact our support if you think we made a mistake."
     else:
         title = "Unknown"

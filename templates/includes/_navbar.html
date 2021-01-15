@@ -109,7 +109,7 @@
                                     <li><a href="wishlist.html">wishlist </a></li>
                                     <li><a href="my-account.html">my account</a></li>
                                     <li><a href="login-register.html">login / register </a></li>
-                                    <li><a href="contact.html">contact us </a></li>
+                                    <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                                     <li><a href="404.html">404 page </a></li>
                                 </ul>
                             </li>
@@ -124,7 +124,7 @@
                                 </ul>
                             </li>
                             <li><a href="about.html"> About </a></li>
-                            <li><a href="contact.html"> Contact</a></li>
+                            <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                         </ul>
                     </nav>
                 </div>
@@ -292,7 +292,7 @@
                                 <li><a href="wishlist.html">wishlist </a></li>
                                 <li><a href="my-account.html">my account</a></li>
                                 <li><a href="login-register.html">login / register </a></li>
-                                <li><a href="contact.html">contact us </a></li>
+                                <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                                 <li><a href="404.html">404 page </a></li>
                             </ul>
                         </li>
@@ -307,7 +307,7 @@
                             </ul>
                         </li>
                         <li><a href="about.html">About us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                     </ul>
                 </nav>
             </div>

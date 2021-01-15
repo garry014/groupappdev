@@ -49,5 +49,6 @@ class SearchItem(Form):
 class SendMsg(Form):
     message = StringField('', validators=[validators.DataRequired()])
 
-class CreateChat(SendMsg):
+class CreateChat(Form):
+    message = TextAreaField('', validators=[validators.DataRequired()])
     email = StringField('',  validators=[validators.Email()]) #validators.DataRequired(),
