@@ -149,7 +149,7 @@
                                     {% if loop.index <= 3 %}
                                         {% if values.get_status() == "new" %}
                                         <!--NEW NOTIFICATIONS-->
-                                        <div style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black;">
+                                        <div onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
 
                                                 <div style="position: relative; float: right;">
                                                     <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
@@ -162,9 +162,8 @@
                                                 </div>
 
                                         </div>
-
                                         {% else %}
-                                        <div style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black;">
+                                        <div onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
                                             <div style="position: relative; float: right;">
                                                 <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
                                             </div>

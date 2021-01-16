@@ -251,6 +251,9 @@ def updateAd(id, updatewhat):
             ad.set_adtext(update_ad.adtext.data)
             if username == "Admin":
                 ad.set_status(update_ad.status.data)
+                if update_ad.status.data == "Rejected":
+                    create_notification(ad.get_store_name(), "updates", "Sorry, your advertisement isn't in-line with our terms and conditions and has been rejected.",
+                                        "manage_ads")
             else:
                 ad.set_status("Pending Approval")
 
