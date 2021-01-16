@@ -2161,7 +2161,7 @@ a.default-btn {
   -o-transition: all 0.5s ease 0s;
   transition: all 0.5s ease 0s;
   visibility: hidden;
-  width: 190px;
+  width: 200px;
   z-index: 999;
 }
 .main-menu nav ul li ul.submenu li {

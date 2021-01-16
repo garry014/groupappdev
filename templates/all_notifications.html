@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Advertise with us{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="custom-row-2">
+            <div class="col-lg-8 col-md-7"  style="margin: auto;">
+                <div class="contact-form">
+                    <div class="contact-title mb-30">
+                        <h2>View all notification</h2>
+                    </div>
+                    {% set my_noti, count = view_notification() %}
+                    {% if my_noti == "down" %}
+                        Our database is currently down, please try again later
+                    {% else %}
+                        {% for key,values in my_noti.items() %}
+                            {% if values.get_status() == "new" %}
+                            <!--NEW NOTIFICATIONS-->
+                            <div style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black;">
+
+                                    <div style="position: relative; float: right;">
+                                        <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
+                                    </div>
+                                    {{ values.get_message() }}
+                                    <div style="font-size:10px">
+                                        {% if values.get_category() == "updates" %}<i class="fa fa-rss"></i>
+                                        {% elif values.get_category() == "purchase" %}<i class="pe-7s-shopbag"></i>
+                                        {% endif %}{{ values.get_time() }}
+                                    </div>
+
+                            </div>
+
+                            {% else %}
+                            <div style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black;">
+                                <div style="position: relative; float: right;">
+                                    <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
+                                </div>
+                                {{ values.get_message() }}
+                                <div style="font-size:10px">
+                                    {% if values.get_category() == "updates" %}<i class="fa fa-rss"></i>
+                                    {% elif values.get_category() == "purchase" %}<i class="pe-7s-shopbag"></i>
+                                    {% endif %}{{ values.get_time() }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <p class="form-messege"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<br>
+
+{% endblock %}

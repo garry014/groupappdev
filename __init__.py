@@ -85,6 +85,10 @@ def update_notification(action,id):
         db1.close()
     return redirect(request.referrer)
 
+@app.route('/all_notifications')
+def all_notifications():
+    return render_template('all_notifications.html')
+
 @app.route('/')
 def home():
     return redirect(url_for('home_page'))

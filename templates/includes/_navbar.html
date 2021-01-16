@@ -119,8 +119,8 @@
                                     <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
                                     <li><a href="{{ url_for('advertise') }}">Advertise</a></li>
                                     <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
-                                    <li><a href="blog-details-2.html">blog details 2</a></li>
-                                    <li><a href="blog-details-3.html">blog details 3</a></li>
+                                    <li><a href="blog-details-2.html">Create Notification</a></li>
+                                    <li><a href="blog-details-3.html">Manage Notification</a></li>
                                 </ul>
                             </li>
                             <li><a href="about.html"> About </a></li>
@@ -180,7 +180,7 @@
                                 {% endfor %}
                             {% endif %}
                             {% if my_noti|length > 3 %}
-                            <center><a href="{{ url_for('view_shops') }}">See All</a></center>
+                            <center><a href="{{ url_for('all_notifications') }}">See All</a></center>
                             {% endif %}
                         </div>
                     </div>
