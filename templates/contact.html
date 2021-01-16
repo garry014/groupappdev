@@ -44,9 +44,11 @@
                     <form class="contact-form-style" action="" method="post">
                         <div class="row">
                             <div class="col-lg-12">
+                                {% if username == "" %}
                                 <label for="email">Email Address:*</label>
-                                    {{ render_field(form.email, class="form-control") }}
+                                    {{ render_field(form.email, class="form-control", type="email") }}
                                     <br>
+                                {% endif %}
                             </div>
                             <div class="col-lg-12">
                                 <label for="message">How may we help you today? Please provide details of the issue.*</label>
@@ -63,5 +65,11 @@
         </div>
     </div>
 <br>
+
+<script>
+    window.onload = function(){
+        document.getElementById("email").setAttribute("required","true");
+    }
+</script>
 
 {% endblock %}

@@ -51,4 +51,4 @@ class SendMsg(Form):
 
 class CreateChat(Form):
     message = TextAreaField('', validators=[validators.DataRequired()])
-    email = StringField('',  validators=[validators.Email()]) #validators.DataRequired(),
+    email = StringField('', ) #validators.DataRequired(),

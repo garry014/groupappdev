@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, Request
+from flask import Flask, render_template, request, redirect, url_for, Request, session
 from Forms import *
 from cregform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat
+import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
@@ -15,6 +15,75 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #File upload size cap 16MB
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def view_notification():
+    noti_dict = {}
+    count = 0
+    try:
+        db = shelve.open('notification.db', 'r')
+        noti_dict = db['Notification']
+        db.close()
+    except:
+        return "down", count
+    else:
+        my_noti = {}
+
+        for key,values in noti_dict.items():
+            if values.get_recipient() == username:
+                my_noti[key] = values
+                if values.get_status() == "new":
+                    count += 1
+                    print(count)
+
+        rev_dict = {}
+        for i in sorted(my_noti.keys(), reverse=True):
+            rev_dict[i] = my_noti[i]
+        return rev_dict, count
+
+app.jinja_env.globals.update(view_notification=view_notification)
+
+
+def create_notification(recipient, category, message, hyperlink):
+    #noti = notification
+    noti_dict = {}
+    try:
+        db1 = shelve.open('notification.db', 'c')
+        noti_dict = db1['Notification']
+    except:
+        print("Internal error of opening database.")
+
+    try:
+        count_id = max(noti_dict, key=int) + 1
+    except:
+        count_id = 1  # if no dictionary exist, set id as 1
+
+    noti = Notification.Notification(recipient, category, message, hyperlink)
+    noti.set_id(count_id)
+    noti_dict[count_id] = noti
+    db1['Notification'] = noti_dict
+
+    db1.close()
+
+@app.route('/noti/<action>/<int:id>', methods=['GET', 'POST'])
+def update_notification(action,id):
+    noti_dict = {}
+    try:
+        db1 = shelve.open('notification.db', 'w')
+        noti_dict = db1['Notification']
+    except:
+        print("Database error")
+    else:
+        if action == "readall":
+            for noti in noti_dict:
+                if username == noti_dict[noti].get_recipient():
+                    noti_dict[noti].set_status("read")
+        elif action == "delete":
+            if username == noti_dict[id].get_recipient():
+                noti_dict.pop(id)
+
+        db1['Notification'] = noti_dict
+        db1.close()
+    return redirect(request.referrer)
 
 @app.route('/')
 def home():
@@ -158,8 +227,10 @@ def updateAd(id, updatewhat):
             return redirect(url_for('db_error'))
         ad = ads_dict.get(id)
         ad.set_status("Approved")
+        create_notification(ad.get_store_name(),"updates","Your advertisement just got approved!", "manage_ads")  # create notification
         db['Ads'] = ads_dict
         db.close()
+
         return redirect(url_for('manage_ads'))
     else: #Update All
         if request.method == 'POST' and update_ad.validate():
@@ -510,24 +581,23 @@ def contact(name):
             msg_from = username
         else:
             msg_from = create_chat.email.data
+            session['temp_user'] = create_chat.email.data
 
         message = Chat.Message(create_chat.message.data, msg_from, dt.today().strftime("%d %b %Y %H:%M")) # | %A
         chat = Chat.Chat(count_id, msg_from, name)
         chat.set_messages(message)
-        dchat = {}
         chat_dict[count_id] = chat
-        print(chat_dict)
+
 
         db['Chats'] = chat_dict
         db.close()
 
         return redirect(url_for('chat_page', chat="inbox", chatid=count_id))
-    return render_template('contact.html', form=create_chat)
+    return render_template('contact.html', form=create_chat, username=username)
 
 @app.route('/<string:chat>/<int:chatid>', methods=['GET', 'POST'])
 def chat_page(chat, chatid):
     send_msg = SendMsg(request.form)
-    chat = chat
     if request.method == 'POST':
         chat_dict = {}
         try:
@@ -565,7 +635,10 @@ def chat_page(chat, chatid):
 
         user_chat = {}
         for item in chat_dict:
-            if chat == "inbox":
+            if username == "" and session['temp_user'] != None:
+                if chat_dict[item].get_sender() == session['temp_user']:
+                    user_chat[chat_dict[item].get_id()] = chat_dict[item]
+            elif chat == "inbox":
                 if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
                 elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() != "Archive":

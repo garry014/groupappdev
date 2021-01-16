@@ -27,7 +27,7 @@
           <div class="inbox_people">
             <div class="headind_srch">
               <div class="recent_heading">
-                <h4>Recent</h4> | <h4>Archives</h4>
+                <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><h4>Recent</h4></a> | <a href="{{ url_for('chat_page', chat='archive', chatid=0) }}"><h4>Archives</h4></a>
               </div>
               <div class="srch_bar">
                 <div class="stylish-input-group">
@@ -171,7 +171,7 @@
           <div class="inbox_people">
             <div class="headind_srch">
               <div class="recent_heading">
-                <h4>Recent</h4> | <h4>Archives</h4>
+                <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><h4>Recent</h4></a> | <a href="{{ url_for('chat_page', chat='archive', chatid=0) }}"><h4>Archives</h4></a>
               </div>
               <div class="srch_bar">
                 <div class="stylish-input-group">
