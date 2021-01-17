@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static',filename='img/icon.png')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static',filename='img/favicon.png')}}">
 
     <!-- CSS
 	============================================ -->
@@ -25,16 +25,24 @@
     <script src="{{url_for('static',filename='/js/vendor/modernizr-2.8.3.min.js')}}"></script>
 </head>
 {% block navbar %}
-    {% include 'includes/_navbar.html' %}
+    {% include 'includes/_navbar_riders.html' %}
 {% endblock %}
 <body>
 
-{% block content %}
+
+<div class="container-fluid">
+    {% block content %}
+    {% endblock %}
+</div>
+
+{% block footer %}
+    {% include 'includes/_footer_riders.html' %}
 {% endblock %}
 
 {% block scripts %}
 <!-- All JS is here
 ============================================ -->
+
 <!-- jQuery JS -->
 <script src="{{url_for('static',filename='js/vendor/jquery-v3.4.1.min.js')}}"></script>
 <!-- Popper JS -->
@@ -50,7 +58,4 @@
 {% endblock %}
 </body>
 
-{% block footer %}
-    {% include 'includes/_footer.html' %}
-{% endblock %}
 </html>

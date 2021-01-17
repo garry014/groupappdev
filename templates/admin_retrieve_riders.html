@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %} Retrieve Riders {% endblock %}
+
+{% block content %}
+{% if 'user_updated' in session %}
+<div class="alert alert-success">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ session.pop('user_updated', None) }} was updated.
+</div>
+{% elif 'user_deleted' in session %}
+<div class="alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ session.pop('user_deleted', None) }} was deleted.
+</div>
+{% endif %}
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Riders</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="cart-main-area pt-90 pb-100">
+    <div class="container">
+        <h3 class="cart-page-title">Riders Accounts</h3>
+        <div>
+          {% if count == 0 %}
+          <p>There are no users.</p>
+          {% elif count == 1 %}
+          <p>There is 1 user.</p>
+          {% else %}
+          <p>There are {{ count }} users.</p>
+          {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12"></div>
+                    <div class="table-content table-responsive cart-table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Email</th>
+                                    <th>Phone Number</th>
+                                    <th>Gender</th>
+                                    <th>Transport</th>
+                                    <th>license Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in riders_list %}
+                                <tr>
+                                    <td>{{ user.get_user_id() }}</td>
+                                    <td>{{ user.get_firstname()}}</td>
+                                    <td>{{ user.get_lastname()}}</td>
+                                    <td>{{ user.get_user_name()}}</td>
+                                    <td>{{ user.get_password()}}</td>
+                                    <td>{{ user.get_email()}}</td>
+                                    <td>{{ user.get_phone_number()}}</td>
+                                    <td>{{ user.get_gender()}}</td>
+                                    <td>{{ user.get_transport()}}</td>
+                                    <td>{{ user.get_license_number()}}</td>
+                                    <td class="product-remove">
+                                        <a href="/update_riders_admin/{{user.get_user_id()}}"><i class="fa fa-pencil"></i></a>
+                                    <form action="{{url_for('delete_rider', id=user.get_user_id())}}" method="POST">
+                                         <a href="#"><i class="fa fa-times" data-toggle="modal" data-target="#myModal_{{user.get_user_id()}}"></i></a>
+<!--
+                                     <!-- The Modal -->
+                                            <div class="modal" id="myModal_{{user.get_user_id()}}">
+                                              <div class="modal-dialog">
+                                                <div class="modal-content">
+
+                                                  <!-- Modal Header -->
+                                                  <div class="modal-header">
+                                                      <h4 class="modal-title">Delete Confirmation</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                  </div>
+
+                                                  <!-- Modal body -->
+                                                  <div class="modal-body">
+                                                    Are you sure you want to delete {{user.get_firstname()}} {{user.get_lastname()}}?
+                                                  </div>
+
+                                                  <!-- Modal footer -->
+                                                  <div class="modal-footer">
+                                                      <input type="submit" value="Delete" class="btn btn-danger">
+                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                             {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="cart-shiping-update-wrapper">
+                                <div class="cart-shiping-update">
+                                </div>
+                                <div class="cart-clear">
+                                    <a href="#">Clear All Riders</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
