@@ -6,6 +6,11 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
+from Admin_Update_Form import UpdateAdmin
+from Register_Form import CreateUserForm
+from Forms_Riders import RidersAccounts
+import Rider
+
 username = "Admin"  #Test Scriptdas
 
 app = Flask(__name__)
@@ -723,6 +728,210 @@ def general_error(errorid):
         message = "Something went wrong, please try again later."
 
     return render_template('error.html', title=title, message=message)
+
+###################################RIDERS START##################################################
+
+@app.route('/')
+def riders_home():
+    login= False
+    if 'username' in session:
+        login = True
+    return render_template('riders_home1.html')
+
+
+@app.route('/register_complete')
+def register_complete():
+    return render_template('register_complete.html')
+
+
+@app.route('/delivery_orders')
+def riders_delivery():
+    return render_template('delivery_orders.html')
+
+
+@app.route('/orders_main')
+def orders_main():
+    return render_template('orders_main.html')
+
+
+@app.route('/admin_retrieve_riders')
+def retrieve_riders():
+    users_dict = {}
+    db = shelve.open('storage.db', 'r')
+    users_dict = db['Users']
+    db.close()
+
+    riders_list = []
+    for key in users_dict:
+        user = users_dict.get(key)
+        riders_list.append(user)
+
+    return render_template('admin_retrieve_riders.html', count=len(riders_list), riders_list=riders_list)
+
+
+@app.route('/register_riders', methods=['GET', 'POST'])
+def register_riders():
+    createUserForm = CreateUserForm(request.form)
+    if request.method == 'POST' and createUserForm.validate():
+        users_dict = {}
+        user_count_id = 0
+        db = shelve.open('storage.db', 'c')
+        try:
+            users_dict = db['Users']
+            user_count_id = int(db['user_count_id'])
+
+        except:
+            print("Error in retrieving Users from storage.db.")
+        user = Rider.Rider(createUserForm.firstname.data, createUserForm.lastname.data, createUserForm.user_name.data,
+                           createUserForm.password.data, createUserForm.email.data, createUserForm.phone_number.data,
+                           createUserForm.gender.data, createUserForm.transport.data,
+                           createUserForm.license_number.data)
+        # auto increment user_id from shelve
+        user_count_id = user_count_id + 1
+        user.set_user_id(user_count_id)
+        db['user_count_id'] = user_count_id
+
+        users_dict[user.get_user_id()] = user
+        db['Users'] = users_dict
+        db.close()
+        return render_template('register_complete.html')
+    return render_template('register_riders.html', form=createUserForm)
+
+
+@app.route('/update_riders_admin/<int:id>/', methods=['GET', 'POST'])
+def update_rider(id):
+    update_user_form = UpdateAdmin(request.form)
+    if request.method == 'POST' and update_user_form.validate():
+        users_dict = {}
+        db = shelve.open('storage.db', 'w')
+        users_dict = db['Users']
+
+        user = users_dict.get(id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_user_name(update_user_form.user_name.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+        user.set_gender(update_user_form.gender.data)
+        user.set_transport(update_user_form.transport.data)
+        user.set_license_number(update_user_form.license_number.data)
+
+        db['Users'] = users_dict
+        db.close()
+
+        session['user_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return redirect(url_for('retrieve_riders'))
+    else:
+        users_dict = {}
+        db = shelve.open('storage.db', 'r')
+        users_dict = db['Users']
+        db.close()
+
+        user = users_dict.get(id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.user_name.data = user.get_user_name()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+        update_user_form.gender.data = user.get_gender()
+        update_user_form.transport.data = user.get_transport()
+        update_user_form.license_number.data = user.get_license_number()
+
+        return render_template('update_riders_admin.html', form=update_user_form)
+
+
+@app.route('/deleteRider/<int:id>', methods=['POST'])
+def delete_rider(id):
+    users_dict = {}
+    user = users_dict.get(id)
+    db = shelve.open('storage.db', 'w')
+    users_dict = db['Users']
+
+    user = users_dict.pop(id)
+
+    db['Users'] = users_dict
+    db.close()
+
+    session['user_deleted'] = user.get_firstname() + ' ' + user.get_lastname()
+    return redirect(url_for('retrieve_riders'))
+
+
+@app.route('/login_riders', methods=['GET', 'POST'])
+def login_riders():
+    error = None
+
+    if request.method == 'POST':
+        users_dict = {}
+        db = shelve.open('storage.db', 'r')
+        users_dict = db['Users']
+        for user_id in users_dict:
+            user = users_dict.get(user_id)
+            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                session['rider_account'] = user.get_user_id()
+                return redirect(url_for('riders_home'))
+            elif request.form['user-name'] == 'admin' and request.form['user-password'] == 'admin':
+                return redirect(url_for('retrieve_riders'))
+            else:
+                error = 'Invalid Credentials. Please try again.'
+
+    return render_template('login_riders.html', error=error)
+
+
+@app.route('/riders_account', methods=['GET', 'POST'])
+def update_riders_details():
+    update_user_form = RidersAccounts(request.form)
+    user_id = session['rider_account']
+    if request.method == 'POST' and update_user_form.validate():
+        users_dict = {}
+        db = shelve.open('storage.db', 'w')
+        users_dict = db['Users']
+        user = users_dict.get(user_id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+        user.set_transport(update_user_form.transport.data)
+        user.set_license_number(update_user_form.license_number.data)
+        user.set_password(update_user_form.password.data)
+        db['Users'] = users_dict
+        db.close()
+
+        session['user_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return render_template('riders_account.html', form=update_user_form)
+
+    else:
+        users_dict = {}
+        db = shelve.open('storage.db', 'r')
+        users_dict = db['Users']
+        db.close()
+
+        user = users_dict.get(user_id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+        update_user_form.transport.data = user.get_transport()
+        update_user_form.license_number.data = user.get_license_number()
+        update_user_form.password.data = user.get_password()
+
+        return render_template('riders_account.html', form=update_user_form)
+
+
+@app.route('/riders_account/<int:id>/riders_orders')
+def riders_orders(id):
+    users_dict = {}
+    db = shelve.open('storage.db', 'r')
+    users_dict = db['Users']
+
+    user = users_dict.get(id)
+    db.close()
+
+    session['user_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+    return render_template('riders_orders.html')
+
+#################################RIDERS END#################################################
 
 if __name__ == '__main__':
     app.debug = True
