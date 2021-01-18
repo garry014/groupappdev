@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
-from Admin_Update_Form import UpdateAdmin
+from Admin_Update_Form_Riders import UpdateAdmin
 from Register_Form import CreateUserForm
 from Forms_Riders import RidersAccounts
 import Rider
@@ -38,7 +38,6 @@ def view_notification():
                 my_noti[key] = values
                 if values.get_status() == "new":
                     count += 1
-                    print(count)
 
         rev_dict = {}
         for i in sorted(my_noti.keys(), reverse=True):
@@ -47,22 +46,24 @@ def view_notification():
 
 app.jinja_env.globals.update(view_notification=view_notification)
 
-def refresh_notification():
-    noti_dict = {}
-    try:
-        db1 = shelve.open('notification.db', 'w')
-        noti_dict = db1['Notification']
-    except:
-        print("Database error")
-    else:
-        for noti in noti_dict:
-            if username == noti_dict[noti].get_recipient():
-                noti_dict[noti].set_status("read")
-
-        db1['Notification'] = noti_dict
-        db1.close()
-
-app.jinja_env.globals.update(refresh_notification=refresh_notification)
+# def refresh_notification():
+#     noti_dict = {}
+#     print("Opening noti database")
+#     try:
+#         db1 = shelve.open('notification.db', 'w')
+#         noti_dict = db1['Notification']
+#     except:
+#         print("Database error 1")
+#     else:
+#         print("database opened")
+#         for noti in noti_dict:
+#             if username == noti_dict[noti].get_recipient():
+#                 noti_dict[noti].set_status("read")
+#
+#         db1['Notification'] = noti_dict
+#         db1.close()
+#
+# app.jinja_env.globals.update(refresh_notification=refresh_notification)
 
 def create_notification(recipient, category, message, hyperlink):
     #noti = notification
@@ -97,6 +98,10 @@ def update_notification(action,id):
         if action == "delete":
             if username == noti_dict[id].get_recipient():
                 noti_dict.pop(id)
+        if action == "readall":
+            for noti in noti_dict:
+                if username == noti_dict[noti].get_recipient():
+                    noti_dict[noti].set_status("read")
 
         db1['Notification'] = noti_dict
         db1.close()

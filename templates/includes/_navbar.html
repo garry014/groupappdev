@@ -137,7 +137,7 @@
                             <i class="fa fa-bell-o" style="font-size:20px"></i>
                             {% set my_noti, count = view_notification() %}
                             {% if (my_noti != "down") and (count > 0) %}
-                                <span style="position: absolute; top: -9px; right: -5px; background-color: #000; color: #fff; display: inline-block; width: 21px;height: 21px;border-radius: 100%;line-height: 21px;font-size: 12px; text-align: center;">{{ count }}</span>
+                                <span id="new_noti" style="position: absolute; top: -9px; right: -5px; background-color: #000; color: #fff; display: inline-block; width: 21px;height: 21px;border-radius: 100%;line-height: 21px;font-size: 12px; text-align: center;">{{ count }}</span>
                             {% endif %}
 
                         </button>
@@ -149,7 +149,7 @@
                                     {% if loop.index <= 3 %}
                                         {% if values.get_status() == "new" %}
                                         <!--NEW NOTIFICATIONS-->
-                                        <div onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
+                                        <div {% if values.get_hyperlink()!="" %} onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" {% endif %} style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
 
                                                 <div style="position: relative; float: right;">
                                                     <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
@@ -163,7 +163,7 @@
 
                                         </div>
                                         {% else %}
-                                        <div onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
+                                        <div {% if values.get_hyperlink()!="" %} onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" {% endif %} style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
                                             <div style="position: relative; float: right;">
                                                 <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
                                             </div>
@@ -366,6 +366,7 @@
                 location.href = "{{ url_for('update_notification', action="readall", id=0) }}";
             } else {
                 action = 1;
+                document.getElementById("new_noti").style.display = 'none';
             }
         }
     </script>
