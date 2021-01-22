@@ -55,3 +55,8 @@ class CreateChat(Form):
 
 class CreateNoti(Form):
     message = StringField('', validators=[validators.DataRequired()])
+
+class CreateReview(Form):
+    stars = StringField('')
+    review = TextAreaField('Leave a Review')
+    photo = FileField('Photo:')

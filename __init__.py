@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Request, session
 from Forms import *
 from cregform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification
+import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
@@ -717,6 +717,74 @@ def update_chatstatus(action, id):
         return redirect(url_for('chat_page', chat=action ,chatid=id))
 
 
+@app.route('/review/<shop>/<int:itemid>', methods=['GET' ,'POST'])
+def review(shop, itemid):
+    error = None
+    createReview = CreateReview(request.form)
+    if request.method == 'POST':
+        try:
+            starsgiven = int(createReview.stars.data)
+        except:
+            error = 'Please rate with 1 to 5 stars.'
+        else:
+            print(starsgiven)
+            file = request.files['photo']
+            if not allowed_file(file.filename):
+                error = 'The file format must be in jpg, jpeg, png or gif.'
+            #All validations done at this point
+            review_dict = {}
+            try:
+                db2 = shelve.open('review.db', 'c')
+                review_dict = db2['Review']
+            except:
+                error = "Internal error opening database"
+
+            try:
+                count_id = max(review_dict, key=int) + 1
+            except:
+                count_id = 1  # if no dictionary exist, set id as 1
+
+            # Image Handling
+            app.config['UPLOAD_FOLDER'] = './static/uploads/reviews/'
+            filename = secure_filename(file.filename)
+            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_extension = os.path.splitext(filename)  # get file type
+            os.rename('static/uploads/reviews/' + filename, 'static/uploads/reviews/' + str(count_id) + file_extension[1])
+            # End of Image Handling
+
+            thisreview = Reviews.Reviews(count_id, shop, itemid, starsgiven, review, str(count_id) + file_extension[1])
+            review_dict[count_id] = thisreview
+            db2['Review'] = review_dict
+
+            db2.close()
+            return redirect(url_for('manage_ads'))
+    else:
+        catalogue_dict = {}
+        try:
+            db = shelve.open('catalogue.db', 'r')
+            catalogue_dict = db['Catalogue']
+            db.close()
+        except:
+            return redirect(url_for('general_error'), errorid=0)
+        # if shop not in catalogue_dict():
+        #     return redirect(url_for('general_error', errorid=2))
+        nomatch = 1
+        product_name = ""
+        for key, value in catalogue_dict.items():
+            if shop == key:
+                for item in catalogue_dict[key]:
+                    print(item.get_id())
+                    if item.get_id() == itemid:
+                        product_name = item.get_name()
+                        nomatch = 0
+                        break
+
+        if nomatch == 1:
+            return redirect(url_for('general_error', errorid=2))
+    return render_template('review.html', form=createReview, error=error, product_name=product_name)
+
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
 def page_not_found(e):
@@ -745,6 +813,8 @@ def general_error(errorid):
         message = "Something went wrong, please try again later."
 
     return render_template('error.html', title=title, message=message)
+
+
 
 ###################################RIDERS START##################################################
 
