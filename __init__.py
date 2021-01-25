@@ -773,8 +773,7 @@ def review(shop, itemid):
             db.close()
         except:
             return redirect(url_for('general_error'), errorid=0)
-        # if shop not in catalogue_dict():
-        #     return redirect(url_for('general_error', errorid=2))
+
         nomatch = 1
         for key, value in catalogue_dict.items():
             if shop == key:
@@ -847,6 +846,28 @@ def updateReview(shop, productid, id):
                 db2.close()
                 return redirect(url_for('viewReviews', shop=shop, productid=productid))
     else:
+        ### Check Catalouge id ###
+        catalogue_dict = {}
+        try:
+            db = shelve.open('catalogue.db', 'r')
+            catalogue_dict = db['Catalogue']
+            db.close()
+        except:
+            return redirect(url_for('general_error'), errorid=0)
+
+        nomatch = 1
+        for key, value in catalogue_dict.items():
+            if shop == key:
+                for item in catalogue_dict[key]:
+                    print(item.get_id())
+                    if item.get_id() == productid:
+                        product_name = item.get_name()
+                        nomatch = 0
+                        break
+
+        if nomatch == 1:
+            return redirect(url_for('general_error', errorid=2))
+        ##########################
         review_dict = {}
         try:
             db2 = shelve.open('review.db', 'r')
@@ -867,7 +888,7 @@ def updateReview(shop, productid, id):
             review = current_dict.get(id)
             updateReview.stars.data = review.get_stars()
             updateReview.review.data = review.get_review()
-    return render_template('updateReview.html', form=updateReview, current_dict=current_dict, error=error)
+    return render_template('updateReview.html', form=updateReview, current_dict=current_dict, product_name=product_name, error=error)
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)

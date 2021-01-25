@@ -63,6 +63,30 @@
           }
         }
     }
+
+    // Set number of stars whenever onload
+    function setRadioValue() {
+        var radios = document.getElementsByName('rg1');
+        var stars = document.getElementById("stars").value;
+        var numStars = parseInt(document.getElementById('stars').value);
+        if (numStars == 5) {
+            radios[0].checked = true;
+        }
+        else if (numStars == 4) {
+            radios[1].checked = true;
+        }
+        else if (numStars == 3) {
+            radios[2].checked = true;
+        }
+        else if (numStars == 2) {
+            radios[3].checked = true;
+        }
+        else if (numStars == 1) {
+            radios[4].checked = true;
+        }
+    }
+
+    setRadioValue();
 </script>
 
 {% endblock %}

@@ -69,11 +69,20 @@
         var radios = document.getElementsByName('rg1');
         var stars = document.getElementById("stars").value;
         var numStars = parseInt(document.getElementById('stars').value);
-
-        for (var i = 6; i > 0; i--) {
-          if (i == numStars) {
-            radios[i].checked = true;
-          }
+        if (numStars == 5) {
+            radios[0].checked = true;
+        }
+        else if (numStars == 4) {
+            radios[1].checked = true;
+        }
+        else if (numStars == 3) {
+            radios[2].checked = true;
+        }
+        else if (numStars == 2) {
+            radios[3].checked = true;
+        }
+        else if (numStars == 1) {
+            radios[4].checked = true;
         }
     }
 
