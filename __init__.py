@@ -720,6 +720,7 @@ def update_chatstatus(action, id):
 @app.route('/review/<shop>/<int:itemid>', methods=['GET' ,'POST'])
 def review(shop, itemid):
     error = None
+    product_name = ""
     createReview = CreateReview(request.form)
     if request.method == 'POST':
         try:
@@ -727,11 +728,8 @@ def review(shop, itemid):
         except:
             error = 'Please rate with 1 to 5 stars.'
         else:
-            print(starsgiven)
             file = request.files['photo']
-            if not allowed_file(file.filename):
-                error = 'The file format must be in jpg, jpeg, png or gif.'
-            #All validations done at this point
+
             review_dict = {}
             try:
                 db2 = shelve.open('review.db', 'c')
@@ -744,17 +742,24 @@ def review(shop, itemid):
             except:
                 count_id = 1  # if no dictionary exist, set id as 1
 
-            # Image Handling
-            app.config['UPLOAD_FOLDER'] = './static/uploads/reviews/'
-            filename = secure_filename(file.filename)
-            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            file_extension = os.path.splitext(filename)  # get file type
-            os.rename('static/uploads/reviews/' + filename, 'static/uploads/reviews/' + str(count_id) + file_extension[1])
-            # End of Image Handling
-
-            thisreview = Reviews.Reviews(count_id, shop, itemid, starsgiven, review, str(count_id) + file_extension[1])
+            if file.filename != '':
+                if not allowed_file(file.filename):
+                    error = 'The file format must be in jpg, jpeg, png or gif.'
+                else:
+                    # Image Handling
+                    app.config['UPLOAD_FOLDER'] = './static/uploads/reviews/'
+                    filename = secure_filename(file.filename)
+                    if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file_extension = os.path.splitext(filename)  # get file type
+                    os.rename('static/uploads/reviews/' + filename,
+                              'static/uploads/reviews/' + str(count_id) + file_extension[1])
+                    # End of Image Handling
+                    thisreview = Reviews.Reviews(count_id, shop, itemid, username, starsgiven, createReview.review.data,
+                                                 str(count_id) + file_extension[1])
+            else:
+                thisreview = Reviews.Reviews(count_id, shop, itemid, username, starsgiven, createReview.review.data, "")
             review_dict[count_id] = thisreview
             db2['Review'] = review_dict
 
@@ -771,7 +776,6 @@ def review(shop, itemid):
         # if shop not in catalogue_dict():
         #     return redirect(url_for('general_error', errorid=2))
         nomatch = 1
-        product_name = ""
         for key, value in catalogue_dict.items():
             if shop == key:
                 for item in catalogue_dict[key]:
@@ -784,6 +788,41 @@ def review(shop, itemid):
         if nomatch == 1:
             return redirect(url_for('general_error', errorid=2))
     return render_template('review.html', form=createReview, error=error, product_name=product_name)
+
+@app.route('/viewReviews/<shop>/<int:productid>', methods=['GET' ,'POST'])
+def viewReviews(shop, productid):
+    review_dict = {}
+    try:
+        db2 = shelve.open('review.db', 'r')
+        review_dict = db2['Review']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+
+    current_dict = {}
+    for item in review_dict:
+        if review_dict[item].get_storename() == shop and review_dict[item].get_productid() == productid:
+            current_dict[item] = review_dict[item]
+            print(current_dict) #Test script
+
+    if not current_dict:
+        return redirect(url_for('general_error', errorid=3))
+
+    return render_template('viewReviews.html', current_dict=current_dict, username=username, productid=productid, shop=shop)
+
+@app.route('/deleteReview/<shop>/<int:productid>/<int:id>', methods=['GET', 'POST'])
+def deleteReview(shop, productid, id):
+    review_dict = {}
+    try:
+        db2 = shelve.open('review.db', 'w')
+        review_dict = db2['Review']
+    except:
+        return redirect(url_for('general_error', errorid=0))
+    else:
+        review_dict.pop(id)
+        db2['Review'] = review_dict
+        db2.close()
+        return redirect(url_for('viewReviews', shop=shop, productid=productid))
 
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
@@ -808,6 +847,9 @@ def general_error(errorid):
     elif errorid == 2: #Path not accessible Error
         title = "Path Not Accessible"
         message = "You do not have sufficient permission to access the information. Please contact our support if you think we made a mistake."
+    elif errorid == 3:
+        title = "No review available"
+        message = "There is no available reviews for this product."
     else:
         title = "Unknown"
         message = "Something went wrong, please try again later."

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Advertise with us{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="custom-row-2">
+            <div class="col-lg-8 col-md-7"  style="margin: auto;">
+                <div class="contact-form">
+                    <div class="contact-title mb-30">
+                        <h2>View Reviews</h2>
+                    </div>
+
+                    {% for item in current_dict %}
+                    <div style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
+                        {% if (username == "Admin") or (username == current_dict[item].get_username()) %}
+                        <div style="position: relative; float: right;">
+                            <a href="{{ url_for('deleteReview', shop=shop, productid=productid, id=current_dict[item].get_id()) }}"><i class="fa fa-times" title="Delete this Review"></i></a>
+                        </div>
+                        {% endif %}
+
+                        {{ current_dict[item].get_username() }} <a href="{{ url_for('updateReview', shop=shop, productid=productid, id=current_dict[item].get_id()) }}"><i class="fa fa-times" title="Delete this Review"></i></a>
+                        <br>
+                        {% for star in range(current_dict[item].get_stars()) %}
+                            <span class="fa fa-star" style="color: orange;"></span>
+                        {% endfor %}
+                        {% set temp_count = 5 - current_dict[item].get_stars() %}
+                        {% for star in range(temp_count) %}
+                            <span class="fa fa-star"></span>
+                        {% endfor %}
+                        <br>
+                        {{ current_dict[item].get_review() }}
+                        <div style="font-size:10px">
+                            {{ current_dict[item].get_timestamp() }}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <p class="form-messege"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<br>
+
+{% endblock %}

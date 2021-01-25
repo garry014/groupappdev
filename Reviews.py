@@ -1,7 +1,8 @@
 from datetime import datetime as dt
 
 class Reviews:
-    def __init__(self, id, storename, productid, stars, review, photo):
+    def __init__(self, id, storename, productid, username, stars, review, photo):
+        self.__username = username
         self.__productid = productid
         self.__storename = storename
         self.__photo = photo
@@ -51,3 +52,9 @@ class Reviews:
 
     def set_timestamp(self, timestamp):
         self.__timestamp = timestamp
+
+    def get_username(self):
+        return self.__username
+
+    def set_username(self, username):
+        self.__username = username
