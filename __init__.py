@@ -824,6 +824,51 @@ def deleteReview(shop, productid, id):
         db2.close()
         return redirect(url_for('viewReviews', shop=shop, productid=productid))
 
+@app.route('/updateReview/<shop>/<int:productid>/<int:id>', methods=['GET', 'POST'])
+def updateReview(shop, productid, id):
+    error = None
+    updateReview = CreateReview(request.form)
+    if request.method == 'POST':
+        review_dict = {}
+        try:
+            db2 = shelve.open('review.db', 'w')
+            review_dict = db2['Review']
+        except:
+            return redirect(url_for('general_error', errorid=0))
+        else:
+            try:
+                starsgiven = int(updateReview.stars.data)
+            except:
+                error = 'Please rate with 1 to 5 stars.'
+            else:
+                review_dict[id].set_stars(starsgiven)
+                review_dict[id].set_review(updateReview.review.data)
+                db2['Review'] = review_dict
+                db2.close()
+                return redirect(url_for('viewReviews', shop=shop, productid=productid))
+    else:
+        review_dict = {}
+        try:
+            db2 = shelve.open('review.db', 'r')
+            review_dict = db2['Review']
+            db2.close()
+        except:
+            return redirect(url_for('general_error', errorid=0))
+
+        current_dict = {}
+        for item in review_dict:
+            if review_dict[item].get_storename() == shop and review_dict[item].get_productid() == productid:
+                current_dict[item] = review_dict[item]
+                print(current_dict)
+
+        if not current_dict:
+            return redirect(url_for('general_error', errorid=3))
+        else:
+            review = current_dict.get(id)
+            updateReview.stars.data = review.get_stars()
+            updateReview.review.data = review.get_review()
+    return render_template('updateReview.html', form=updateReview, current_dict=current_dict, error=error)
+
 #ERROR 404 Not Found Page
 @app.errorhandler(404)
 def page_not_found(e):

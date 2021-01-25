@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Updating Review{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<style type="text/css">
+  @import url("{{url_for('static',filename='/css/review.css')}}");
+</style>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="contact-form">
+                    <div class="contact-title mb-30">
+                        <h2>Updating Review for {{ product_name }}</h2>
+                    </div>
+                    <form class="contact-form-style" action="" method="post" enctype=multipart/form-data>
+                        <div class="row">
+                            <div class="wrapper">
+                              <input type="radio" id="r1" name="rg1" value="5" onclick="getRadioValue()">
+                              <label for="r1">&#9733;</label>
+                              <input type="radio" id="r2" name="rg1" value="4" onclick="getRadioValue()">
+                              <label for="r2">&#9733;</label>
+                              <input type="radio" id="r3" name="rg1" value="3" onclick="getRadioValue()">
+                              <label for="r3">&#9733;</label>
+                              <input type="radio" id="r4" name="rg1" value="2" onclick="getRadioValue()">
+                              <label for="r4">&#9733;</label>
+                              <input type="radio" id="r5" name="rg1" value="1" onclick="getRadioValue()">
+                              <label for="r5">&#9733;</label>
+                            </div>
+                            {{ render_field(form.stars, class="form-control", type="hidden") }}
+                            <div class="col-lg-12">
+                                {{ render_field(form.review, class="form-control") }}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.photo, class="form-control", style="margin-bottom: 0;") }}
+                            </div>
+                            <div class="col-lg-9">
+                                {% if error %}
+                                    <div class="text-danger">Error: {{ error }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-3">
+                                <button class="submit" type="submit" style="float: right;">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="form-messege"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+
+<script>
+    // Get number of stars whenever clicked.
+    function getRadioValue() {
+        var radios = document.getElementsByName('rg1');
+        for (var i = 0, length = radios.length; i < length; i++) {
+          if (radios[i].checked) {
+            $('#stars').val(radios[i].value);
+            break;
+          }
+        }
+    }
+
+    // Set number of stars whenever onload
+    function setRadioValue() {
+        var radios = document.getElementsByName('rg1');
+        var stars = document.getElementById("stars").value;
+        var numStars = parseInt(document.getElementById('stars').value);
+
+        for (var i = 6; i > 0; i--) {
+          if (i == numStars) {
+            radios[i].checked = true;
+          }
+        }
+    }
+
+    setRadioValue();
+
+</script>
+
+{% endblock %}
