@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, Request, session
+
 from Forms import *
 from cregform import *
 import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews
@@ -583,10 +584,18 @@ def viewstore(name):
         return redirect(url_for('general_error'), errorid=0)
     #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
 
+    review_dict = {}
+    try:
+        db2 = shelve.open('review.db', 'r')
+        review_dict = db2['Review']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+
     if name not in catalogue_dict:
         return redirect(url_for('view_shops'))
 
-    return render_template('viewstore.html', shop_dict=catalogue_dict[name], name=name)
+    return render_template('viewstore.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name)
 
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
@@ -764,6 +773,7 @@ def review(shop, itemid):
             db2['Review'] = review_dict
 
             db2.close()
+
             return redirect(url_for('manage_ads'))
     else:
         catalogue_dict = {}
@@ -859,7 +869,6 @@ def updateReview(shop, productid, id):
         for key, value in catalogue_dict.items():
             if shop == key:
                 for item in catalogue_dict[key]:
-                    print(item.get_id())
                     if item.get_id() == productid:
                         product_name = item.get_name()
                         nomatch = 0
@@ -880,7 +889,6 @@ def updateReview(shop, productid, id):
         for item in review_dict:
             if review_dict[item].get_storename() == shop and review_dict[item].get_productid() == productid:
                 current_dict[item] = review_dict[item]
-                print(current_dict)
 
         if not current_dict:
             return redirect(url_for('general_error', errorid=3))

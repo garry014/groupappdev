@@ -63,12 +63,26 @@
                                 <div class="product-content text-center">
                                     <h3><a data-toggle="modal" data-target="#modal{{ product.get_id() }}">{{ product.get_name() }}</a></h3>
                                     <div class="product-rating">
-                                        {{ product.get_reviews() }} stars
-                                        <i class="fa fa-star-o yellow"></i>
-                                        <i class="fa fa-star-o yellow"></i>
-                                        <i class="fa fa-star-o yellow"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
+                                        {% set count = namespace(value=0) %}
+                                        {% set total_stars = namespace(value=0) %}
+                                        {% for i in review_dict %}
+                                            {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == product.get_id() %}
+                                                {% set count.value = count.value + 1 %}
+                                                {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if total_stars.value > 0 %}
+                                            <a href="{{ url_for('viewReviews', shop=name, productid=product.get_id()) }}">
+                                                {{ (total_stars.value/count.value) }} stars
+                                                <i class="fa fa-star-o yellow"></i>
+                                                <i class="fa fa-star-o yellow"></i>
+                                                <i class="fa fa-star-o yellow"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                            </a>
+                                        {% else %}
+                                            No reviews yet.
+                                        {% endif %}
                                     </div>
                                     <div class="product-price">
                                         {% if product.get_discount() > 0 %}
@@ -145,6 +159,18 @@
                                 {% endif %}
                             </div>
                             <div class="pro-details-rating-wrap">
+                                {% set count = namespace(value=0) %}
+                                {% set total_stars = namespace(value=0) %}
+                                {% for i in review_dict %}
+                                    {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == product.get_id() %}
+                                        {% set count.value = count.value + 1 %}
+                                        {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
+                                    {% endif %}
+                                {% endfor %}
+                                <a href="https://www.w3schools.com">
+                                {% if total_stars.value > 0 %}
+                                    {{ total_stars.value/count.value }} 
+                                {% endif %}
                                 <div class="pro-details-rating">
                                     <i class="fa fa-star-o yellow"></i>
                                     <i class="fa fa-star-o yellow"></i>
@@ -152,7 +178,7 @@
                                     <i class="fa fa-star-o"></i>
                                     <i class="fa fa-star-o"></i>
                                 </div>
-                                <span>{{ product.get_reviews() }} Reviews</span>
+                                <span>{{ count.value }} Reviews</span>
                             </div>
                             <p>{{ product.get_description() }}</p>
                             <br>

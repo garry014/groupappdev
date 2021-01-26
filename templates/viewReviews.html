@@ -19,7 +19,10 @@
                         </div>
                         {% endif %}
 
-                        {{ current_dict[item].get_username() }} <a href="{{ url_for('updateReview', shop=shop, productid=productid, id=current_dict[item].get_id()) }}"><i class="fa fa-pencil" title="Update this Review"></i></a>
+                        {{ current_dict[item].get_username() }}
+                        {% if (username == "Admin") or (username == current_dict[item].get_username()) %}
+                        <a href="{{ url_for('updateReview', shop=shop, productid=productid, id=current_dict[item].get_id()) }}"><i class="fa fa-pencil" title="Update this Review"></i></a>
+                        {% endif %}
                         <br>
                         {% for star in range(current_dict[item].get_stars()) %}
                             <span class="fa fa-star" style="color: orange;"></span>
