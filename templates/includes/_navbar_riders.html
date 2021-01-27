@@ -30,7 +30,9 @@
                     </div>
                 </div>
                 <div class="header-offer">
-                    <p>Free delivery on order over <span>$200</span></p>
+                     {% if 'rider_account' in session %}
+                    <p> {{  session.get('rider_identity') }} </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -187,7 +189,9 @@
                                     {% if 'rider_account' in session %}
                                     <li><a href="/riders_account">My account</a></li>
                                     {% endif %}
-                                    <li><a href="/">Log Out </a></li>
+                                    {% if 'rider_account' in session %}
+                                    <li><a href="/log_out"> Log Out </a></li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
