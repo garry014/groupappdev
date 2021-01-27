@@ -1,14 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, Request, session
-
-
-import Customer
 from Register_Customer import Customer_Register
 from Forms import *
 from cregform import *
 from orderform import *
 from targetform import *
 from availform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability
+import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability, Customer
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
@@ -24,6 +21,11 @@ from Forms_Tailors import TailorsAccount
 username = "Admin"  #Test Scriptdas
 import shelve, Tailor
 from Register_Tailors import *
+
+from CreateCourseForm import *
+from AddContentForm import *
+import Course, Content
+
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -1783,6 +1785,7 @@ def DeleteContent(id, topic):
 
     return redirect(url_for('AddContent', id=id, topic=topic))
 ######################################## End of Stacey's code #####################################
+
 ######################################## Start of Kai Jie's code #####################################
 @app.route('/createOrder', methods=['GET', 'POST'])
 def create_Order():

@@ -30,7 +30,7 @@
 
                                     <td class="due-date">{{ custOrder.get_due_date() }}</td>
                                     <td class="orders-action">
-                                        <form action="{{url_for('completedOrder', id=custOrder.get_order_id())}}" method="POST" style="display: inline-block;">
+                                        <form action="{{ url_for('vieworders', id=custOrder.get_order_id()) }}" method="POST" style="display: inline-block;">
                                         <button type="button" style="border:none; background: none; display: inline-block;" data-toggle="modal" data-target="#myModal_{{custOrder.get_order_id()}}"><i class="fa fa-times"></i></button>
                                         <!-- The Modal -->
                                         <div class="modal" id="myModal_{{custOrder.get_order_id()}}">
