@@ -22,8 +22,14 @@ username = "Admin"  #Test Scriptdas
 import shelve, Tailor
 from Register_Tailors import *
 
+import Course, Content
+from CreateCourseForm import *
+from AddContentForm import *
+
+
 app = Flask(__name__)
 app.secret_key = 'super secret key'
+app.secret_key = 'any_random_string'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #File upload size cap 16MB
 
 def allowed_file(filename):
@@ -1536,6 +1542,243 @@ def log_out_customers():
         session.pop('customer_identity')
 
     return redirect(url_for('home'))
+
+
+
+@app.route('/CreateCourse', methods=['GET', 'POST'])
+def CreateCourse():
+    createcourse = CreateCourseForm(request.form)
+
+    if request.method == 'POST' and createcourse.validate():
+        courseDict = {}
+        courseid_count = 0
+        try:
+            db = shelve.open('course.db', 'c')
+            courseDict = db['course']
+            courseid_count = int(db['courseid_count']) #
+        except:
+            print("error reading course.db")
+
+
+        file = request.files[createcourse.tbnail.name]
+
+
+        app.config['UPLOAD_FOLDER'] = './static/uploads/courseban/'
+        filename = secure_filename(file.filename)
+        if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file_extension = os.path.splitext(filename)  # get file type
+        os.rename('static/uploads/courseban/' + filename, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
+
+        course = Course.Course(createcourse.title.data, createcourse.tailor.data, createcourse.material.data, createcourse.language.data, createcourse.livecourse.data,createcourse.note.data, createcourse.price.data, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
+
+        courseid_count = courseid_count + 1
+        course.set_courseid(courseid_count)
+        db["courseid_count"] = courseid_count
+
+        courseDict[course.get_courseid()] = course
+        db["course"] = courseDict
+        db.close()
+
+        session['course_created'] = course.get_title()
+
+        return redirect(url_for('viewcourse'))  #??? what
+
+    return render_template('CreateCourse.html', form=createcourse)
+
+
+@app.route('/ViewCourse')
+def viewcourse():
+    courseDict = {}
+    try:
+        db = shelve.open('course.db', 'r')  # open shelve
+        courseDict = db['course']  # retrieve users
+        db.close()
+    except:
+        print("Error retrieving users from course.db")
+
+    courseList = []
+    for key in courseDict:
+        course = courseDict.get(key)  # key is user id
+        courseList.append(course)
+
+    return render_template('ViewCourse.html', count=len(courseList), courseList=courseList)  # red is like parameters
+    # parse in 2 variables, count and users_list
+
+
+
+@app.route('/UpdateCourse/<int:id>', methods=['GET','POST'])  #??????????????
+def UpdateCourse(id):
+    updatecourse = CreateCourseForm(request.form)
+    if request.method == 'POST' and updatecourse.validate(): #???
+        courseDict = {}
+        db = shelve.open('course.db', 'w')
+        courseDict = db['course']
+
+        course = courseDict.get(id)  # id?
+        course.set_title(updatecourse.title.data)
+        course.set_tailor(updatecourse.tailor.data)
+        course.set_material(updatecourse.material.data)
+        course.set_language(updatecourse.language.data)
+        course.set_livecourse(updatecourse.livecourse.data)
+        course.set_note(updatecourse.note.data)
+        course.set_price(updatecourse.price.data)
+
+        db['course'] = courseDict
+        db.close()
+
+        session['course_updated'] = course.get_title()
+
+        #change to saved notif
+        return redirect(url_for('viewcourse'))
+
+    else:
+        courseDict = {}
+        db = shelve.open('course.db', 'r')
+        courseDict = db['course']
+
+        db.close()
+
+        course = courseDict.get(id)  # ??
+        updatecourse.title.data = course.get_title()
+        updatecourse.tailor.data = course.get_tailor()
+        updatecourse.material.data = course.get_material()
+        updatecourse.language.data = course.get_language()
+        updatecourse.livecourse.data = course.get_livecourse()
+        updatecourse.note.data = course.get_note()
+        updatecourse.price.data = course.get_price()
+        updatecourse.tbnail.data = course.get_tbnail()
+
+        return render_template('UpdateCourse.html', form=updatecourse, course=course)
+
+
+
+@app.route('/DeleteCourse/<int:id>', methods=['POST']) #?????????????
+def DeleteCourse(id):
+    courseDict = {}
+    db = shelve.open('course.db', 'w')
+    courseDict = db['course']
+
+    courseDict.pop(id)
+
+    db['course'] = courseDict
+    db.close()
+
+    return redirect(url_for('viewcourse'))
+
+
+
+# View all courses avaliable
+@app.route('/ViewShopsCourse')
+def viewshopscourse():
+    courseDict = {}
+    try:
+        db = shelve.open('course.db', 'r')  # open shelve
+        courseDict = db['course']  # retrieve users
+        db.close()
+    except:
+        print("Error retrieving users from course.db")
+
+    print(courseDict)
+
+
+    return render_template('ViewShopsCourse.html', courseDict=courseDict)
+
+
+# View individual course info
+@app.route('/course/<int:id>') #/<int:id>
+def indivCourse(id):
+    courseDict = {}
+    try:
+        db = shelve.open('course.db', 'r')  # open shelve
+        courseDict = db['course']  # retrieve users
+        db.close()
+    except:
+        print("Error retrieving users from course.db")
+
+    courseInfo = courseDict.get(id)
+    #print(courseInfo)
+    return render_template('course.html',  courseInfo=courseInfo)
+
+
+
+
+@app.route('/AddContent/<int:id>', methods=['GET', 'POST'])
+def AddContent(id):
+    contentDict = {}
+    courseDict = {}
+    addcontent = AddContentForm(request.form)
+    try:
+        db = shelve.open('content.db', 'r')
+        contentDict = db['content']
+        # videoid_count = int(db['videoid_count']) #
+        db.close()
+    except:
+        print("error reading content.db")
+
+    course = courseDict.get(id)
+    contentList = []
+    for key in contentDict:
+        content = contentDict.get(key)  # key is topic
+        contentList.append(content)
+
+    addcontent = AddContentForm(request.form)
+    #print(addcontent.validate())
+    if request.method == 'POST' and addcontent.validate():
+        contentDict = {}
+        courseDict = {}
+        #videoid_count = 0
+        try:
+           db = shelve.open('content.db', 'c')
+           contentDict = db['content']
+           #videoid_count = int(db['videoid_count']) #
+        except:
+           print("error reading content.db")
+
+        course = courseDict.get(id)
+        vidfile = request.files[addcontent.video.name]
+
+        app.config['UPLOAD_FOLDER'] = './static/uploads/coursevideo/' + str(id)
+        if not os.path.exists('./static/uploads/coursevideo/' + str(id)): #??
+            os.makedirs('./static/uploads/coursevideo/' + str(id))
+
+
+        filename = secure_filename(vidfile.filename)
+        if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+           os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        vidfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        content = Content.Content(addcontent.topic.data, addcontent.video.data, id)
+
+        db[addcontent.topic.data] = content
+        contentDict[content.get_topic()] = content
+        db['content'] = contentDict
+        db.close()
+
+        return redirect(url_for('AddContent', id=id))  #??? what
+
+    return render_template('AddContent.html',form=addcontent, count=len(contentList), contentList=contentList, id=id)
+
+
+@app.route('/DeleteContent/<int:id>/<topic>', methods=['GET', 'POST']) #?????????????lollolololol
+def DeleteContent(id, topic):
+    contentDict = {}
+
+    db = shelve.open('content.db', 'w')
+    contentDict = db['content']
+
+    #print(contentDict)
+    if id == contentDict[topic].get_course():
+        contentDict.pop(topic)
+
+    db['content'] = contentDict
+    db.close()
+
+    return redirect(url_for('AddContent', id=id, topic=topic))
+
+
+
 
 
 @app.route('/my_cart')
