@@ -2,6 +2,7 @@
 {% block title %}View Items - {{ name }}{% endblock %}
 
 {% block content %}
+{% from "includes/_formHelper.html" import render_field %}
 <div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
     <div class="container">
         <div class="breadcrumb-content text-center">
@@ -167,7 +168,6 @@
                                         {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
                                     {% endif %}
                                 {% endfor %}
-                                <a href="https://www.w3schools.com">
                                 {% if total_stars.value > 0 %}
                                     {{ total_stars.value/count.value }} 
                                 {% endif %}
@@ -206,10 +206,13 @@
                             </div>
                             <div class="pro-details-quality">
                                 <div class="cart-plus-minus">
-                                    <input class="cart-plus-minus-box" type="text" name="qtybutton" value="1">
+
+                                    {{ render_field(form.qtybutton, class="cart-plus-minus-box", value="1") }}
                                 </div>
                                 <div class="pro-details-cart btn-hover">
-                                    <a href="#">Add To Cart</a>
+                                    <form id="form1" action="{{ url_for('AddCartItem', shop=name, id=product.get_id()) }}" method="post">
+                                        <a href="javascript:;" onclick="document.getElementById('form1').submit();">Add To Cart</a>
+                                    </form>
                                 </div>
                                 <div class="pro-details-wishlist">
                                     <a href="#"><i class="fa fa-heart-o"></i></a>

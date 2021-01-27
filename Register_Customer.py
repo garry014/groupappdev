@@ -1,6 +1,7 @@
 from wtforms import Form, StringField, SelectField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, Regexp, Length
+import email_validator
 
 
 class Customer_Register(Form):

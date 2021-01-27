@@ -26,6 +26,8 @@ app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #File upload size cap 16MB
 
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -584,6 +586,7 @@ def view_shops():
 def viewstore(name):
     catalogue_dict = {}
     disc_price_dict = {}
+    createOrder = CreateOrder(request.form)
     try:
         db = shelve.open('catalogue.db', 'r')
         catalogue_dict = db['Catalogue']
@@ -593,6 +596,7 @@ def viewstore(name):
     #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
 
     review_dict = {}
+
     try:
         db2 = shelve.open('review.db', 'r')
         review_dict = db2['Review']
@@ -603,7 +607,13 @@ def viewstore(name):
     if name not in catalogue_dict:
         return redirect(url_for('view_shops'))
 
-    return render_template('viewstore.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name)
+    session['cart_items'] = {}
+    print(session['cart_items'])
+
+    if request.method == 'POST':
+        print('a')
+
+    return render_template('viewstore.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, form=createOrder)
 
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])

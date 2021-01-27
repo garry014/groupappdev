@@ -60,3 +60,6 @@ class CreateReview(Form):
     stars = StringField('')
     review = TextAreaField('Leave a Review')
     photo = FileField('Photo:')
+
+class CreateOrder(Form):
+    qtybutton = StringField('')
