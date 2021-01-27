@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, Request, session
 
+
+import Customer
+from Register_Customer import Customer_Register
 from Forms import *
 from cregform import *
 import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews
@@ -8,11 +11,16 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
+
 from Admin_Update_Form_Riders import UpdateAdmin
 from Register_Form import CreateUserForm
 from Forms_Riders import RidersAccounts
 import Rider
+from Admin_Update_Form_Tailors import AdminUpdateTailor
+from Forms_Tailors import TailorsAccount
 username = "Admin"  #Test Scriptdas
+import shelve, Tailor
+from Register_Tailors import *
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
