@@ -46,13 +46,56 @@
                 <div class="col-xl-2 col-lg-2 col-md-6 col-8">
                        <div class="header-right-wrap">
                         <div class="same-style header-search">
-                            <a class="search-active" href="#"><i class="pe-7s-search"></i></a>
-                            <div class="search-content">
-                                <form action="#">
-                                    <input type="text" placeholder="Search" />
-                                    <button class="button-search"><i class="pe-7s-search"></i></button>
-                                </form>
-                            </div>
+                        <button type="button" onclick="clear_new()" class="search-active" style="border:none; background: none;">
+
+                            <i class="fa fa-bell-o" style="font-size:20px"></i>
+                            {% set my_noti, count = view_notification() %}
+                            {% if (my_noti != "down") and (count > 0) %}
+                                <span id="new_noti" style="position: absolute; top: -9px; right: -5px; background-color: #000; color: #fff; display: inline-block; width: 21px;height: 21px;border-radius: 100%;line-height: 21px;font-size: 12px; text-align: center;">{{ count }}</span>
+                            {% endif %}
+
+                        </button>
+                        <div class="search-content">
+                            {% if my_noti == "down" %}
+                                Our database is currently down, please try again later
+                            {% else %}
+                                {% for key,values in my_noti.items() %}
+                                    {% if loop.index <= 3 %}
+                                        {% if values.get_status() == "new" %}
+                                        <!--NEW NOTIFICATIONS-->
+                                        <div {% if values.get_hyperlink()!="" %} onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" {% endif %} style="background: #ebebeb; border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
+
+                                                <div style="position: relative; float: right;">
+                                                    <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
+                                                </div>
+                                                {{ values.get_message() }}
+                                                <div style="font-size:10px">
+                                                    {% if values.get_category() == "updates" %}<i class="fa fa-rss"></i>
+                                                    {% elif values.get_category() == "purchase" %}<i class="pe-7s-shopbag"></i>
+                                                    {% endif %}{{ values.get_time() }}
+                                                </div>
+
+                                        </div>
+                                        {% else %}
+                                        <div {% if values.get_hyperlink()!="" %} onclick="location.href='{{ url_for(values.get_hyperlink()) }}';" {% endif %} style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
+                                            <div style="position: relative; float: right;">
+                                                <a href="{{ url_for('update_notification', action='delete', id=key) }}"><i class="fa fa-times" title="Delete this notification"></i></a>
+                                            </div>
+                                            {{ values.get_message() }}
+                                            <div style="font-size:10px">
+                                                {% if values.get_category() == "updates" %}<i class="fa fa-rss"></i>
+                                                {% elif values.get_category() == "purchase" %}<i class="pe-7s-shopbag"></i>
+                                                {% endif %}{{ values.get_time() }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if my_noti|length > 3 %}
+                            <center><a href="{{ url_for('all_notifications') }}">See All</a></center>
+                            {% endif %}
+                        </div>
                         </div>
                         <div class="same-style account-satting">
                             <a class="account-satting-active" href="#"><i class="pe-7s-user-female"></i></a>
@@ -161,6 +204,20 @@
             </div>
         </div>
     </div>
+
+    <script>
+        var action = 0;
+
+        function clear_new() {
+            if ( action == 1 ) {
+                action = 2;
+                location.href = "{{ url_for('update_notification', action="readall", id=0) }}";
+            } else {
+                action = 1;
+                document.getElementById("new_noti").style.display = 'none';
+            }
+        }
+    </script>
 </header>
 
 
