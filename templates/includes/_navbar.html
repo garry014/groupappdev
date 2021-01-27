@@ -100,7 +100,12 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
+                            <li><a href="{{ url_for('view_shops') }}">View Shops</a>
+                                <ul class="submenu">
+                                    <li><a href="{{ url_for('view_shops') }}">Tailor Shop</a></li>
+                                    <li><a href="{{ url_for('viewshopscourse') }}">Courses</a></li>
+                                </ul>
+                            </li>
                             <li><a href="#"> Pages <i class="fa fa-angle-down"></i></a>
                                 <ul class="submenu">
                                     <li><a href="about.html">about us</a></li>
