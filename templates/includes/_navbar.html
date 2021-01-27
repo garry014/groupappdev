@@ -1,3 +1,4 @@
+<!--------------------------------------CUSTOMER NAVBAR--------------------------------------------->
 <header class="header-area header-padding-1 sticky-bar header-res-padding clearfix">
     <div class="container-fluid">
         <div class="row">
@@ -12,14 +13,14 @@
                 <div class="main-menu">
                     <nav>
                         <ul>
+
                             <li><a href="{{ url_for('view_shops') }}">View Shops</i></a></li>
                             <li><a href="{{ url_for('viewshopscourse') }}">Courses <i class="fa fa-angle-down"></i></i></a>
                                 <ul class="submenu">
-                                    <li><a href="{{ url_for('view_shops') }}">View Courses Available</a></li>
+                                    <li><a href="{{ url_for('viewshopscourse') }}">View Courses Available</a></li>
                                     <li><a href="">My Courses</a></li>
                                 </ul>
                             </li>
-
                             <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                         </ul>
                     </nav>
@@ -158,23 +159,13 @@
             <div class="mobile-menu">
                 <nav id="mobile-menu-active">
                     <ul class="menu-overflow">
-                        <li><a href="{{ url_for('view_shops') }}">View Shops</a>
+                        <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
+                        <li><a href="{{ url_for('viewshopscourse') }}">Courses</a>
                             <ul>
-                                <li><a href="{{ url_for('view_shops') }}">Tailor Shops</a></li>
-                                <li><a href="{{ url_for('viewshopscourse') }}">Courses</a></li>
+                                <li><a href="{{ url_for('viewshopscourse') }}">View Courses Available</a></li>
+                                <li><a href="">My Courses</a></li>
                             </ul>
                         </li>
-                        <li><a href="#">Manage</a>
-                            <ul>
-                                <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
-                                <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
-                                <li><a href="{{ url_for('advertise') }}">Advertise</a></li>
-                                <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
-                                <li><a href="blog-details-2.html">blog details 2</a></li>
-                                <li><a href="blog-details-3.html">blog details 3</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="about.html">About us</a></li>
                         <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                     </ul>
                 </nav>

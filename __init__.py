@@ -1710,8 +1710,6 @@ def indivCourse(id):
     return render_template('course.html',  courseInfo=courseInfo)
 
 
-
-
 @app.route('/AddContent/<int:id>', methods=['GET', 'POST'])
 def AddContent(id):
     contentDict = {}

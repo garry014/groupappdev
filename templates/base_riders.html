@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static',filename='img/favicon.png')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static',filename='img/icon.png')}}">
 
     <!-- CSS
 	============================================ -->
@@ -31,10 +31,10 @@
     {% include 'includes/_navbar_riders.html' %}
 {% endblock %}
 <body>
-<div class="container-fluid">
-    {% block content %}
-    {% endblock %}
-</div>
+
+{% block content %}
+{% endblock %}
+
 
 {% block footer %}
     {% include 'includes/_footer_riders.html' %}
