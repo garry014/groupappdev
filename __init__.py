@@ -21,6 +21,7 @@ from Forms_Tailors import TailorsAccount
 username = "Admin"  #Test Scriptdas
 import shelve, Tailor
 from Register_Tailors import *
+from Forms_Customers import *
 
 from CreateCourseForm import *
 from AddContentForm import *
@@ -1020,7 +1021,7 @@ def register_riders():
         users_dict[user.get_user_id()] = user
         db['Users'] = users_dict
         db.close()
-        return render_template('register_complete_riders.html')
+        return render_template('register_completeRider.html')
     return render_template('register_riders.html', form=createUserForm)
 
 
@@ -1202,7 +1203,7 @@ def register_tailors():
         tailor_dict[user.get_user_id()] = user
         db['Tailors'] = tailor_dict
         db.close()
-        return render_template('register_complete_tailors.html')
+        return render_template('register_completeTailor.html')
 
     return render_template('register_tailors.html', form=createUserForm)
 
@@ -1394,7 +1395,7 @@ def register_customers():
         customer_dict[user.get_user_id()] = user
         db['Customer'] = customer_dict
         db.close()
-        return render_template('register_complete.html')
+        return render_template('register_completeCustomer.html')
     return render_template('CustRegister.html', form=createUserForm)
 
 
