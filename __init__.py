@@ -5,7 +5,10 @@ import Customer
 from Register_Customer import Customer_Register
 from Forms import *
 from cregform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews
+from orderform import *
+from targetform import *
+from availform import *
+import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
@@ -1780,6 +1783,167 @@ def DeleteContent(id, topic):
 
     return redirect(url_for('AddContent', id=id, topic=topic))
 ######################################## End of Stacey's code #####################################
+######################################## Start of Kai Jie's code #####################################
+@app.route('/createOrder', methods=['GET', 'POST'])
+def create_Order():
+    createcOrder = createOrder(request.form)
+
+    if request.method == 'POST' and createcOrder.validate():
+        ordersDict = {}
+        order_count_id = 0
+        db = shelve.open('orders.db', 'c')
+        try:
+            ordersDict = db['orders']
+            order_count_id = int(db['order_count_id'])
+        except:
+            print("error reading orders.db")
+
+        custOrder = Orders.Orders(createcOrder.cname.data, createcOrder.description.data,
+                                  createcOrder.price.data, createcOrder.due_date.data, )
+
+        order_count_id = order_count_id + 1
+        custOrder.set_order_id(order_count_id)
+        db['order_count_id'] = order_count_id
+        ordersDict[custOrder.get_order_id()] = custOrder
+        db['orders'] = ordersDict
+        db.close()
+        return redirect(url_for('thankyou'))
+
+    return render_template('createOrders.html', form=createcOrder)
+
+@app.route('/thankyou')
+def thankyou():
+    return render_template('thankyou.html')
+
+@app.route('/vieworders')
+def vieworders():
+    ordersDict = {}
+    try:
+        db = shelve.open('orders.db', 'r')
+        ordersDict = db['orders']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+    print(ordersDict)
+    order_list = []
+    for key in ordersDict:
+        custOrder = ordersDict.get(key)
+        order_list.append(custOrder)
+
+    #for i in order_list:
+        #print (i.get_order_id())
+
+    return render_template('vieworders.html',count=len(order_list), order_list=order_list)
+
+@app.route('/salesChart', methods=['GET', 'POST'])
+def salesChart():
+    targetDict = {}
+    try:
+        db = shelve.open('target.db', 'r')
+        targetDict = db['target']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+    print(targetDict)
+    target_list = []
+    for key in targetDict:
+        ttarget = targetDict.get(key)
+        target_list.append(ttarget)
+    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    data = ['1165', '1135']
+    updatetarget = updateTarget(request.form)
+    if request.method == 'POST' and updatetarget.validate():
+        return redirect(url_for('targetSales'))
+    return render_template('salesChart.html', labels=labels, data=data, target_list=target_list)
+
+@app.route('/targetSales', methods=['GET', 'POST'])
+def targetSales():
+    updatetarget = updateTarget(request.form)
+
+    if request.method == 'POST' and updatetarget.validate():
+        targetDict = {}
+        try:
+            db = shelve.open('target.db', 'w')
+            try:
+                targetDict = db['target']
+            except:
+                print("error reading target.db")
+
+            ttarget = Target.Target(updatetarget.target.data)
+            targetDict[ttarget.get_target_id()] = ttarget
+            db['target'] = targetDict
+            db.close()
+            return redirect(url_for('salesChart'))
+        except:
+            db = shelve.open('target.db', 'c')
+            try:
+                targetDict = db['target']
+
+            except:
+                print("error reading target.db")
+
+            ttarget = Target.Target(updatetarget.target.data)
+            targetDict[ttarget.get_target_id()] = ttarget
+            db['target'] = targetDict
+            db.close()
+            return redirect(url_for('salesChart'))
+
+    return render_template('targetSales.html', form=updatetarget)
+
+@app.route('/custChart', methods=['GET', 'POST'])
+def custChart():
+    availDict = {}
+    try:
+        db = shelve.open('avail.db', 'r')
+        availDict = db['avail']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+    print(availDict)
+    avail_list = []
+    for key in availDict:
+        avail = availDict.get(key)
+        avail_list.append(avail)
+    labels = ['week 1', 'week 2', 'week 3', 'week 4']
+    updateavail = updateAvail(request.form)
+    if request.method == 'POST' and updateavail.validate():
+        return redirect(url_for('availability'))
+    return render_template('custChart.html', labels=labels, avail_list=avail_list)
+
+@app.route('/availability', methods=['GET', 'POST'])
+def availability():
+    updateavail = updateAvail(request.form)
+
+    if request.method == 'POST' and updateavail.validate():
+        availDict = {}
+        try:
+            db = shelve.open('avail.db', 'w')
+            try:
+                availDict = db['avail']
+            except:
+                print("error reading avail.db")
+
+            avail = Availability.Availability(updateavail.availstart.data, updateavail.availend.data)
+            availDict[avail.get_avail_id()] = avail
+            db['avail'] = availDict
+            db.close()
+            return redirect(url_for('custChart'))
+        except:
+            db = shelve.open('avail.db', 'c')
+            try:
+                availDict = db['avail']
+
+            except:
+                print("error reading avail.db")
+
+            avail = Availability.Availability(updateavail.availstart.data, updateavail.availend.data)
+            availDict[avail.get_avail_id()] = avail
+            db['avail'] = availDict
+            db.close()
+            return redirect(url_for('custChart'))
+
+    return render_template('availability.html', form=updateavail)
+######################################## End of Kai Jie's code #####################################
 
 @app.route('/my_cart')
 def customer_cart():
