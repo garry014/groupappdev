@@ -24,9 +24,11 @@
     <!-- Modernizer JS -->
     <script src="{{url_for('static',filename='/js/vendor/modernizr-2.8.3.min.js')}}"></script>
 </head>
+{% if active_page != "home" %}
 {% block navbar %}
     {% include 'includes/_navbar.html' %}
 {% endblock %}
+{% endif %}
 <body>
 
 {% block content %}
@@ -50,7 +52,9 @@
 {% endblock %}
 </body>
 
+{% if active_page != "home" %}
 {% block footer %}
     {% include 'includes/_footer.html' %}
 {% endblock %}
+{% endif %}
 </html>
