@@ -32,6 +32,9 @@ app.secret_key = 'super secret key'
 app.config['MAX_CONTENT_LENGTH'] = 1000 * 1024 * 1024 #File upload size cap 1GB
 
 
+@app.route('/')
+def starting_page():
+    return render_template('main_selection.html')
 
 def allowed_file(filename):
     return '.' in filename and \
