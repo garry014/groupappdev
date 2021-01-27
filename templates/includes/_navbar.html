@@ -187,10 +187,15 @@
                         <a class="account-satting-active" href="#"><i class="pe-7s-user-female"></i></a>
                         <div class="account-dropdown">
                             <ul>
-                                <li><a href="login-register.html">Login</a></li>
-                                <li><a href="login-register.html">Register</a></li>
+                                <li><a href="/login_customers">Login</a></li>
+                                <li><a href="/register_customers">Register</a></li>
                                 <li><a href="wishlist.html">Wishlist  </a></li>
-                                <li><a href="my-account.html">my account</a></li>
+                                {% if 'customer_account' in session %}
+                                <li><a href="/customers_account">my account</a></li>
+                                 {% endif %}
+                                {% if 'customer_account' in session %}
+                                <li><a href="/log_out_customers">Log Out</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
@@ -236,10 +241,13 @@
                                 <h4>Total : <span class="shop-total">$260.00</span></h4>
                             </div>
                             <div class="shopping-cart-btn btn-hover text-center">
-                                <a class="default-btn" href="cart-page.html">view cart</a>
+                                <a class="default-btn" href="/my_cart">view cart</a>
                                 <a class="default-btn" href="checkout.html">checkout</a>
                             </div>
                         </div>
+                         {% if 'customer_account' in session %}
+                    <p> {{  session.get('customer_identity') }} </p>
+                    {% endif %}
                     </div>
                 </div>
             </div>
