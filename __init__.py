@@ -22,14 +22,8 @@ username = "Admin"  #Test Scriptdas
 import shelve, Tailor
 from Register_Tailors import *
 
-import Course, Content
-from CreateCourseForm import *
-from AddContentForm import *
-
-
 app = Flask(__name__)
 app.secret_key = 'super secret key'
-app.secret_key = 'any_random_string'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #File upload size cap 16MB
 
 def allowed_file(filename):
@@ -1008,7 +1002,7 @@ def register_riders():
         users_dict[user.get_user_id()] = user
         db['Users'] = users_dict
         db.close()
-        return render_template('register_complete.html')
+        return render_template('register_complete_riders.html')
     return render_template('register_riders.html', form=createUserForm)
 
 
@@ -1190,7 +1184,7 @@ def register_tailors():
         tailor_dict[user.get_user_id()] = user
         db['Tailors'] = tailor_dict
         db.close()
-        return render_template('register_complete.html')
+        return render_template('register_complete_tailors.html')
 
     return render_template('register_tailors.html', form=createUserForm)
 
@@ -1543,8 +1537,7 @@ def log_out_customers():
 
     return redirect(url_for('home'))
 
-
-
+########################################## Start of Stacey's code ##########################################
 @app.route('/CreateCourse', methods=['GET', 'POST'])
 def CreateCourse():
     createcourse = CreateCourseForm(request.form)
@@ -1776,10 +1769,7 @@ def DeleteContent(id, topic):
     db.close()
 
     return redirect(url_for('AddContent', id=id, topic=topic))
-
-
-
-
+######################################## End of Stacey's code #####################################
 
 @app.route('/my_cart')
 def customer_cart():
