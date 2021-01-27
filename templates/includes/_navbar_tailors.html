@@ -148,9 +148,15 @@
                             <a class="account-satting-active" href="#"><i class="pe-7s-user-female"></i></a>
                             <div class="account-dropdown">
                                 <ul>
+                                   {% if 'tailor_account' is not in session %}
                                     <li><a href="/login_tailors">Login</a></li>
+                                    {% endif %}
+                                    {% if 'tailor_account' is not in session %}
                                     <li><a href="/register_tailors">Register</a></li>
+                                    {% endif %}
+                                    {% if 'tailor_account' is in session %}
                                     <li><a href="wishlist.html">Wishlist  </a></li>
+                                    {% endif %}
                                     {% if 'tailor_account' in session %}
                                     <li><a href="/tailors_account">My account</a></li>
                                     {% endif %}
