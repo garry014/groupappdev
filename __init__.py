@@ -936,9 +936,6 @@ def general_error(errorid):
 
 @app.route('/')
 def riders_home():
-    login= False
-    if 'username' in session:
-        login = True
     return render_template('riders_home1.html')
 
 
@@ -1063,7 +1060,6 @@ def delete_rider(id):
 @app.route('/login_riders', methods=['GET', 'POST'])
 def login_riders():
     error = None
-
     if request.method == 'POST':
         users_dict = {}
         db = shelve.open('storage.db', 'r')
@@ -1072,6 +1068,7 @@ def login_riders():
             user = users_dict.get(user_id)
             if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
                 session['rider_account'] = user.get_user_id()
+                session['rider_identity'] = user.get_user_name()
                 return redirect(url_for('riders_home'))
             elif request.form['user-name'] == 'admin' and request.form['user-password'] == 'admin':
                 return redirect(url_for('retrieve_riders'))
@@ -1080,6 +1077,20 @@ def login_riders():
 
     return render_template('login_riders.html', error=error)
 
+@app.route('/log_out')
+def log_out():
+    error = None
+    db = shelve.open('storage.db', 'r')
+    users_dict = db['Users']
+    for user_id in users_dict:
+        user = users_dict.get(user_id)
+        session['rider_account'] = user.get_user_id()
+        session['rider_identity'] = user.get_user_name()
+    if session['rider_account'] != error:
+        session.pop('rider_account')
+        session.pop('rider_identity')
+
+    return redirect(url_for('riders_home'))
 
 @app.route('/riders_account', methods=['GET', 'POST'])
 def update_riders_details():
@@ -1135,6 +1146,202 @@ def riders_orders(id):
     return render_template('riders_orders.html')
 
 #################################RIDERS END#################################################
+
+##################################TAILORS START#############################################
+@app.route('/tailors_home')
+def tailors_home():
+    return render_template('tailors_home.html')
+
+
+@app.route('/register_tailors', methods=['GET', 'POST'])
+def register_tailors():
+    createUserForm = RegisterTailors(request.form)
+    if request.method == 'POST' and createUserForm.validate():
+        tailor_dict = {}
+        tailor_count_id = 0
+        db = shelve.open('tailor_storage.db', 'c')
+        try:
+            tailor_dict = db['Tailors']
+            tailor_count_id = int(db['tailor_count_id'])
+
+        except:
+            print("Error in retrieving Users from storage.db.")
+        # print(createUserForm.firstname.data)
+        user = Tailor.Tailor(createUserForm.firstname.data, createUserForm.lastname.data, createUserForm.user_name.data, createUserForm.password.data, createUserForm.store_name.data, createUserForm.address1.data, createUserForm.address2.data, createUserForm.city.data, createUserForm.postal_code.data,createUserForm.email.data, createUserForm.phone_number.data)
+        # auto increment user_id from shelve
+        tailor_count_id = tailor_count_id + 1
+        user.set_user_id(tailor_count_id)
+        db['tailor_count_id'] = tailor_count_id
+
+        tailor_dict[user.get_user_id()] = user
+        db['Tailors'] = tailor_dict
+        db.close()
+        return render_template('register_complete.html')
+
+    return render_template('register_tailors.html', form=createUserForm)
+
+
+@app.route('/admin_retrieve_tailors')
+def retrieve_tailors():
+    tailor_dict = {}
+    db = shelve.open('tailor_storage.db', 'r')
+    tailor_dict = db['Tailors']
+    db.close()
+
+    tailor_list = []
+    for key in tailor_dict:
+        tailor = tailor_dict.get(key)
+        tailor_list.append(tailor)
+
+    return render_template('admin_retrieve_tailors.html', count=len(tailor_list), tailor_list=tailor_list)
+
+
+@app.route('/update_tailors_admin/<int:id>/', methods=['GET', 'POST'])
+def update_tailor(id):
+    update_user_form = AdminUpdateTailor(request.form)
+    if request.method == 'POST' and update_user_form.validate():
+        tailor_dict = {}
+        db = shelve.open('tailor_storage.db', 'w')
+        tailor_dict = db['Tailors']
+
+        user = tailor_dict.get(id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_user_name(update_user_form.user_name.data)
+        user.set_store_name(update_user_form.store_name.data)
+        user.set_address1(update_user_form.address1.data)
+        user.set_address2(update_user_form.address2.data)
+        user.set_postal_code(update_user_form.postal_code.data)
+        user.set_city(update_user_form.city.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+
+        db['Tailors'] = tailor_dict
+        db.close()
+
+        session['user_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return redirect(url_for('retrieve_tailors'))
+    else:
+        tailor_dict = {}
+        db = shelve.open('tailor_storage.db', 'r')
+        tailor_dict = db['Tailors']
+        db.close()
+
+        user = tailor_dict.get(id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.user_name.data = user.get_user_name()
+        update_user_form.store_name.data = user.get_store_name()
+        update_user_form.address1.data = user.get_address1()
+        update_user_form.address2.data = user.get_address2()
+        update_user_form.postal_code.data = user.get_postal_code()
+        update_user_form.city.data = user.get_city()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+
+        return render_template('update_tailors_admin.html', form=update_user_form)
+
+
+@app.route('/deleteTailor/<int:id>', methods=['POST'])
+def delete_tailor(id):
+    tailor_dict = {}
+    user = tailor_dict.get(id)
+    db = shelve.open('tailor_storage.db', 'w')
+    tailor_dict = db['Tailors']
+
+    user = tailor_dict.pop(id)
+
+    db['Tailors'] = tailor_dict
+    db.close()
+
+    session['user_deleted'] = user.get_firstname() + ' ' + user.get_lastname()
+    return redirect(url_for('retrieve_tailors'))
+
+
+@app.route('/login_tailors', methods=['GET', 'POST'])
+def tailors_login():
+    error = None
+    if request.method == 'POST':
+        tailor_dict = {}
+        db = shelve.open('tailor_storage.db', 'r')
+        tailor_dict = db['Tailors']
+        for user_id in tailor_dict:
+            user = tailor_dict.get(user_id)
+            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                session['tailor_account'] = user.get_user_id()
+                session['tailor_identity'] = user.get_user_name()
+                return redirect(url_for('tailors_home'))
+            elif request.form['user-name'] == 'tailor_admin' and request.form['user-password'] == 'tailor_admin':
+                return redirect(url_for('retrieve_tailors'))
+            else:
+                error = 'Invalid Credentials. Please try again.'
+    return render_template('login_tailors.html', error=error)
+
+
+@app.route('/log_out_tailors')
+def log_out_tailors():
+    error = None
+    db = shelve.open('tailor_storage.db', 'r')
+    tailor_dict = db['Tailors']
+    for user_id in tailor_dict:
+        user = tailor_dict.get(user_id)
+        session['tailor_account'] = user.get_user_id()
+        session['tailor_identity'] = user.get_user_name()
+    if session['tailor_account'] != error:
+        session.pop('tailor_account')
+        session.pop('tailor_identity')
+
+    return redirect(url_for('tailors_home'))
+
+
+@app.route('/tailors_account', methods=['GET', 'POST'])
+def update_tailors_details():
+    update_user_form = TailorsAccount(request.form)
+    user_id = session['tailor_account']
+    if request.method == 'POST' and update_user_form.validate():
+        tailor_dict = {}
+        db = shelve.open('tailor_storage.db', 'w')
+        tailor_dict = db['Tailors']
+        user = tailor_dict.get(user_id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_store_name(update_user_form.store_name.data)
+        user.set_address1(update_user_form.address1.data)
+        user.set_address2(update_user_form.address2.data)
+        user.set_postal_code(update_user_form.postal_code.data)
+        user.set_city(update_user_form.city.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+        user.set_password(update_user_form.password.data)
+        db['Tailors'] = tailor_dict
+        db.close()
+
+        session['user_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return render_template('tailors_account.html', form=update_user_form)
+
+    else:
+        tailor_dict = {}
+        db = shelve.open('tailor_storage.db', 'r')
+        tailor_dict = db['Tailors']
+        db.close()
+
+        user = tailor_dict.get(user_id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.store_name.data = user.get_store_name()
+        update_user_form.address1.data = user.get_address1()
+        update_user_form.address2.data = user.get_address2()
+        update_user_form.city.data = user.get_city()
+        update_user_form.postal_code.data = user.get_postal_code()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+        update_user_form.password.data = user.get_password()
+
+        return render_template('tailors_account.html', form=update_user_form)
+
+##################################TAILORS END#############################################
 
 if __name__ == '__main__':
     app.debug = True
