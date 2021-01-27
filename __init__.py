@@ -942,7 +942,7 @@ def general_error(errorid):
 
 ###################################RIDERS START##################################################
 
-@app.route('/')
+@app.route('/riders_home')
 def riders_home():
     return render_template('riders_home1.html')
 
