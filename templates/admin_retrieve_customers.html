@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %} Retrieve Customers {% endblock %}
+
+{% block content %}
+{% if 'customer_updated' in session %}
+<div class="alert alert-success">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ session.pop('user_updated', None) }} was updated.
+</div>
+{% elif 'customer_deleted' in session %}
+<div class="alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ session.pop('user_deleted', None) }} was deleted.
+</div>
+{% endif %}
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Customers</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="cart-main-area pt-90 pb-100">
+    <div class="container">
+        <h3 class="cart-page-title">Customers Accounts</h3>
+        <div>
+          {% if count == 0 %}
+          <p>There are no users.</p>
+          {% elif count == 1 %}
+          <p>There is 1 user.</p>
+          {% else %}
+          <p>There are {{ count }} users.</p>
+          {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12"></div>
+                    <div class="table-content table-responsive cart-table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Username </th>
+                                    <th>Address </th>
+                                    <th>City </th>
+                                    <th>Email</th>
+                                    <th>Phone Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers_list %}
+                                <tr>
+                                    <td>{{ customer.get_user_id() }}</td>
+                                    <td>{{ customer.get_firstname()}}</td>
+                                    <td>{{ customer.get_lastname()}}</td>
+                                    <td>{{ customer.get_user_name()}}</td>
+                                    <td>{{ customer.get_address1() + ' ' + customer.get_address2() + ' ' + customer.get_postal_code()}}</td>
+                                    <td>{{ customer.get_city()}}</td>
+                                    <td>{{ customer.get_email()}}</td>
+                                    <td>{{ customer.get_phone_number()}}</td>
+                                    <td class="product-remove">
+                                        <a href="/update_customer_admin/{{customer.get_user_id()}}"><i class="fa fa-pencil"></i></a>
+                                    <form action="{{url_for('delete_customer', id=customer.get_user_id())}}" method="POST">
+                                         <a href="#"><i class="fa fa-times" data-toggle="modal" data-target="#myModal_{{customer.get_user_id()}}"></i></a>
+<!--
+                                     <!-- The Modal -->
+                                            <div class="modal" id="myModal_{{customer.get_user_id()}}">
+                                              <div class="modal-dialog">
+                                                <div class="modal-content">
+
+                                                  <!-- Modal Header -->
+                                                  <div class="modal-header">
+                                                      <h4 class="modal-title">Delete Confirmation</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                  </div>
+
+                                                  <!-- Modal body -->
+                                                  <div class="modal-body">
+                                                    Are you sure you want to delete {{customer.get_firstname()}} {{customer.get_lastname()}}?
+                                                  </div>
+
+                                                  <!-- Modal footer -->
+                                                  <div class="modal-footer">
+                                                      <input type="submit" value="Delete" class="btn btn-danger">
+                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                             {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="cart-shiping-update-wrapper">
+                                <div class="cart-shiping-update">
+                                </div>
+                                <div class="cart-clear">
+                                    <a href="#">Clear All Customers</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
