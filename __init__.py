@@ -130,7 +130,7 @@ def update_notification(action,id):
 def all_notifications():
     return render_template('all_notifications.html')
 
-@app.route('/')
+@app.route('/cust_home')
 def home():
     return redirect(url_for('home_page'))
 
