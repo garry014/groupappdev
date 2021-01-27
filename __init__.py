@@ -1343,6 +1343,197 @@ def update_tailors_details():
 
 ##################################TAILORS END#############################################
 
+@app.route('/register_customers', methods=['GET', 'POST'])
+def register_customers():
+    createUserForm = Customer_Register(request.form)
+    if request.method == 'POST' and createUserForm.validate():
+        customer_dict = {}
+        user_count_id = 0
+        db = shelve.open('customer.db', 'c')
+        try:
+            customer_dict = db['Customer']
+            user_count_id = int(db['user_count_id'])
+
+        except:
+            print("Error in retrieving Users from storage.db.")
+        user = Customer.Customer(createUserForm.firstname.data, createUserForm.lastname.data, createUserForm.user_name.data,
+                           createUserForm.password.data, createUserForm.address1.data, createUserForm.address2.data, createUserForm.city.data, createUserForm.postal_code.data,
+                           createUserForm.gender.data, createUserForm.email.data,
+                           createUserForm.phone_number.data)
+        # auto increment user_id from shelve
+        user_count_id = user_count_id + 1
+        user.set_user_id(user_count_id)
+        db['user_count_id'] = user_count_id
+
+        customer_dict[user.get_user_id()] = user
+        db['Customer'] = customer_dict
+        db.close()
+        return render_template('register_complete.html')
+    return render_template('CustRegister.html', form=createUserForm)
+
+
+@app.route('/admin_retrieve_customers')
+def retrieve_customers():
+    customer_dict = {}
+    db = shelve.open('customer.db', 'r')
+    customer_dict = db['Customer']
+    db.close()
+
+    customers_list = []
+    for key in customer_dict:
+        customer = customer_dict.get(key)
+        customers_list.append(customer)
+
+    return render_template('admin_retrieve_customers.html', count=len(customers_list), customers_list=customers_list)
+
+
+@app.route('/update_customer_admin/<int:id>/', methods=['GET', 'POST'])
+def update_customer(id):
+    update_user_form = Customer_AdminUpdate(request.form)
+    if request.method == 'POST' and update_user_form.validate():
+        customer_dict = {}
+        db = shelve.open('customer.db', 'w')
+        customer_dict = db['Customer']
+
+        user = customer_dict.get(id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_user_name(update_user_form.user_name.data)
+        user.set_address1(update_user_form.address1.data)
+        user.set_address2(update_user_form.address2.data)
+        user.set_postal_code(update_user_form.postal_code.data)
+        user.set_city(update_user_form.city.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+
+        db['Customer'] = customer_dict
+        db.close()
+
+        session['customer_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return redirect(url_for('retrieve_customers'))
+    else:
+        customer_dict = {}
+        db = shelve.open('customer.db', 'r')
+        customer_dict = db['Customer']
+        db.close()
+
+        user = customer_dict.get(id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.user_name.data = user.get_user_name()
+        update_user_form.address1.data = user.get_address1()
+        update_user_form.address2.data = user.get_address2()
+        update_user_form.postal_code.data = user.get_postal_code()
+        update_user_form.city.data = user.get_city()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+
+        return render_template('update_customer_admin.html', form=update_user_form)
+
+
+@app.route('/deleteCustomer/<int:id>', methods=['POST'])
+def delete_customer(id):
+    customer_dict = {}
+    user = customer_dict.get(id)
+    db = shelve.open('customer.db', 'w')
+    customer_dict = db['Customer']
+
+    user = customer_dict.pop(id)
+
+    db['Customer'] = customer_dict
+    db.close()
+
+    session['customer_deleted'] = user.get_firstname() + ' ' + user.get_lastname()
+    return redirect(url_for('retrieve_customers'))
+
+
+@app.route('/login_customers', methods=['GET', 'POST'])
+def login_customers():
+    error = None
+    if request.method == 'POST':
+        customer_dict = {}
+        db = shelve.open('customer.db', 'r')
+        customer_dict = db['Customer']
+        for user_id in customer_dict:
+            user = customer_dict.get(user_id)
+            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                session['customer_account'] = user.get_user_id()
+                session['customer_identity'] = user.get_user_name()
+                return redirect(url_for('home_page'))
+            elif request.form['user-name'] == 'customer_admin' and request.form['user-password'] == 'customer_admin':
+                return redirect(url_for('retrieve_customers'))
+            else:
+                error = 'Invalid Credentials. Please try again.'
+
+    return render_template('login_customers.html', error=error)
+
+
+@app.route('/customers_account', methods=['GET', 'POST'])
+def update_customers_details():
+    update_user_form = Customer_Update(request.form)
+    user_id = session['customer_account']
+    if request.method == 'POST' and update_user_form.validate():
+        customer_dict = {}
+        db = shelve.open('customer.db', 'w')
+        customer_dict = db['Customer']
+        user = customer_dict.get(user_id)
+        user.set_firstname(update_user_form.firstname.data)
+        user.set_lastname(update_user_form.lastname.data)
+        user.set_address1(update_user_form.address1.data)
+        user.set_address2(update_user_form.address2.data)
+        user.set_city(update_user_form.city.data)
+        user.set_postal_code(update_user_form.postal_code.data)
+        user.set_email(update_user_form.email.data)
+        user.set_phone_number(update_user_form.phone_number.data)
+        user.set_password(update_user_form.password.data)
+        db['Customer'] = customer_dict
+        db.close()
+
+        session['customer_updated'] = user.get_firstname() + ' ' + user.get_lastname()
+
+        return render_template('customer_account.html', form=update_user_form)
+
+    else:
+        customer_dict = {}
+        db = shelve.open('customer.db', 'r')
+        customer_dict = db['Customer']
+        db.close()
+
+        user = customer_dict.get(user_id)
+        update_user_form.firstname.data = user.get_firstname()
+        update_user_form.lastname.data = user.get_lastname()
+        update_user_form.address1.data = user.get_address1()
+        update_user_form.address2.data = user.get_address2()
+        update_user_form.city.data = user.get_city()
+        update_user_form.postal_code.data = user.get_postal_code()
+        update_user_form.email.data = user.get_email()
+        update_user_form.phone_number.data = user.get_phone_number()
+        update_user_form.password.data = user.get_password()
+
+        return render_template('customer_account.html', form=update_user_form)
+
+
+@app.route('/log_out_customers')
+def log_out_customers():
+    error = None
+    db = shelve.open('customer.db', 'r')
+    customer_dict = db['Customer']
+    for user_id in customer_dict:
+        user = customer_dict.get(user_id)
+        session['customer_account'] = user.get_user_id()
+        session['customer_identity'] = user.get_user_name()
+    if session['customer_account'] != error:
+        session.pop('customer_account')
+        session.pop('customer_identity')
+
+    return redirect(url_for('home'))
+
+
+@app.route('/my_cart')
+def customer_cart():
+    return render_template('customer_cart.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
