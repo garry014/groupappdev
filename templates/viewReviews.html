@@ -7,10 +7,10 @@
         <div class="custom-row-2">
             <div class="col-lg-8 col-md-7"  style="margin: auto;">
                 <div class="contact-form">
+                    <a href="{{ url_for('viewstore', name=shop) }}" class="error-btn">Back to {{ shop }}</a>
                     <div class="contact-title mb-30">
                         <h2>View Reviews</h2>
                     </div>
-
                     {% for item in current_dict %}
                     <div style="border-radius: 3px; padding: 5px 10px 5px 12px; border-bottom: 1px solid black; cursor: pointer;">
                         {% if (username == "Admin") or (username == current_dict[item].get_username()) %}
