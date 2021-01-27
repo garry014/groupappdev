@@ -21,6 +21,12 @@
                                         <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
                                     </ul>
                                 </li>
+                                <li><a href="{{ url_for('viewcourse') }}">Courses <i class="fa fa-angle-down"></i></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ url_for('viewcourse') }}">View Course offered by me</a></li>
+                                        <li><a href="{{ url_for('CreateCourse') }}">Create Course</a></li>
+                                    </ul>
+                                </li>
                                 <li><a href="{{ url_for('salesChart') }}"> Sales <i class="fa fa-angle-down"></i></a>
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('salesChart') }}">View Sales</a></li>
@@ -33,7 +39,6 @@
                                         <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="about.html"> About </a></li>
                             </ul>
                         </nav>
                     </div>
