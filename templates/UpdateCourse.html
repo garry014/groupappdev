@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Update Course{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+
+
+
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Update Course</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="contact-area pt-100 pb-100">
+    <div class="container">
+        <div class="custom-row-2">
+
+
+            <div class="col-lg-7 col-md-7">
+                <div class="contact-form">
+                    <div class="contact-title mb-30">
+                        <h2>Update Course</h2>
+                        <h4>Course Details</h4>
+                    </div>
+                    <form class="contact-form-style" action="#" method="post" enctype="multipart/form-data">
+                        <div class="row">
+
+                            <div class="col-lg-12">
+                                {{ render_field(form.title, class="form-control") }}
+                            </div>
+
+                            <div class="col-lg-12">
+                                {{ render_field(form.tailor, class="form-control") }}
+                            </div>
+
+                            <div class="col-lg-12">
+                                {{ render_field(form.material, class="form-control") }}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.language, class="form-control") }}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.livecourse, class="form-control") }}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.note, class="form-control") }}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ render_field(form.price, class="form-control") }}
+                            </div>
+
+
+
+                            <div class="button-box">
+                                <!-- <button class="submit" type="submit">Save</button> -->
+                                <button type="submit">Publish</button> <!--class="submit"-->
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

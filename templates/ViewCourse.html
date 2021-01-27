@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Courses You Offer{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Courses You Offer</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="Blog-area pt-100 pb-100">
+    <div class="container">
+        <div style="margin-bottom: 40px;">
+            {% if count == 0 %}
+            <p>You have no published courses.</p>
+            {% elif count == 1 %}
+            <p>There is 1 course.</p>
+            {% else %}
+            <p>There are {{ count }} courses.</p>
+            {% endif %}
+        </div>
+
+        <a href="/CreateCourse">ADD COURSE</a>
+
+        <div>
+            <div class="row" >
+                {% for course in courseList %}
+                <div class="col-lg-4 col-md-6 col-sm-12">  <!-- lg-6 width of box? -->
+                    <div class="blog-wrap-2 mb-40"> <!-- mb=space btw 1st and 2nd row-->
+                        <div class="blog-img-2">
+                            <img src="{{ course.get_tbnail() }}" style="height:120px; width: 100%;">
+                        </div>
+                        <div class="blog-content-2">
+
+                            <h4>{{ course.get_title() }}</h4>
+                            <div class="blog-meta-2">
+                                By {{ course.get_tailor() }}
+                            </div>
+                            <br>
+                            <div style="width: 100%; max-height: 50px; overflow:hidden; text-overflow:ellipsis;">
+                            <p>{{ course.get_note() }}</p>
+                            </div>
+                            <div class="blog-share-comment">
+                                <br>
+                                <hr>
+                                <br>
+                                <div class="blog-share" style="float: right;">
+                                    <span style="font-size: 25px;">SGD ${{ course.get_price() }}</span>
+                                </div>
+
+                            </div>
+
+                            <div class="blog-btn-2" style="font-size: 15px;">
+                                <a href="/UpdateCourse/{{course.get_courseid()}}">Edit</a> &nbsp;
+                                <a href="/AddContent/{{course.get_courseid()}}">Content</a> &nbsp;
+                                <a href="#" data-toggle="modal" data-target="#myModal_{{course.get_courseid()}}">Delete</a>
+                                <form action="{{url_for('DeleteCourse', id=course.get_courseid())}}"  method="POST">
+
+                                          <!-- Button to Open the Modal -->
+
+                                <!-- The Modal -->
+                                <div class="modal" id="myModal_{{course.get_courseid()}}">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                      <!-- Modal Header -->
+                                      <div class="modal-header">
+                                        <h4 class="modal-title">Delete Confirmation</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                      </div>
+
+                                      <!-- Modal body -->
+                                      <div class="modal-body" style="font-size: 20px;">
+                                        Are you sure you want to delete {{course.get_title()}} ?
+                                      </div>
+
+
+                                      <!-- Modal footer -->
+                                      <div class="modal-footer">
+                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                </div>
+
+                                </form>
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="pro-pagination-style text-center mt-20">
+    <ul>
+        <li><a class="prev" href="#"><i class="fa fa-angle-double-left"></i></a></li>
+        <li><a class="active" href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a class="next" href="#"><i class="fa fa-angle-double-right"></i></a></li>
+    </ul>
+</div>
+
+{% endblock %}
