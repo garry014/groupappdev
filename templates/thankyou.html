@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Thank You{% endblock %}
+
+{% block content %}
+
+<div class="login-register-area pt-100 pb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7 col-md-12 ml-auto mr-auto">
+                <div class="login-register-wrapper">
+                    <div class="login-register-tab-list nav">
+                        <a data-toggle="tab" href="#lg2">
+                            <h4> Order Complete </h4>
+                        </a>
+                    </div>
+                        <div id="lg2" class="tab-pane">
+                            <div class="login-form-container">
+                                <div class="login-register-form">
+                                    <form action="#" method="post">
+                                        <h4 style="text-align: center">Thank you for your order!<br><br><br></h4>
+                                        <div class="button-box">
+                                            <button type="submit" style="position: absolute; left: 50%; -ms-transform: translate(-50%, -50%);
+                                                                         transform: translate(-50%, -50%);"><span>Back</span></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
