@@ -587,8 +587,18 @@ def view_shops():
 
         return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, error=error)
 
+    review_dict = {}
 
-    return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, error=error)
+    try:
+        db2 = shelve.open('review.db', 'r')
+        review_dict = db2['Review']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+
+
+
+    return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, review_dict=review_dict, error=error)
 
 
 @app.route('/view/<name>', methods=['GET', 'POST'])
