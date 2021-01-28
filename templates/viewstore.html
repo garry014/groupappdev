@@ -166,24 +166,29 @@
                             </div>
                             <div class="pro-details-rating-wrap">
                                 {% set count = namespace(value=0) %}
-                                {% set total_stars = namespace(value=0) %}
-                                {% for i in review_dict %}
-                                    {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == product.get_id() %}
-                                        {% set count.value = count.value + 1 %}
-                                        {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
-                                    {% endif %}
-                                {% endfor %}
-                                {% if total_stars.value > 0 %}
-                                    {{ total_stars.value/count.value }}
-                                {% endif %}
-                                <div class="pro-details-rating">
-                                    <i class="fa fa-star-o yellow"></i>
-                                    <i class="fa fa-star-o yellow"></i>
-                                    <i class="fa fa-star-o yellow"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                </div>
-                                <span>{{ count.value }} Reviews</span>
+                                        {% set total_stars = namespace(value=0) %}
+                                        {% for i in review_dict %}
+                                            {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == product.get_id() %}
+                                                {% set count.value = count.value + 1 %}
+                                                {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if total_stars.value > 0 %}
+                                            {% set temp_stars = (total_stars.value/count.value) %}
+                                            <a href="{{ url_for('viewReviews', shop=name, productid=product.get_id()) }}">
+                                                {{ (total_stars.value/count.value) }} stars
+                                                {% set rounded_stars = (total_stars.value/count.value) | round | int %}
+                                                {% for star in range(rounded_stars) %}
+                                                    <span class="fa fa-star" style="color: orange;"></span>
+                                                {% endfor %}
+                                                 {% set leftover_stars = 5 - rounded_stars %}
+                                                {% for star in range(leftover_stars) %}
+                                                    <span class="fa fa-star"></span>
+                                                {% endfor %}
+                                            </a>
+                                        {% else %}
+                                            No reviews yet.
+                                        {% endif %}
                             </div>
                             <p>{{ product.get_description() }}</p>
                             <br>
