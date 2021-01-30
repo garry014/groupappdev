@@ -41,6 +41,33 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Get user details using session. Need to pass in type(customer,tailor, rider)
+def get_userdata(usertype):
+    db_dict = {}
+    userdata = ""
+    try:
+        if usertype == "tailor":
+            db = shelve.open('tailor_storage.db', 'r')
+            db_dict = db['Tailors']
+            userdata = db_dict.get(session['tailor_account'])
+            db.close()
+        elif usertype == "customer":
+            db = shelve.open('customer.db', 'r')
+            db_dict = db['Customer']
+            userdata = db_dict.get(session['customer_account'])
+            db.close()
+        elif usertype == "rider":
+            db = shelve.open('storage.db', 'r')
+            db_dict = db['Users']
+            userdata = db_dict.get(session['rider_account'])
+            db.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+    else:
+        return userdata
+
+
+################################ GARY'S CODE ###########################################
 def view_notification():
     noti_dict = {}
     count = 0
@@ -66,27 +93,7 @@ def view_notification():
 
 app.jinja_env.globals.update(view_notification=view_notification)
 
-# def refresh_notification():
-#     noti_dict = {}
-#     print("Opening noti database")
-#     try:
-#         db1 = shelve.open('notification.db', 'w')
-#         noti_dict = db1['Notification']
-#     except:
-#         print("Database error 1")
-#     else:
-#         print("database opened")
-#         for noti in noti_dict:
-#             if username == noti_dict[noti].get_recipient():
-#                 noti_dict[noti].set_status("read")
-#
-#         db1['Notification'] = noti_dict
-#         db1.close()
-#
-# app.jinja_env.globals.update(refresh_notification=refresh_notification)
-
 def create_notification(recipient, category, message, hyperlink):
-    #noti = notification
     noti_dict = {}
     try:
         db1 = shelve.open('notification.db', 'c')
@@ -143,7 +150,7 @@ def home_page():
         ads_dict = db['Ads']
         db.close()
     except:
-        return redirect(url_for('db_error'))
+        return redirect(url_for('general_error'), errorid=0)
 
     ads_list = []
     for key in ads_dict:
@@ -163,6 +170,9 @@ def home_page():
 def advertise():
     error = None
     create_ad = CreateAd(request.form)
+
+    if session.get('tailor_account') is None: #For restricted functions.
+        return redirect(url_for('tailors_login'))
 
     if request.method == 'POST' and create_ad.validate():
         if (create_ad.startdate.data > create_ad.enddate.data): #Compare start and end dates.
@@ -191,10 +201,13 @@ def advertise():
                 #Image Handling
                 app.config['UPLOAD_FOLDER'] = './static/uploads/ads/'
                 filename = secure_filename(file.filename)
+                file_extension = os.path.splitext(filename)  # get file type
+                if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1])):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1]))
                 if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
                     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                file_extension = os.path.splitext(filename) # get file type
                 os.rename('static/uploads/ads/'+filename, 'static/uploads/ads/'+ str(count_id) + file_extension[1])
                 #End of Image Handling
 
@@ -207,13 +220,15 @@ def advertise():
                 else:
                     adtext = create_ad.adtext.data
 
-                ad = Ads.Ads(str(count_id) + file_extension[1], username, create_ad.startdate.data,
+                tailor_storename = "Admin"
+                if session['tailor_account'] != "Admin":
+                    tailor_storename = get_userdata("tailor").get_store_name()
+
+                ad = Ads.Ads(str(count_id) + file_extension[1], tailor_storename, create_ad.startdate.data,
                                create_ad.enddate.data, adtext)
                 ad.set_ad_id(count_id)
                 ads_dict[ad.get_ad_id()] = ad
                 db['Ads'] = ads_dict
-                # Test codes
-                ad = ads_dict[ad.get_ad_id()]
 
                 db.close()
 
@@ -224,12 +239,15 @@ def advertise():
 
 @app.route('/manage_ads')
 def manage_ads():
+    if session.get('tailor_account') is None: #For restricted functions.
+        return redirect(url_for('tailors_login'))
+
     try:
         ads_dict = {}
         db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
     except:
-        return redirect(url_for('db_error'))
+        return redirect(url_for('general_error'), errorid=0)
 
     ads_list = []
     for key in ads_dict:
@@ -239,8 +257,13 @@ def manage_ads():
     count = 0
     expired_list = []
     show_ads_list = []
+
+    tailor_storename = "" # admin cant view
+    if session['tailor_account'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
+
     for ad in ads_list:
-        if username == ad.get_store_name():
+        if ad.get_store_name() == tailor_storename:
             count += 1
             show_ads_list.append(ad)
         enddate_str = str(ad.get_end_date())
@@ -254,23 +277,28 @@ def manage_ads():
         db['Ads'] = ads_dict
     db.close()
 
-    if username == "Admin":
+    if session['tailor_account'] == "Admin":
         count = len(ads_list)
         show_ads_list = []
         show_ads_list = ads_list
+        print("Run this part")
 
     return render_template('manage_ads.html', count=count, ads_list=show_ads_list, username=username)
 
 @app.route('/updateAd/<int:id>/<int:updatewhat>/', methods=['GET', 'POST'])
 def updateAd(id, updatewhat):
     update_ad = UpdateAd(request.form)
-    if updatewhat == 1: #Update Status only
+
+    if session.get('tailor_account') is None: #For restricted functions.
+        return redirect(url_for('tailors_login'))
+
+    if updatewhat == 1 and session['tailor_account'] == "Admin": #Update Status only
         try:
             ads_dict = {}
             db = shelve.open('ads.db', 'w')
             ads_dict = db['Ads']
         except:
-            return redirect(url_for('db_error'))
+            return redirect(url_for('general_error'), errorid=0)
         ad = ads_dict.get(id)
         ad.set_status("Approved")
         create_notification(ad.get_store_name(),"updates","Your advertisement just got approved!", "manage_ads")  # create notification
@@ -285,13 +313,13 @@ def updateAd(id, updatewhat):
                 db = shelve.open('ads.db', 'w')
                 ads_dict = db['Ads']
             except:
-                return redirect(url_for('db_error'))
+                return redirect(url_for('general_error'), errorid=0)
 
             ad = ads_dict.get(id)
             ad.set_start_date(update_ad.startdate.data)
             ad.set_end_date(update_ad.enddate.data)
             ad.set_adtext(update_ad.adtext.data)
-            if username == "Admin":
+            if session['tailor_account'] == "Admin":
                 ad.set_status(update_ad.status.data)
                 if update_ad.status.data == "Rejected":
                     create_notification(ad.get_store_name(), "updates", "Sorry, your advertisement isn't in-line with our terms and conditions and has been rejected.",
@@ -328,15 +356,20 @@ def updateAd(id, updatewhat):
                 ads_dict = db['Ads']
                 db.close()
             except:
-                return redirect(url_for('db_error'))
+                return redirect(url_for('general_error', errorid=0))
 
             ad = ads_dict.get(id)
+
+            if (session['tailor_account'] != "Admin"):
+                if (ad.get_store_name() != get_userdata("tailor").get_store_name()):
+                    return redirect(url_for('general_error', errorid=1))
+
             update_ad.startdate.data = ad.get_start_date()
             update_ad.enddate.data = ad.get_end_date()
-
             update_ad.adtext.data = ad.get_adtext()
-            if username == "Admin":
+            if session['tailor_account'] == "Admin":
                 update_ad.status.data = ad.get_status()
+
         return render_template('updateAd.html', form=update_ad, username=username)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
@@ -346,7 +379,7 @@ def delete_ad(id):
         db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
     except:
-        return redirect(url_for('db_error'))
+        return redirect(url_for('general_error'), errorid=0)
     else:
         for i in ALLOWED_EXTENSIONS:
             directpath = 'static/uploads/ads/'+ str(id) + '.' + i
@@ -1303,13 +1336,17 @@ def tailors_login():
         tailor_dict = {}
         db = shelve.open('tailor_storage.db', 'r')
         tailor_dict = db['Tailors']
+        db.close()
         for user_id in tailor_dict:
             user = tailor_dict.get(user_id)
             if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
                 session['tailor_account'] = user.get_user_id()
                 session['tailor_identity'] = user.get_user_name()
                 return redirect(url_for('tailors_home'))
-            elif request.form['user-name'] == 'tailor_admin' and request.form['user-password'] == 'tailor_admin':
+            # Do this for the rest of the admins
+            elif (request.form['user-name'] == 'Admin') and request.form['user-password'] == tailor_dict.get(3).get_password():
+                session['tailor_account'] = "Admin"
+                session['tailor_identity'] = user.get_user_name()
                 return redirect(url_for('retrieve_tailors'))
             else:
                 error = 'Invalid Credentials. Please try again.'
@@ -1328,6 +1365,8 @@ def log_out_tailors():
     if session['tailor_account'] != error:
         session.pop('tailor_account')
         session.pop('tailor_identity')
+
+    db.close()
 
     return redirect(url_for('tailors_home'))
 
@@ -1838,7 +1877,7 @@ def vieworders():
         ordersDict = db['orders']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error', errorid=0))
     print(ordersDict)
     order_list = []
     for key in ordersDict:
@@ -1858,7 +1897,7 @@ def salesChart():
         targetDict = db['target']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error', errorid=0))
     print(targetDict)
     target_list = []
     for key in targetDict:
@@ -1913,7 +1952,7 @@ def custChart():
         availDict = db['avail']
         db.close()
     except:
-        return redirect(url_for('dberror'))
+        return redirect(url_for('general_error', errorid=0))
     print(availDict)
     avail_list = []
     for key in availDict:
