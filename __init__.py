@@ -10,7 +10,7 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
-
+cart_dict = {}
 
 from Admin_Update_Form_Riders import UpdateAdmin
 from Register_Form import CreateUserForm
@@ -41,7 +41,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Get user details using session. Need to pass in type(customer,tailor, rider)
+# Get LOGIN-ed user details using session. Need to pass in type(customer,tailor, rider)
 def get_userdata(usertype):
     db_dict = {}
     userdata = ""
@@ -66,6 +66,30 @@ def get_userdata(usertype):
     else:
         return userdata
 
+# Get user details of OTHER USERS. Need to pass in type(customer,tailor, rider), userid
+def get_otheruserdata(usertype, userid):
+    db_dict = {}
+    userdata = ""
+    try:
+        if usertype == "tailor":
+            db = shelve.open('tailor_storage.db', 'r')
+            db_dict = db['Tailors']
+            userdata = db_dict.get(userid)
+            db.close()
+        elif usertype == "customer":
+            db = shelve.open('customer.db', 'r')
+            db_dict = db['Customer']
+            userdata = db_dict.get(userid)
+            db.close()
+        elif usertype == "rider":
+            db = shelve.open('storage.db', 'r')
+            db_dict = db['Users']
+            userdata = db_dict.get(userid)
+            db.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+    else:
+        return userdata
 
 ################################ GARY'S CODE ###########################################
 def view_notification():
@@ -81,7 +105,15 @@ def view_notification():
         my_noti = {}
 
         for key,values in noti_dict.items():
-            if values.get_recipient() == username:
+            if session.get('customer_account') is not None and values.get_recipient() == session['customer_account']:
+                my_noti[key] = values
+                if values.get_status() == "new":
+                    count += 1
+            elif session.get('tailor_account') is not None and values.get_recipient() == session['tailor_account']:
+                my_noti[key] = values
+                if values.get_status() == "new":
+                    count += 1
+            elif session.get('rider_account') is not None and values.get_recipient() == session['rider_account']:
                 my_noti[key] = values
                 if values.get_status() == "new":
                     count += 1
@@ -258,7 +290,7 @@ def manage_ads():
     expired_list = []
     show_ads_list = []
 
-    tailor_storename = "" # admin cant view
+    tailor_storename = ""
     if session['tailor_account'] != "Admin":
         tailor_storename = get_userdata("tailor").get_store_name()
 
@@ -281,7 +313,6 @@ def manage_ads():
         count = len(ads_list)
         show_ads_list = []
         show_ads_list = ads_list
-        print("Run this part")
 
     return render_template('manage_ads.html', count=count, ads_list=show_ads_list, username=username)
 
@@ -301,6 +332,9 @@ def updateAd(id, updatewhat):
             return redirect(url_for('general_error'), errorid=0)
         ad = ads_dict.get(id)
         ad.set_status("Approved")
+        if session['tailor_account'] != "Admin":
+            tailor_username = get_userdata("tailor").get_user_name()
+            print(tailor_username)
         create_notification(ad.get_store_name(),"updates","Your advertisement just got approved!", "manage_ads")  # create notification
         db['Ads'] = ads_dict
         db.close()
@@ -659,14 +693,53 @@ def viewstore(name):
     if name not in catalogue_dict:
         return redirect(url_for('view_shops'))
 
-    session['cart_items'] = {}
-    print(session['cart_items'])
-
-    if request.method == 'POST':
-        print('a')
-
     return render_template('viewstore.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, form=createOrder)
 
+@app.route('/view/<name>/<int:productid>', methods=['GET', 'POST'])
+def viewshopitem(name, productid):
+    catalogue_dict = {}
+    disc_price_dict = {}
+    createOrder = CreateOrder(request.form)
+    try:
+        db = shelve.open('catalogue.db', 'r')
+        catalogue_dict = db['Catalogue']
+        db.close()
+    except:
+        return redirect(url_for('general_error'), errorid=0)
+    #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
+
+    review_dict = {}
+
+    try:
+        db2 = shelve.open('review.db', 'r')
+        review_dict = db2['Review']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+
+    if name not in catalogue_dict:
+        return redirect(url_for('view_shops'))
+
+    # Amelia
+    if request.method == "POST":
+        req = request.form
+        custom = req.get("custom")
+        qty = req.get("qty")
+
+        # Your validation please
+        # End of validation #
+
+        #cartitem_id
+        try:
+            count_id = max(cart_dict, key=int) + 1
+        except:
+            count_id = 1  # if no dictionary exist, set id as 1
+
+        # cart_dict = {cartitem_id: [shop_name, product_id, qty, custom]}
+        cart_dict[count_id] = [name, productid, qty, custom]
+        print(cart_dict)
+
+    return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, form=createOrder)
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
 def contact(name):
@@ -858,7 +931,6 @@ def review(shop, itemid):
         for key, value in catalogue_dict.items():
             if shop == key:
                 for item in catalogue_dict[key]:
-                    print(item.get_id())
                     if item.get_id() == itemid:
                         product_name = item.get_name()
                         nomatch = 0

@@ -48,7 +48,7 @@
                         <div class="col-xl-4 col-md-6 col-lg-4 col-sm-6">
                             <div class="product-wrap mb-25 scroll-zoom">
                                 <div class="product-img">
-                                    <a data-toggle="modal" data-target="#modal{{ product.get_id() }}">
+                                    <a href="{{ url_for('viewshopitem', name=name, productid=product.get_id() ) }}">
                                         <img class="default-img" src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}">
                                         <img class="hover-img" src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+product.get_image()) }}" alt="{{ product.get_image() }}">
                                     </a>
@@ -57,12 +57,12 @@
                                     {% endif %}
                                     <div class="product-action">
                                         <div class="pro-same-action pro-cart" style="width:100%;">
-                                            <a title="Add To Cart" data-toggle="modal" data-target="#modal{{ product.get_id() }}"><i class="pe-7s-cart"></i> Add to cart</a>
+                                            <a href="{{ url_for('viewshopitem', name=name, productid=product.get_id() ) }}"><i class="pe-7s-cart"></i> Add to cart</a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="product-content text-center">
-                                    <h3><a data-toggle="modal" data-target="#modal{{ product.get_id() }}">{{ product.get_name() }}</a></h3>
+                                    <h3><a href="{{ url_for('viewshopitem', name=name, productid=product.get_id() ) }}">{{ product.get_name() }}</a></h3>
                                     <div class="product-rating">
                                         {% set count = namespace(value=0) %}
                                         {% set total_stars = namespace(value=0) %}
