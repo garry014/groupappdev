@@ -51,7 +51,7 @@
                         {% endfor %}
                         {% if total_stars.value > 0 %}
                             {% set temp_stars = (total_stars.value/count.value) %}
-                            {{ (total_stars.value/count.value) }} stars
+                            {{ (total_stars.value/count.value)|round(2) }} stars
                             {% set rounded_stars = (total_stars.value/count.value) | round | int %}
                             {% for star in range(rounded_stars) %}
                                 &nbsp;<span class="fa fa-star" style="color: orange;"></span>
@@ -160,10 +160,14 @@
                                                         <span class="fa fa-star"></span>
                                                     {% endfor %}
                                                 </div>
-                                                <a href="{{ url_for('deleteReview', shop=name, productid=productid, id=review_dict[review].get_id()) }}"><i class="fa fa-times" title="Delete this Review"></i></a>
+                                                {% if (session['tailor_identity'] == "Admin") or (session['tailor_identity'] == review_dict[review].get_username()) %}
+                                                <a href="{{ url_for('updateReview', shop=name, productid=productid, id=review_dict[review].get_id()) }}"><i class="fa fa-pencil" title="Update this Review"></i></a>
+                                                {% endif %}
                                             </div>
                                             <div class="review-left">
-                                                <a href="#">Reply</a>
+                                                {% if (session['tailor_identity'] == "Admin") or (session['tailor_identity'] == review_dict[review].get_username()) %}
+                                                <a href="{{ url_for('deleteReview', shop=name, productid=productid, id=review_dict[review].get_id()) }}"><i class="fa fa-times" title="Delete this Review"></i></a>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="review-bottom">

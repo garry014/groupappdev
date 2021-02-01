@@ -75,7 +75,7 @@
                                         {% if total_stars.value > 0 %}
                                             {% set temp_stars = (total_stars.value/count.value) %}
                                             <a href="{{ url_for('viewReviews', shop=name, productid=product.get_id()) }}">
-                                                {{ (total_stars.value/count.value) }} stars
+                                                {{ (total_stars.value/count.value)|round(2) }} stars
                                                 {% set rounded_stars = (total_stars.value/count.value) | round | int %}
                                                 {% for star in range(rounded_stars) %}
                                                     <span class="fa fa-star" style="color: orange;"></span>

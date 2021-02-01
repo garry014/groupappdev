@@ -917,7 +917,7 @@ def review(shop, itemid):
 
             db2.close()
 
-            return redirect(url_for('manage_ads'))
+            return redirect(url_for('viewshopitem', name=shop, productid=itemid))
     else:
         catalogue_dict = {}
         try:
@@ -1015,7 +1015,7 @@ def updateReview(shop, productid, id):
                         # End of Image Handling
                 db2['Review'] = review_dict
                 db2.close()
-                return redirect(url_for('viewReviews', shop=shop, productid=productid))
+                return redirect(url_for('viewshopitem', name=shop, productid=productid))
     else:
         ### Check Catalouge id ###
         catalogue_dict = {}
