@@ -994,6 +994,25 @@ def updateReview(shop, productid, id):
             else:
                 review_dict[id].set_stars(starsgiven)
                 review_dict[id].set_review(updateReview.review.data)
+                file = request.files['photo']
+                if file.filename != '':
+                    if not allowed_file(file.filename):
+                        error = 'The file format must be in jpg, jpeg, png or gif.'
+                    else:
+                        # Image Handling
+                        app.config['UPLOAD_FOLDER'] = './static/uploads/reviews/'
+                        filename = secure_filename(file.filename)
+                        if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        file_extension = os.path.splitext(filename)  # get file type
+                        # Make sure to ctrl + f5 to refresh
+                        if os.path.exists('static/uploads/reviews/' + str(productid) + file_extension[1]):
+                            os.remove('static/uploads/reviews/' + str(productid) + file_extension[1])
+                        os.rename('static/uploads/reviews/' + filename,
+                                  'static/uploads/reviews/' + str(productid) + file_extension[1])
+                        review_dict[id].set_photo(str(productid) + file_extension[1])
+                        # End of Image Handling
                 db2['Review'] = review_dict
                 db2.close()
                 return redirect(url_for('viewReviews', shop=shop, productid=productid))
