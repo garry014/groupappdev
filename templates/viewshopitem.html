@@ -72,15 +72,19 @@
                         <div class="pro-details-size-color">
                             <div class="pro-details-color-wrap">
                                 {% if shop_dict[productid].get_custom() != "" %}
-                                <span>Color</span>
-                                <div class="pro-details-color-content">
-                                    <select id="custom" name="custom" required>
-                                      <option value=""></option>
-                                      {% for item in shop_dict[productid].get_custom().get_choices() %}
-                                      <option value="{{ item }}">{{ item }}</option>
-                                      {% endfor %}
-                                    </select>
-                                </div>
+                                <span>{{ shop_dict[productid].get_custom().get_question() }}</span>
+                                    {% if shop_dict[productid].get_custom().get_category() != "textbox" %}
+                                    <div class="pro-details-color-content">
+                                        <select id="custom" name="custom" required>
+                                          <option value=""></option>
+                                          {% for item in shop_dict[productid].get_custom().get_choices() %}
+                                          <option value="{{ item }}">{{ item }}</option>
+                                          {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% else %}
+                                    <input type="text" id="custom" name="custom" required>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                             <div class="pro-details-size">

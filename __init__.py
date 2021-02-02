@@ -18,7 +18,7 @@ from Forms_Riders import RidersAccounts
 import Rider
 from Admin_Update_Form_Tailors import AdminUpdateTailor
 from Forms_Tailors import TailorsAccount
-username = "Admin"  #Test Scriptdas
+username = "Ah Tong Tailor"  #Test Script
 import shelve, Tailor
 from Register_Tailors import *
 from Forms_Customers import *
@@ -492,6 +492,9 @@ def add_product():
             qns = ''
             if create_prod.q1.data != '' and len(create_prod.flist1.data) > 1:
                 qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.flist1.data, create_prod.q1category.data)
+            if create_prod.q1.data != '' and create_prod.q1category.data == "textbox":
+                qns = Catalogue.Customiseable(create_prod.q1.data, None, create_prod.q1category.data)
+            print(qns.get_question())
 
             prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
                                        str(count_id) + file_extension[1], create_prod.description.data, qns)
@@ -707,7 +710,6 @@ def viewshopitem(name, productid):
     except:
         return redirect(url_for('general_error'), errorid=0)
     #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
-
     review_dict = {}
 
     try:
