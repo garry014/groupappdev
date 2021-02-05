@@ -52,7 +52,7 @@
                                 {{ render_field(form.enddate, class="form-control", onchange="updateCost()") }}
                             </div>
                             <div class="col-lg-6">
-                                {% if session['tailor_account'] == "Admin" %}
+                                {% if session['tailor_identity'] == "Admin" %}
                                     <label for="status">Status</label>
                                     {{ render_field(form.status, class="form-control") }}
                                     <br>

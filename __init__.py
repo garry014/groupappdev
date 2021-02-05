@@ -91,6 +91,28 @@ def get_otheruserdata(usertype, userid):
     else:
         return userdata
 
+
+def convert_store_username(storename):
+    db_dict = {}
+    try:
+        db2 = shelve.open('tailor_storage.db', 'r')
+        db_dict = db2['Tailors']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+    print(storename)
+    print(db_dict)
+
+    tailor_username = ""
+    for i in db_dict:
+        if storename == db_dict[i].get_store_name():
+            print("HERE")
+            tailor_username = db_dict[i].get_user_name()
+            print(tailor_username)
+            break
+
+    return tailor_username
+
 ################################ GARY'S CODE ###########################################
 def view_notification():
     noti_dict = {}
@@ -105,15 +127,15 @@ def view_notification():
         my_noti = {}
 
         for key,values in noti_dict.items():
-            if session.get('customer_account') is not None and values.get_recipient() == session['customer_account']:
+            if session.get('customer_identity') is not None and values.get_recipient() == session['customer_identity']:
                 my_noti[key] = values
                 if values.get_status() == "new":
                     count += 1
-            elif session.get('tailor_account') is not None and values.get_recipient() == session['tailor_account']:
+            elif session.get('tailor_identity') is not None and values.get_recipient() == session['tailor_identity']:
                 my_noti[key] = values
                 if values.get_status() == "new":
                     count += 1
-            elif session.get('rider_account') is not None and values.get_recipient() == session['rider_account']:
+            elif session.get('rider_identity') is not None and values.get_recipient() == session['rider_identity']:
                 my_noti[key] = values
                 if values.get_status() == "new":
                     count += 1
@@ -155,13 +177,20 @@ def update_notification(action,id):
         print("Database error")
     else:
         if action == "delete":
-            if username == noti_dict[id].get_recipient():
+            if session.get('customer_identity') is not None and noti_dict[id].get_recipient() == session['customer_identity']:
+                noti_dict.pop(id)
+            elif session.get('tailor_identity') is not None and noti_dict[id].get_recipient() == session['tailor_identity']:
+                noti_dict.pop(id)
+            elif session.get('rider_identity') is not None and noti_dict[id].get_recipient() == session['rider_identity']:
                 noti_dict.pop(id)
         if action == "readall":
             for noti in noti_dict:
-                if username == noti_dict[noti].get_recipient():
+                if session.get('customer_identity') is not None and noti_dict[noti].get_recipient() == session['customer_identity']:
                     noti_dict[noti].set_status("read")
-
+                elif session.get('tailor_identity') is not None and noti_dict[noti].get_recipient() == session['tailor_identity']:
+                    noti_dict[noti].set_status("read")
+                elif session.get('rider_identity') is not None and noti_dict[noti].get_recipient() == session['rider_identity']:
+                    noti_dict[noti].set_status("read")
         db1['Notification'] = noti_dict
         db1.close()
     return redirect(request.referrer)
@@ -203,7 +232,7 @@ def advertise():
     error = None
     create_ad = CreateAd(request.form)
 
-    if session.get('tailor_account') is None: #For restricted functions.
+    if session.get('tailor_identity') is None: #For restricted functions.
         return redirect(url_for('tailors_login'))
 
     if request.method == 'POST' and create_ad.validate():
@@ -252,8 +281,8 @@ def advertise():
                 else:
                     adtext = create_ad.adtext.data
 
-                tailor_storename = "Admin"
-                if session['tailor_account'] != "Admin":
+                tailor_storename = "Admin Store Lah"
+                if session['tailor_identity'] != "Admin":
                     tailor_storename = get_userdata("tailor").get_store_name()
 
                 ad = Ads.Ads(str(count_id) + file_extension[1], tailor_storename, create_ad.startdate.data,
@@ -271,7 +300,7 @@ def advertise():
 
 @app.route('/manage_ads')
 def manage_ads():
-    if session.get('tailor_account') is None: #For restricted functions.
+    if session.get('tailor_identity') is None: #For restricted functions.
         return redirect(url_for('tailors_login'))
 
     try:
@@ -291,8 +320,10 @@ def manage_ads():
     show_ads_list = []
 
     tailor_storename = ""
-    if session['tailor_account'] != "Admin":
+    if session['tailor_identity'] != "Admin":
         tailor_storename = get_userdata("tailor").get_store_name()
+
+    print("Logged in as:",session['tailor_identity']) #Test HEHE
 
     for ad in ads_list:
         if ad.get_store_name() == tailor_storename:
@@ -309,7 +340,7 @@ def manage_ads():
         db['Ads'] = ads_dict
     db.close()
 
-    if session['tailor_account'] == "Admin":
+    if session['tailor_identity'] == "Admin":
         count = len(ads_list)
         show_ads_list = []
         show_ads_list = ads_list
@@ -320,10 +351,10 @@ def manage_ads():
 def updateAd(id, updatewhat):
     update_ad = UpdateAd(request.form)
 
-    if session.get('tailor_account') is None: #For restricted functions.
+    if session.get('tailor_identity') is None: #For restricted functions.
         return redirect(url_for('tailors_login'))
 
-    if updatewhat == 1 and session['tailor_account'] == "Admin": #Update Status only
+    if updatewhat == 1 and session['tailor_identity'] == "Admin": #Update Status only
         try:
             ads_dict = {}
             db = shelve.open('ads.db', 'w')
@@ -332,10 +363,11 @@ def updateAd(id, updatewhat):
             return redirect(url_for('general_error'), errorid=0)
         ad = ads_dict.get(id)
         ad.set_status("Approved")
-        if session['tailor_account'] != "Admin":
-            tailor_username = get_userdata("tailor").get_user_name()
-            print(tailor_username)
-        create_notification(ad.get_store_name(),"updates","Your advertisement just got approved!", "manage_ads")  # create notification
+
+        tailor_username = convert_store_username(ad.get_store_name())
+        print(tailor_username)
+
+        create_notification(tailor_username,"updates","Your advertisement just got approved!", "manage_ads")  # create notification
         db['Ads'] = ads_dict
         db.close()
 
@@ -353,7 +385,7 @@ def updateAd(id, updatewhat):
             ad.set_start_date(update_ad.startdate.data)
             ad.set_end_date(update_ad.enddate.data)
             ad.set_adtext(update_ad.adtext.data)
-            if session['tailor_account'] == "Admin":
+            if session['tailor_identity'] == "Admin":
                 ad.set_status(update_ad.status.data)
                 if update_ad.status.data == "Rejected":
                     create_notification(ad.get_store_name(), "updates", "Sorry, your advertisement isn't in-line with our terms and conditions and has been rejected.",
@@ -394,14 +426,14 @@ def updateAd(id, updatewhat):
 
             ad = ads_dict.get(id)
 
-            if (session['tailor_account'] != "Admin"):
+            if (session['tailor_identity'] != "Admin"):
                 if (ad.get_store_name() != get_userdata("tailor").get_store_name()):
                     return redirect(url_for('general_error', errorid=1))
 
             update_ad.startdate.data = ad.get_start_date()
             update_ad.enddate.data = ad.get_end_date()
             update_ad.adtext.data = ad.get_adtext()
-            if session['tailor_account'] == "Admin":
+            if session['tailor_identity'] == "Admin":
                 update_ad.status.data = ad.get_status()
 
         return render_template('updateAd.html', form=update_ad, username=username)
@@ -415,14 +447,25 @@ def delete_ad(id):
     except:
         return redirect(url_for('general_error'), errorid=0)
     else:
-        for i in ALLOWED_EXTENSIONS:
-            directpath = 'static/uploads/ads/'+ str(id) + '.' + i
-            if os.path.exists(directpath):
-                os.remove(directpath)
-        ads_dict.pop(id)
-        db['Ads'] = ads_dict
-        db.close()
-        return redirect(url_for('manage_ads'))
+        # test script
+        storename_loginuser = get_otheruserdata("tailor", session['tailor_account'])
+        print(storename_loginuser)
+        print(ads_dict[id].get_store_name())
+
+        if session.get('tailor_account') is None:  # For restricted functions.
+            return redirect(url_for('tailors_login'))
+        elif session['tailor_identity'] == "Admin" or session['tailor_account'].get_userdata().get_store_name() == ads_dict[id].get_store_name():
+            print("HEHE")
+            for i in ALLOWED_EXTENSIONS:
+                directpath = 'static/uploads/ads/' + str(id) + '.' + i
+                if os.path.exists(directpath):
+                    os.remove(directpath)
+            ads_dict.pop(id)
+            db['Ads'] = ads_dict
+            db.close()
+            return redirect(url_for('manage_ads'))
+        else:
+            return redirect(url_for('general_error', errorid=1))
 
 @app.route('/CustRegister', methods=['GET', 'POST'])
 def createcustomeracct():
@@ -1438,11 +1481,13 @@ def tailors_login():
                 return redirect(url_for('tailors_home'))
             # Do this for the rest of the admins
             elif (request.form['user-name'] == 'Admin') and request.form['user-password'] == tailor_dict.get(3).get_password():
-                session['tailor_account'] = "Admin"
-                session['tailor_identity'] = user.get_user_name()
+                session['tailor_account'] = 3
+                session['tailor_identity'] = 'Admin'
                 return redirect(url_for('retrieve_tailors'))
             else:
                 error = 'Invalid Credentials. Please try again.'
+
+
     return render_template('login_tailors.html', error=error)
 
 
