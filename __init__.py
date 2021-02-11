@@ -747,18 +747,20 @@ def view_shops():
                         if item.get_discount() > best_disc:
                             best_disc = item.get_discount()
                         shop_dict[key] = [total_review, best_disc]
-                        print(shop_dict)
-                # if price2 != 300:
-                #     if item.get_price() >= price1 and item.get_price() <= price2:
-                #         total_review += item.get_reviews()
-                #         if item.get_discount() > best_disc:
-                #             best_disc = item.get_discount()
-                #         shop_dict[key] = [total_review, best_disc]
+                        print("show this", shop_dict)
+                        break
+                if price2 != 300:
+                    if item.get_price() >= price1 and item.get_price() <= price2:
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        shop_dict[key] = [total_review, best_disc]
 
         if not shop_dict: #Checks for empty dict
             error = "Sorry! We could not find the store you are looking for, try searching another store or changing your filter requirements."
 
-        if search == '' and not cbList and (price1 == 6 or price2 == 300):
+        if search == '' and not cbList and (price1 == 6 and price2 == 300):
+            print("imhere")
             return redirect(url_for('view_shops'))
 
         return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, error=error)
