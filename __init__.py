@@ -5,7 +5,7 @@ from cregform import *
 from orderform import *
 from targetform import *
 from availform import *
-import os, pathlib, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability, Customer
+import os, pathlib, re, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability, Customer
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
@@ -665,6 +665,7 @@ def updateProduct(name, id):
 
 @app.route('/viewshops', methods=['GET' ,'POST'])
 def view_shops():
+    # to do my onchange checkbox, i nid to keep a copy of the data I have.
     error = None
     catalogue_dict = {}
     try:
@@ -673,6 +674,14 @@ def view_shops():
         db.close()
     except:
         return redirect(url_for('general_error'), errorid=0)
+
+    review_dict = {}
+    try:
+        db2 = shelve.open('review.db', 'r')
+        review_dict = db2['Review']
+        db2.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
 
     shop_dict = {} #Key: [Total Review, Most Discounted Item]
     for key, value in catalogue_dict.items():
@@ -684,34 +693,77 @@ def view_shops():
                 best_disc = item.get_discount()
         shop_dict[key] = [total_review, best_disc]
 
-    search_item = SearchItem(request.form)
     if request.method == 'POST':
         shop_dict = {}
+
+        search = request.form.get('search')
+        cbList = request.form.getlist('cbList')
+        pricefilter = request.form.get('price')
+        session['checkboxList'] = cbList
+
+        pricefilter = re.findall(r'\d+', pricefilter)
+        price1 = int(pricefilter[0])
+        price2 = int(pricefilter[1])
+        print(pricefilter)
+
         for key, value in catalogue_dict.items():
-            if search_item.search.data != '' and search_item.search.data.lower()[:5] == key.lower()[:5]:
+            best_disc = 0
+            total_review = 0
+            if search != '' and search.lower()[:5] == key.lower()[:5]:
                 for item in value:
                     total_review += item.get_reviews()
                     if item.get_discount() > best_disc:
                         best_disc = item.get_discount()
                 shop_dict[key] = [total_review, best_disc]
 
+            if cbList:
+                for item in value:
+                    if "sales" in cbList:
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        if best_disc > 0:
+                            shop_dict[key] = [total_review, best_disc]
+                    if 'altering' in cbList and 'alter' in item.get_name().lower():
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        shop_dict[key] = [total_review, best_disc]
+                    if 'tapering' in cbList and 'taper' in item.get_name().lower():
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        shop_dict[key] = [total_review, best_disc]
+                    if 'suits' in cbList and 'customised suit' in item.get_name().lower():
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        shop_dict[key] = [total_review, best_disc]
+
+            for item in value:
+                if price1 != 6:
+                    if item.get_price() >= price1 and item.get_price() <= price2:
+                        total_review += item.get_reviews()
+                        if item.get_discount() > best_disc:
+                            best_disc = item.get_discount()
+                        shop_dict[key] = [total_review, best_disc]
+                        print(shop_dict)
+                # if price2 != 300:
+                #     if item.get_price() >= price1 and item.get_price() <= price2:
+                #         total_review += item.get_reviews()
+                #         if item.get_discount() > best_disc:
+                #             best_disc = item.get_discount()
+                #         shop_dict[key] = [total_review, best_disc]
+
         if not shop_dict: #Checks for empty dict
             error = "Sorry! We could not find the store you are looking for, try searching another store or changing your filter requirements."
 
-        return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, error=error)
+        if search == '' and not cbList and (price1 == 6 or price2 == 300):
+            return redirect(url_for('view_shops'))
 
-    review_dict = {}
+        return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, error=error)
 
-    try:
-        db2 = shelve.open('review.db', 'r')
-        review_dict = db2['Review']
-        db2.close()
-    except:
-        return redirect(url_for('general_error', errorid=0))
-
-
-
-    return render_template('viewshops.html', shop_dict=shop_dict, form=search_item, review_dict=review_dict, error=error)
+    return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, error=error)
 
 
 @app.route('/view/<name>', methods=['GET', 'POST'])

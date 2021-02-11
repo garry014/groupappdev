@@ -62,4 +62,4 @@ class CreateReview(Form):
     photo = FileField('Photo:')
 
 class CreateOrder(Form):
-    qtybutton = StringField('')
+    qtybutton = StringField('', validators=[validators.DataRequired()])

@@ -481,7 +481,7 @@
     $(function() {
         sliderrange.slider({
             range: true,
-            min: 16,
+            min: 6,
             max: 400,
             values: [0, 300],
             slide: function(event, ui) {
@@ -490,6 +490,8 @@
         });
         amountprice.val("$" + sliderrange.slider("values", 0) +
             " - $" + sliderrange.slider("values", 1));
+
+        document.getElementById("form").submit();
     });
     
     

@@ -105,33 +105,56 @@
                    <div class="sidebar-widget">
                         <h4 class="pro-sidebar-title">Search Stores</h4>
                         <div class="pro-sidebar-search mb-50 mt-25">
-                            <form class="pro-sidebar-search-form" method="post">
-                                {{ form.search }}
+                            <form class="pro-sidebar-search-form" id="searchForm" name="searchForm" method="post">
+                                <input type="text" name="search" placeholder="Store Name">
                                 <button type="submit">
                                     <i class="pe-7s-search"></i>
                                 </button>
-                            </form>
+
                         </div>
                     </div>
                     <div class="sidebar-widget">
                         <h4 class="pro-sidebar-title">Refine By </h4>
                         <div class="sidebar-widget-list mt-30">
                             <ul>
+
                                 <li>
                                     <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" method="post"> <a href="#">On Sale <span>4</span> </a>
+                                        {% if 'sales' in session['checkboxList'] %}
+                                        <input type="checkbox" value="sales" name="cbList" id="sales" method="post" onChange="this.form.submit()" checked> <label for="sales"><a>On Sales</a></label>
+                                        {% else %}
+                                        <input type="checkbox" value="sales" name="cbList" id="sales" method="post" onChange="this.form.submit()"> <label for="sales"><a>On Sales</a></label>
+                                        {% endif %}
                                         <span class="checkmark"></span>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">New <span>4</span></a>
+                                        {% if 'altering' in session['checkboxList'] %}
+                                        <input type="checkbox" value="altering" id="altering" name="cbList" onChange="this.form.submit()" checked><label for="altering"><a>Altering Services</a></label>
+                                        {% else %}
+                                        <input type="checkbox" value="altering" id="altering" name="cbList" onChange="this.form.submit()"><label for="altering"><a>Altering Services</a></label>
+                                        {% endif %}
                                         <span class="checkmark"></span>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">In Stock <span>4</span> </a>
+                                        {% if 'tapering' in session['checkboxList'] %}
+                                        <input type="checkbox" value="tapering" id="tapering" name="cbList" onChange="this.form.submit()" checked><label for="tapering"><a>Tapering Services</a></label>
+                                        {% else %}
+                                        <input type="checkbox" value="tapering" id="tapering" name="cbList" onChange="this.form.submit()"><label for="tapering"><a>Tapering Services</a></label>
+                                        {% endif %}
+                                        <span class="checkmark"></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="sidebar-widget-list-left">
+                                        {% if 'suits' in session['checkboxList'] %}
+                                        <input type="checkbox" value="suits" id="suits" name="cbList" onChange="this.form.submit()" checked><label for="suits"><a>Customised Suits</a></label>
+                                        {% else %}
+                                        <input type="checkbox" value="suits" id="suits" name="cbList" onChange="this.form.submit()"><label for="suits"><a>Customised Suits</a></label>
+                                        {% endif %}
                                         <span class="checkmark"></span>
                                     </div>
                                 </li>
@@ -142,89 +165,23 @@
                         <h4 class="pro-sidebar-title">Filter By Price </h4>
                         <div class="price-filter mt-10">
                             <div class="price-slider-amount">
-                                <input type="text" id="amount" name="price"  placeholder="Add Your Price" />
+                                <input type="text" id="amount" name="price"  placeholder="Add Your Price" style="pointer-events:none;"/>
                             </div>
                             <div id="slider-range"></div>
+                            <a href="javascript:{}" onclick="document.getElementById('searchForm').submit();"><i class="fa fa-filter"></i> Filter Now</a>
                         </div>
+                        </form>
                     </div>
-                    <div class="sidebar-widget mt-50">
-                        <h4 class="pro-sidebar-title">Colour </h4>
-                        <div class="sidebar-widget-list mt-20">
-                            <ul>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">Green <span>4</span> </a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">Cream <span>4</span> </a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">Blue <span>4</span> </a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">Black <span>4</span> </a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="sidebar-widget mt-40">
-                        <h4 class="pro-sidebar-title">Size </h4>
-                        <div class="sidebar-widget-list mt-20">
-                            <ul>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">XL</a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">L</a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">SM</a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="sidebar-widget-list-left">
-                                        <input type="checkbox" value=""> <a href="#">XXL</a>
-                                        <span class="checkmark"></span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="sidebar-widget mt-50">
-                        <h4 class="pro-sidebar-title">Tag </h4>
-                        <div class="sidebar-widget-tag mt-25">
-                            <ul>
-                                <li><a href="#">Clothing</a></li>
-                                <li><a href="#">Accessories</a></li>
-                                <li><a href="#">For Men</a></li>
-                                <li><a href="#">Women</a></li>
-                                <li><a href="#">Fashion</a></li>
-                            </ul>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
 {% endblock %}

@@ -17,7 +17,6 @@
                                     <th>Price</th>
                                     <th>Discounts</th>
                                     <th>Description</th>
-                                    <th>Reviews</th>
                                     <th>action</th>
                                 </tr>
                             </thead>
@@ -33,7 +32,7 @@
                                     <td class="product-quantity">
                                         {{ product.get_description() }}
                                     </td>
-                                    <td class="product-subtotal">{{ product.get_reviews()*5 }} stars</td>
+
                                     <td class="product-remove">
                                         <a href="/updateProduct/{{username}}/{{product.get_id()}}"><i class="fa fa-pencil"></i></a>
                                         <form action="{{url_for('delete_product', id=product.get_id(), name=username)}}" method="POST" style="display: inline-block;">
