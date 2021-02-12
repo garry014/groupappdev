@@ -219,11 +219,23 @@ def home_page():
         ads_list.append(ad)
 
     show_ads_list = []
+    datetoday = datetime.today().strftime('%Y-%m-%d') #datetoday = datetime.today().strftime('%Y-%m-%d')
+    datetoday = dt.strptime(datetoday, "%Y-%m-%d")
+    print("date today;",datetoday)
+    print(type(datetoday))
+
     for ad in ads_list:
-        startdate_str = str(ad.get_end_date())
+        startdate_str = str(ad.get_start_date())
+        enddate_str = str(ad.get_end_date())
         startdate = dt.strptime(startdate_str, "%Y-%m-%d")
-        if startdate >= datetime.now() and ad.get_status() == "Approved":
+        print(startdate_str, enddate_str, ad.get_status())
+        enddate = dt.strptime(enddate_str, "%Y-%m-%d")
+        datenow_str = str(datetime.now())
+
+        #datenow = dt.strptime(datenow_str, "%Y-%m-%d")
+        if (datetoday >= startdate) and (datetoday <= enddate) and ad.get_status() == "Approved": #enddate >= datetime.now()
             show_ads_list.append(ad)
+            print(ad.get_store_name())
 
     return render_template('index.html', show_ads_list=show_ads_list)
 
@@ -246,6 +258,8 @@ def advertise():
                 error = 'Please upload a file.'
             elif not allowed_file(file.filename):
                 error = 'The file format must be in jpg, jpeg, png or gif.'
+            # elif os.path.exists(file.filename): #if user deletes the file b4 submitting.
+            #     error = 'The file you are submitting does not exist.'
             elif file: #All validations done at this stage
                 ads_dict = {}
                 try:
@@ -349,6 +363,7 @@ def manage_ads():
 
 @app.route('/updateAd/<int:id>/<int:updatewhat>/', methods=['GET', 'POST'])
 def updateAd(id, updatewhat):
+    error = None
     update_ad = UpdateAd(request.form)
 
     if session.get('tailor_identity') is None: #For restricted functions.
@@ -365,7 +380,6 @@ def updateAd(id, updatewhat):
         ad.set_status("Approved")
 
         tailor_username = convert_store_username(ad.get_store_name())
-        print(tailor_username)
 
         create_notification(tailor_username,"updates","Your advertisement just got approved!", "manage_ads")  # create notification
         db['Ads'] = ads_dict
@@ -383,12 +397,15 @@ def updateAd(id, updatewhat):
 
             ad = ads_dict.get(id)
             ad.set_start_date(update_ad.startdate.data)
-            ad.set_end_date(update_ad.enddate.data)
             ad.set_adtext(update_ad.adtext.data)
             if session['tailor_identity'] == "Admin":
                 ad.set_status(update_ad.status.data)
+                tailor_username = convert_store_username(ad.get_store_name())
                 if update_ad.status.data == "Rejected":
-                    create_notification(ad.get_store_name(), "updates", "Sorry, your advertisement isn't in-line with our terms and conditions and has been rejected.",
+                    create_notification(tailor_username, "updates", "Sorry, your advertisement isn't in-line with our terms and conditions and has been rejected.",
+                                        "manage_ads")
+                if update_ad.status.data == "Approved":
+                    create_notification(tailor_username, "updates", "Your advertisement just got approved!",
                                         "manage_ads")
             else:
                 ad.set_status("Pending Approval")
@@ -412,9 +429,16 @@ def updateAd(id, updatewhat):
                 os.rename('static/uploads/ads/' + filename, 'static/uploads/ads/' + str(ad.get_ad_id()) + file_extension[1])
                 ad.set_image(str(ad.get_ad_id()) + file_extension[1])
                 # End of Image Handling
-            db['Ads'] = ads_dict
-            db.close()
-            return redirect(url_for('manage_ads'))
+
+            #delta = update_ad.enddate.data - update_ad.startdate.data
+            if (update_ad.enddate.data < update_ad.startdate.data):  # Compare start and end dates.
+                error = "End date cannot be earlier than start date"
+            else:
+                ad.set_end_date(update_ad.enddate.data)
+                db['Ads'] = ads_dict
+                db.close()
+                return redirect(url_for('manage_ads'))
+
         else:
             try:
                 ads_dict = {}
@@ -436,7 +460,7 @@ def updateAd(id, updatewhat):
             if session['tailor_identity'] == "Admin":
                 update_ad.status.data = ad.get_status()
 
-        return render_template('updateAd.html', form=update_ad, username=username)
+        return render_template('updateAd.html', form=update_ad, username=username, erorr=error)
 
 @app.route('/deleteAd/<int:id>', methods=['POST'])
 def delete_ad(id):
