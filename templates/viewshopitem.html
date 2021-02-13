@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Shop Item{% endblock %}
+{% block title %}{{ shop_dict[productid].get_name() }} - {{ name }}{% endblock %}
 
 {% block content %}
 

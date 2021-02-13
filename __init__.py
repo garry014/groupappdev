@@ -10,7 +10,6 @@ from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
-cart_dict = {}
 
 from Admin_Update_Form_Riders import UpdateAdmin
 from Register_Form import CreateUserForm
@@ -191,6 +190,16 @@ def update_notification(action,id):
                     noti_dict[noti].set_status("read")
                 elif session.get('rider_identity') is not None and noti_dict[noti].get_recipient() == session['rider_identity']:
                     noti_dict[noti].set_status("read")
+        if action == "seeall":
+            for noti in noti_dict:
+                if session.get('customer_identity') is not None and noti_dict[noti].get_recipient() == session['customer_identity']:
+                    noti_dict[noti].set_status("read")
+                elif session.get('tailor_identity') is not None and noti_dict[noti].get_recipient() == session['tailor_identity']:
+                    noti_dict[noti].set_status("read")
+                elif session.get('rider_identity') is not None and noti_dict[noti].get_recipient() == session['rider_identity']:
+                    noti_dict[noti].set_status("read")
+            return redirect(url_for('all_notifications'))
+
         db1['Notification'] = noti_dict
         db1.close()
     return redirect(request.referrer)
@@ -491,30 +500,30 @@ def delete_ad(id):
         else:
             return redirect(url_for('general_error', errorid=1))
 
-@app.route('/CustRegister', methods=['GET', 'POST'])
-def createcustomeracct():
-    createcustacct = createCust(request.form)
-
-    if request.method == 'POST' and createcustacct.validate():
-        try:
-            custDict = {}
-            cdb = shelve.open('cust.db', 'c')
-            custDict = cdb['cust']
-        except:
-            print("error reading cust.db")
-
-        custacct = CustRegister.CustRegister(createcustacct.city.data, createcustacct.email.data,
-                                             createcustacct.password.data, createcustacct.firstname.data,
-                                             createcustacct.lastname.data, createcustacct.number.data)
-
-        cdb[createcustacct.email.data] = custacct
-        cdb['CustRegister'] = custDict
-
-        cdb.close()
-
-        return redirect(url_for('CustLogin'))
-
-    return render_template('CustRegister.html', form=createcustacct)
+# @app.route('/CustRegister', methods=['GET', 'POST'])
+# def createcustomeracct():
+#     createcustacct = createCust(request.form)
+#
+#     if request.method == 'POST' and createcustacct.validate():
+#         try:
+#             custDict = {}
+#             cdb = shelve.open('cust.db', 'c')
+#             custDict = cdb['cust']
+#         except:
+#             print("error reading cust.db")
+#
+#         custacct = CustRegister.CustRegister(createcustacct.city.data, createcustacct.email.data,
+#                                              createcustacct.password.data, createcustacct.firstname.data,
+#                                              createcustacct.lastname.data, createcustacct.number.data)
+#
+#         cdb[createcustacct.email.data] = custacct
+#         cdb['CustRegister'] = custDict
+#
+#         cdb.close()
+#
+#         return redirect(url_for('CustLogin'))
+#
+#     return render_template('CustRegister.html', form=createcustacct)
 
 @app.route('/addproduct', methods=['GET', 'POST'])
 def add_product():
@@ -539,20 +548,26 @@ def add_product():
             except:
                 error = "Error in opening DB"
 
+            tailor_storename = "Admin Store Lah"
+            if session['tailor_identity'] != "Admin":
+                tailor_storename = get_userdata("tailor").get_store_name()
+
             count_id = 0
-            if username in catalogue_dict: #Set count_id to the max number of the store
-                for product in catalogue_dict[username]:
+            if tailor_storename in catalogue_dict: #Set count_id to the max number of the store
+                for product in catalogue_dict[tailor_storename]:
                     if product.get_id() >= count_id:
                         count_id = product.get_id() + 1
 
             # Image Handling
-            app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + username + '/'
+            app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + tailor_storename + '/'
             filename = secure_filename(file.filename)
             pathlib.Path(app.config['UPLOAD_FOLDER']).mkdir(parents=True, exist_ok=True) #Create shop directory if does nt exist.
-            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)): #if upload filename exists
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             file_extension = os.path.splitext(filename)  # get file type
+            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1])):
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1]))
             os.rename(app.config['UPLOAD_FOLDER'] + filename, app.config['UPLOAD_FOLDER'] +str(count_id) + file_extension[1])
             # End of Image Handling
 
@@ -561,15 +576,14 @@ def add_product():
                 qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.flist1.data, create_prod.q1category.data)
             if create_prod.q1.data != '' and create_prod.q1category.data == "textbox":
                 qns = Catalogue.Customiseable(create_prod.q1.data, None, create_prod.q1category.data)
-            print(qns.get_question())
 
             prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
                                        str(count_id) + file_extension[1], create_prod.description.data, qns)
 
-            if username in catalogue_dict:
-                catalogue_dict[username].append(prod)
+            if tailor_storename in catalogue_dict:
+                catalogue_dict[tailor_storename].append(prod)
             else:
-                catalogue_dict[username] = [prod]
+                catalogue_dict[tailor_storename] = [prod]
 
             db['Catalogue'] = catalogue_dict
             db.close()
@@ -588,10 +602,14 @@ def catalogue():
     except:
         return redirect(url_for('general_error'), errorid=0)
 
-    if username not in catalogue_dict:
+    tailor_storename = "Admin Store Lah"
+    if session['tailor_identity'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
+
+    if tailor_storename not in catalogue_dict:
         return redirect(url_for('add_product'))
 
-    return render_template('catalogue.html', catalogue_list=catalogue_dict[username], username=username)
+    return render_template('catalogue.html', catalogue_list=catalogue_dict[tailor_storename], username=tailor_storename)
 
 @app.route('/deleteProduct/<name>/<int:id>', methods=['POST'])
 def delete_product(name, id):
@@ -844,25 +862,45 @@ def viewshopitem(name, productid):
         return redirect(url_for('view_shops'))
 
     # Amelia
+    cart_dict = {}
+    # session.pop('cart_session', None)
+    # session.pop('cart_id', None)
+    if session.get('cart_session') is None:
+        session["cart_session"] = {}
+        count_id = 1
+    if session.get('cart_id') is None:
+        session["cart_id"] = 0
+
     if request.method == "POST":
         req = request.form
         custom = req.get("custom")
         qty = req.get("qty")
 
-        # Your validation please
+        # Your fields validation please
+        try:
+            quantity = int(qty)
+        except:
+            print("Quantity not a valid integer")
         # End of validation #
 
-        #cartitem_id
-        try:
-            count_id = max(cart_dict, key=int) + 1
-        except:
-            count_id = 1  # if no dictionary exist, set id as 1
+        session["cart_id"] += 1
 
-        # cart_dict = {cartitem_id: [shop_name, product_id, qty, custom]}
-        cart_dict[count_id] = [name, productid, qty, custom]
-        print(cart_dict)
+        shop_dict = catalogue_dict[name]
+        productname = shop_dict[productid].get_name()
+        unitprice = float(shop_dict[productid].get_price()) * (1-(shop_dict[productid].get_discount()/100))
+
+        cart_id = str(session["cart_id"])
+        # cart_dict = {cartitem_id(in str): [shop_name, productname, product_id, unitprice, quantity, custom]}
+        cart_dict[cart_id] = [name, productname, productid, unitprice, quantity, custom]
+        session["cart_session"].update(cart_dict)
+        print(session["cart_session"])
 
     return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, form=createOrder)
+
+@app.route('/cart', methods=['GET', 'POST'])
+def cart():
+    print(session["cart_session"])
+    return render_template('cart-page.html')
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
 def contact(name):

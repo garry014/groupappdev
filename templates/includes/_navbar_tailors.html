@@ -93,7 +93,7 @@
                                 {% endfor %}
                             {% endif %}
                             {% if my_noti|length > 3 %}
-                            <center><a href="{{ url_for('all_notifications') }}">See All</a></center>
+                            <center><a href="{{ url_for('update_notification', action='seeall', id=0) }}">See All</a></center>
                             {% endif %}
                         </div>
                         </div>
