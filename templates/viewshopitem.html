@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ shop_dict[productid].get_name() }} - {{ name }}{% endblock %}
+{% block title %}{{ prod.get_name() }} - {{ name }}{% endblock %}
 
 {% block content %}
 
 <div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
     <div class="container">
+
         <div class="breadcrumb-content text-center">
             <ul>
                 <li>
@@ -16,7 +17,7 @@
                 <li>
                     <a href="{{ url_for('viewstore', name=name) }}">{{ name }}</a>
                 </li>
-                <li class="active">{{ shop_dict[productid].get_name() }} </li>
+                <li class="active">{{ prod.get_name() }} </li>
             </ul>
         </div>
     </div>
@@ -26,25 +27,25 @@
         <div class="row">
             <div class="col-lg-6 col-md-6">
                 <div class="product-details dec-img-wrap">
-                    <img src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+ shop_dict[productid].get_image()) }}" alt="">
+                    <img src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+ prod.get_image()) }}" alt="">
                 </div>
             </div>
             <div class="col-lg-6 col-md-6">
                 <div class="product-details-content ml-70">
-                    <h2>{{ shop_dict[productid].get_name() }}</h2>
+                    <h2>{{ prod.get_name() }}</h2>
                     <div class="product-details-price">
-                        {% if shop_dict[productid].get_discount() > 0 %}
-                            <span>$ {{ '%0.2f'|format(shop_dict[productid].get_price()|float * ((100 - shop_dict[productid].get_discount())/100)) }}</span>
-                            <span class="old">$ {{ shop_dict[productid].get_price() }}</span>
+                        {% if prod.get_discount() > 0 %}
+                            <span>$ {{ '%0.2f'|format(prod.get_price()|float * ((100 - prod.get_discount())/100)) }}</span>
+                            <span class="old">$ {{ prod.get_price() }}</span>
                         {% else %}
-                            <span>$ {{ shop_dict[productid].get_price() }}</span>
+                            <span>$ {{ prod.get_price() }}</span>
                         {% endif %}
                     </div>
                     <div class="pro-details-rating-wrap">
                         {% set count = namespace(value=0) %}
                         {% set total_stars = namespace(value=0) %}
                         {% for i in review_dict %}
-                            {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == shop_dict[productid].get_id() %}
+                            {% if review_dict[i].get_storename() == name and review_dict[i].get_productid() == prod.get_id() %}
                                 {% set count.value = count.value + 1 %}
                                 {% set total_stars.value = total_stars.value + review_dict[i].get_stars() %}
                             {% endif %}
@@ -65,19 +66,19 @@
                         {% endif %}
                     </div>
                     <div class="pro-details-list">
-                        {{ shop_dict[productid].get_description() }}
+                        {{ prod.get_description() }}
                     </div>
 
                     <form class="contact-form-style" id="my_form" action="" method="post">
                         <div class="pro-details-size-color">
                             <div class="pro-details-color-wrap">
-                                {% if shop_dict[productid].get_custom() != "" %}
-                                <span>{{ shop_dict[productid].get_custom().get_question() }}</span>
-                                    {% if shop_dict[productid].get_custom().get_category() != "textbox" %}
+                                {% if prod.get_custom() != "" %}
+                                <span>{{ prod.get_custom().get_question() }}</span>
+                                    {% if prod.get_custom().get_category() != "textbox" %}
                                     <div class="pro-details-color-content">
                                         <select id="custom" name="custom" required>
                                           <option value=""></option>
-                                          {% for item in shop_dict[productid].get_custom().get_choices() %}
+                                          {% for item in prod.get_custom().get_choices() %}
                                           <option value="{{ item }}">{{ item }}</option>
                                           {% endfor %}
                                         </select>
@@ -147,7 +148,7 @@
                         <div class="col-lg-8" style="margin: 0 auto;">
                             <div class="review-wrapper">
                                 {% for review in review_dict %}
-                                {% if review_dict[review].get_storename() == name and review_dict[review].get_productid() == shop_dict[productid].get_id() %}
+                                {% if review_dict[review].get_storename() == name and review_dict[review].get_productid() == prod.get_id() %}
                                 <div class="single-review">
                                     <div class="review-content">
                                         <div class="review-top-wrap">

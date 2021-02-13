@@ -34,7 +34,7 @@ class CreateProduct(Form):
     discount = IntegerField("Discounts:* (0 for N.A)")
     description = TextAreaField('Description:')
     q1 = StringField('Question 1:')
-    q1category = RadioField('Category', [validators.DataRequired()], choices=[('textbox', 'Textbox - Open-ended question'), ('radiobtn', 'Radio Button - Single Choice Selection'), ('checkbox', 'Check boxes - Multiple Choice Selection')], default='textbox')
+    q1category = RadioField('Category', [validators.DataRequired()], choices=[('textbox', 'Textbox - Open-ended question'), ('radiobtn', 'Dropdown Menu - Show a list of selections the user can choose from')], default='textbox')
     flist1 = FieldList(StringField())
     # q2 = StringField('Question 1:')
     # q2category = RadioField('Category', [validators.DataRequired()],

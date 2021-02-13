@@ -572,22 +572,27 @@ def add_product():
             # End of Image Handling
 
             qns = ''
-            if create_prod.q1.data != '' and len(create_prod.flist1.data) > 1:
-                qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.flist1.data, create_prod.q1category.data)
-            if create_prod.q1.data != '' and create_prod.q1category.data == "textbox":
-                qns = Catalogue.Customiseable(create_prod.q1.data, None, create_prod.q1category.data)
+            if create_prod.q1.data != '':
+                if create_prod.q1category.data == "radiobtn" and len(create_prod.flist1.data) > 1:
+                    qns = Catalogue.Customiseable(create_prod.q1.data, create_prod.flist1.data, create_prod.q1category.data)
+                elif create_prod.q1category.data == "textbox":
+                    qns = Catalogue.Customiseable(create_prod.q1.data, None, create_prod.q1category.data)
+                else:
+                    error = "Please ensure all your customisable question fields is filled."
 
-            prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data, create_prod.discount.data,
-                                       str(count_id) + file_extension[1], create_prod.description.data, qns)
+            if error == None:
+                prod = Catalogue.Catalouge(count_id, create_prod.name.data, create_prod.price.data,
+                                           create_prod.discount.data,
+                                           str(count_id) + file_extension[1], create_prod.description.data, qns)
 
-            if tailor_storename in catalogue_dict:
-                catalogue_dict[tailor_storename].append(prod)
-            else:
-                catalogue_dict[tailor_storename] = [prod]
+                if tailor_storename in catalogue_dict:
+                    catalogue_dict[tailor_storename].append(prod)
+                else:
+                    catalogue_dict[tailor_storename] = [prod]
 
-            db['Catalogue'] = catalogue_dict
-            db.close()
-            return redirect(url_for('catalogue'))
+                db['Catalogue'] = catalogue_dict
+                db.close()
+                return redirect(url_for('catalogue'))
 
 
     return render_template('addproduct.html', form=create_prod, error=error)
@@ -861,6 +866,14 @@ def viewshopitem(name, productid):
     if name not in catalogue_dict:
         return redirect(url_for('view_shops'))
 
+    for product in catalogue_dict[name]:
+        if productid == product.get_id():
+            prod = product
+
+    if prod is None:
+        print(prod)
+        return redirect(url_for('view_shops'))
+
     # Amelia
     cart_dict = {}
     # session.pop('cart_session', None)
@@ -886,8 +899,8 @@ def viewshopitem(name, productid):
         session["cart_id"] += 1
 
         shop_dict = catalogue_dict[name]
-        productname = shop_dict[productid].get_name()
-        unitprice = float(shop_dict[productid].get_price()) * (1-(shop_dict[productid].get_discount()/100))
+        productname = prod.get_name()
+        unitprice = float(prod.get_price()) * (1-(prod.get_discount()/100))
 
         cart_id = str(session["cart_id"])
         # cart_dict = {cartitem_id(in str): [shop_name, productname, product_id, unitprice, quantity, custom]}
@@ -895,7 +908,7 @@ def viewshopitem(name, productid):
         session["cart_session"].update(cart_dict)
         print(session["cart_session"])
 
-    return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, form=createOrder)
+    return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, prod=prod, form=createOrder)
 
 @app.route('/cart', methods=['GET', 'POST'])
 def cart():
