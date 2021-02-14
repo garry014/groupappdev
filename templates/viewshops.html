@@ -57,6 +57,8 @@
                                         </div>
                                         <div class="product-content text-center">
                                             <h3><a href="{{ url_for('viewstore', name=key) }}">{{ key }}</a></h3>
+                                            {{ address_dict[key][0] }}<br>
+                                            {{ address_dict[key][1] }}<br>
                                             {% set count = namespace(value=0) %}
                                             {% set total_stars = namespace(value=0) %}
                                             {% for i in review_dict %}

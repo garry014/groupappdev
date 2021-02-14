@@ -529,6 +529,10 @@ def delete_ad(id):
 def add_product():
     create_prod = CreateProduct(request.form)
     error = None
+
+    if session.get('tailor_account') is None:
+        return redirect(url_for('tailors_login'))
+
     if request.method == 'POST' and create_prod.validate():
         if 'image' not in request.files:
             error = 'Something went wrong, please refresh page.'
@@ -599,6 +603,9 @@ def add_product():
 
 @app.route('/catalogue')
 def catalogue():
+    if session.get('tailor_account') is None:
+        return redirect(url_for('tailors_login'))
+
     catalogue_dict = {}
     try:
         db = shelve.open('catalogue.db', 'r')
@@ -638,6 +645,7 @@ def delete_product(name, id):
 @app.route('/updateProduct/<name>/<int:id>', methods=['GET', 'POST'])
 def updateProduct(name, id):
     update_prod = CreateProduct(request.form)
+    error = None
     if request.method == 'POST' and update_prod.validate():
         try:
             catalogue_dict = {}
@@ -652,9 +660,16 @@ def updateProduct(name, id):
                 product.set_discount(update_prod.discount.data)
                 product.set_description(update_prod.description.data)
                 qns = ''
-                if update_prod.q1.data != '' and len(update_prod.flist1.data) > 1:
-                    qns = Catalogue.Customiseable(update_prod.q1.data, update_prod.flist1.data,
-                                                  update_prod.q1category.data)
+
+                if update_prod.q1.data != '':
+                    if update_prod.q1category.data == "radiobtn" and len(update_prod.flist1.data) > 1:
+                        qns = Catalogue.Customiseable(update_prod.q1.data, update_prod.flist1.data,
+                                                      update_prod.q1category.data)
+                    elif update_prod.q1category.data == "textbox":
+                        qns = Catalogue.Customiseable(update_prod.q1.data, None, update_prod.q1category.data)
+                    else:
+                        error = "Please ensure all your customisable question fields is filled."
+
                 product.set_custom(qns)
 
                 if 'image' not in request.files:
@@ -662,9 +677,6 @@ def updateProduct(name, id):
                 file = request.files['image']
                 if file.filename != '' and not allowed_file(file.filename):
                     error = 'The file format must be in jpg, jpeg, png or gif.'
-                # elif update_prod.q1.data != '' and update_prod.q1category.data != 'textbox':
-                #     if len(update_prod.flist1.data) < 1:
-                #         error = 'Please create at least one choice for each question.'
                 elif file:  # All validations done at this stage
                     # Image Handling
                     app.config['UPLOAD_FOLDER'] = './static/uploads/shops/' + name + '/'
@@ -681,9 +693,10 @@ def updateProduct(name, id):
                     product.set_image(str(product.get_id()) + file_extension[1])
                     # End of Image Handling
 
-                db['Catalogue'] = catalogue_dict
-                db.close()
-                return redirect(url_for('catalogue'))
+                if error is None:
+                    db['Catalogue'] = catalogue_dict
+                    db.close()
+                    return redirect(url_for('catalogue'))
 
 
     else:
@@ -705,10 +718,10 @@ def updateProduct(name, id):
                 custom = product.get_custom()
                 if custom != '':
                     update_prod.q1.data = custom.get_question()
-                    update_prod.q1category.data = custom.get_choices()
+                    update_prod.q1category.data = custom.get_category()
 
 
-    return render_template('updateProduct.html', form=update_prod)
+    return render_template('updateProduct.html', form=update_prod, error=error)
 
 @app.route('/viewshops', methods=['GET' ,'POST'])
 def view_shops():
@@ -729,6 +742,19 @@ def view_shops():
         db2.close()
     except:
         return redirect(url_for('general_error', errorid=0))
+
+    tailor_dict = {}
+    try:
+        db3 = shelve.open('tailor_storage.db', 'r')
+        tailor_dict = db3['Tailors']
+        db3.close()
+    except:
+        return redirect(url_for('general_error', errorid=0))
+
+    # Get only store name and tailor_address
+    address_dict = {}
+    for key, value in tailor_dict.items():
+        address_dict[value.get_store_name()] = [value.get_address1() + ' ' + value.get_address2(), value.get_city() + ' ' + value.get_postal_code()]
 
     shop_dict = {} #Key: [Total Review, Most Discounted Item]
     for key, value in catalogue_dict.items():
@@ -810,9 +836,9 @@ def view_shops():
             print("imhere")
             return redirect(url_for('view_shops'))
 
-        return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, error=error)
+        return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, address_dict=address_dict, error=error)
 
-    return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, error=error)
+    return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, address_dict=address_dict, error=error)
 
 
 @app.route('/view/<name>', methods=['GET', 'POST'])
@@ -866,13 +892,13 @@ def viewshopitem(name, productid):
     if name not in catalogue_dict:
         return redirect(url_for('view_shops'))
 
+    prod = None
     for product in catalogue_dict[name]:
         if productid == product.get_id():
             prod = product
 
     if prod is None:
-        print(prod)
-        return redirect(url_for('view_shops'))
+        return redirect(url_for('general_error', errorid=2))
 
     # Amelia
     cart_dict = {}
@@ -906,7 +932,6 @@ def viewshopitem(name, productid):
         # cart_dict = {cartitem_id(in str): [shop_name, productname, product_id, unitprice, quantity, custom]}
         cart_dict[cart_id] = [name, productname, productid, unitprice, quantity, custom]
         session["cart_session"].update(cart_dict)
-        print(session["cart_session"])
 
     return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, prod=prod, form=createOrder)
 
