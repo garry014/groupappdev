@@ -136,6 +136,8 @@
                     <div class="row">
                         <div class="col-lg-8" style="margin: 0 auto;">
                             <div class="review-wrapper">
+                                <a href="{{ url_for('review', shop=name, itemid=productid) }}">Click here to leave a review</a>
+                                <br><br>
                                 {% for review in review_dict %}
                                 {% if review_dict[review].get_storename() == name and review_dict[review].get_productid() == prod.get_id() %}
                                 <div class="single-review">
@@ -154,12 +156,12 @@
                                                         <span class="fa fa-star"></span>
                                                     {% endfor %}
                                                 </div>
-                                                {% if (session['tailor_identity'] == "Admin") or (session['tailor_identity'] == review_dict[review].get_username()) %}
+                                                {% if (session['customer_identity'] == "Admin") or (session['customer_identity'] == review_dict[review].get_username()) %}
                                                 <a href="{{ url_for('updateReview', shop=name, productid=productid, id=review_dict[review].get_id()) }}"><i class="fa fa-pencil" title="Update this Review"></i></a>
                                                 {% endif %}
                                             </div>
                                             <div class="review-left">
-                                                {% if (session['tailor_identity'] == "Admin") or (session['tailor_identity'] == review_dict[review].get_username()) %}
+                                                {% if (session['customer_identity'] == "Admin") or (session['customer_identity'] == review_dict[review].get_username()) %}
                                                 <a href="{{ url_for('deleteReview', shop=name, productid=productid, id=review_dict[review].get_id()) }}"><i class="fa fa-times" title="Delete this Review"></i></a>
                                                 {% endif %}
                                             </div>

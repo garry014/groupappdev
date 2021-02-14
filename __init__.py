@@ -1073,6 +1073,10 @@ def review(shop, itemid):
     error = None
     product_name = ""
     createReview = CreateReview(request.form)
+
+    if session.get('customer_identity') is None:
+        return redirect(url_for('login_customers'))
+
     if request.method == 'POST':
         try:
             starsgiven = int(createReview.stars.data)
@@ -1107,10 +1111,10 @@ def review(shop, itemid):
                     os.rename('static/uploads/reviews/' + filename,
                               'static/uploads/reviews/' + str(count_id) + file_extension[1])
                     # End of Image Handling
-                    thisreview = Reviews.Reviews(count_id, shop, itemid, username, starsgiven, createReview.review.data,
+                    thisreview = Reviews.Reviews(count_id, shop, itemid, session['customer_identity'], starsgiven, createReview.review.data,
                                                  str(count_id) + file_extension[1])
             else:
-                thisreview = Reviews.Reviews(count_id, shop, itemid, username, starsgiven, createReview.review.data, "")
+                thisreview = Reviews.Reviews(count_id, shop, itemid, session['customer_identity'], starsgiven, createReview.review.data, "")
             review_dict[count_id] = thisreview
             db2['Review'] = review_dict
 
@@ -1172,7 +1176,7 @@ def deleteReview(shop, productid, id):
         review_dict.pop(id)
         db2['Review'] = review_dict
         db2.close()
-        return redirect(url_for('viewReviews', shop=shop, productid=productid))
+        return redirect(url_for('viewshopitem', name=shop, productid=productid))
 
 @app.route('/updateReview/<shop>/<int:productid>/<int:id>', methods=['GET', 'POST'])
 def updateReview(shop, productid, id):
