@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Course Content{% endblock %}
+
+{% block content %}
+
+
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Content </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="contact-area pt-100 pb-100">
+    <div class="container">
+        <h2>
+            {% for course in courseDict %}
+                {% if id == courseDict[course].get_courseid() %}
+                    {{courseDict[id].get_title()}}
+                {% endif %}
+            {% endfor %}
+        </h2>
+        <div class="custom-row-2">
+
+
+            <div class="col-lg-4 col-md-5">
+                <div class="contact-form">
+                    <div class="contact-title mb-20" style="width: 200px; float: left;">
+                        <h5>
+                            {% for course in courseDict %}
+                                {% if id == courseDict[course].get_courseid() %}
+                                    {{courseDict[id].get_tailor()}}
+                                {% endif %}
+                            {% endfor %}
+                        </h5>
+                    </div>
+                    {% for content in contentDict %}
+                    <li style="margin:1.5px;"><a href="{{ url_for('EdPlatCourseContent', id=id, topic=contentDict[content].get_topic() ) }}">{{contentDict[content].get_topic()}}</a> </li>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% for key, value in contentDict.items() %}
+            {% if topic == value.get_topic() %}
+            <div class="col-lg-8 col-md-7">
+                <div class="contact-form">
+                    <video width="320" height="240" controls>
+                        <source src="{{ url_for('static', filename='uploads/coursevideo/' + id + '/' + value.get_video()) }}" type="video/mp4">
+
+                    </video>
+                    <p class="form-messege"></p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
