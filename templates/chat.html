@@ -183,7 +183,6 @@
             </div>
             <div class="inbox_chat">
               {% for msg in user_chat %}
-
               <a href="{{url_for('chat_page', chat='inbox', chatid=user_chat[msg].get_id())}}">
               <div class="chat_list">
                 <div class="chat_people">
