@@ -1106,8 +1106,11 @@ def review(shop, itemid):
                     filename = secure_filename(file.filename)
                     if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
                         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     file_extension = os.path.splitext(filename)  # get file type
+                    if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1])):
+                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], str(count_id) + file_extension[1]))
+
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     os.rename('static/uploads/reviews/' + filename,
                               'static/uploads/reviews/' + str(count_id) + file_extension[1])
                     # End of Image Handling
