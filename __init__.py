@@ -33,7 +33,7 @@ import Course, Content, Cart
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['MAX_CONTENT_LENGTH'] = 1000 * 1024 * 1024 #File upload size cap 1GB
-
+courseCart ={}
 
 @app.route('/')
 def starting_page():
