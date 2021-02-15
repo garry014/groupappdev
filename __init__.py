@@ -2778,6 +2778,26 @@ def delete_cartitem(id):
     session["cart_id"] -= 1
     return redirect(url_for('customers_checkout'))
 
+@app.route('/delivery_orders')
+def riders_delivery():
+    return render_template('delivery_orders.html')
+
+
+@app.route('/order_listings')
+def riders_listings():
+    transaction_dict = {}
+    try:
+        db = shelve.open('transaction_orders', 'r')
+        transaction_dict = db['Transaction_Orders']
+    except:
+        print("error!")
+
+    for key, value in transaction_dict.items():
+        print(value[0]) #Example Get store name
+
+    return render_template('Riders_Orders_Listings.html', transaction_orders=transaction_dict)
+
+
 
 if __name__ == '__main__':
     app.debug = True
