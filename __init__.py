@@ -952,6 +952,16 @@ def customer_cart():
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
 def contact(name):
+    username = ""
+    if session.get('customer_identity') is not None:
+        username = session['customer_identity']
+    elif session.get('temp_user') is not None:
+        username = session['temp_user']
+    elif session.get('tailor_identity') is not None:
+        username = session['tailor_identity']
+    elif session.get('rider_identity') is not None:
+        username = session['rider_identity']
+
     create_chat = CreateChat(request.form)
     if request.method == 'POST' and create_chat.validate():
         chat_dict = {}
@@ -967,9 +977,8 @@ def contact(name):
             count_id = 1  # if no dictionary exist, set id as 1
 
         msg_from = ""
-        session['customer_account']
-        if session.get('customer_identity') is not None:
-            msg_from = session['customer_identity']
+        if username is not None:
+            msg_from = username
         else:
             msg_from = create_chat.email.data
             session['temp_user'] = create_chat.email.data
@@ -1024,28 +1033,38 @@ def chat_page(chat, chatid):
         except:
             return redirect(url_for('general_error'), errorid=0)
 
+        username = ""
+        if session.get('customer_identity') is not None:
+            username = session['customer_identity']
+        elif session.get('temp_user') is not None:
+            username = session['temp_user']
+        elif session.get('tailor_identity') is not None:
+            username = session['tailor_identity']
+        elif session.get('rider_identity') is not None:
+            username = session['rider_identity']
+
         user_chat = {}
         for item in chat_dict:
-            if session['customer_identity'] == None and session['temp_user'] != None:
+            if session.get('customer_identity') is None and session.get('temp_user') is not None:
                 if chat_dict[item].get_sender() == session['temp_user']:
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "inbox":
-                if chat_dict[item].get_sender() == session['customer_identity'] and chat_dict[item].get_sender_status() != "Archive":
+                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
-                elif chat_dict[item].get_recipient() == session['customer_identity'] and chat_dict[item].get_recipient_status() != "Archive":
+                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "archive":
-                if chat_dict[item].get_sender() == session['customer_identity']  and chat_dict[item].get_sender_status() == "Archive":
+                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
-                elif chat_dict[item].get_recipient() == session['customer_identity']  and chat_dict[item].get_recipient_status() == "Archive":
+                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             else:
                 return redirect(url_for('general_error', errorid=2))
 
-        if session['customer_identity'] == "Admin":
+        if session.get('customer_identity') is not None and session['customer_identity'] == "Admin":
             user_chat = chat_dict
 
-    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=session['customer_identity'])
+    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=username)
 
 @app.route('/chat/<action>/<int:id>', methods=['GET', 'POST'])
 def update_chatstatus(action, id):

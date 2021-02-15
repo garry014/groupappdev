@@ -150,7 +150,7 @@
             <div class="type_msg">
               <div class="input_msg_write">
                 <form class="contact-form-style" action="" method="post" name="send_msgform">
-                  {{ render_field(form.message, class="write_msg", placeholder="Type a message") }}
+                  {{ render_field(form.message, class="write_msg", placeholder="Type a message", autocomplete="off") }}
                   <button class="msg_send_btn" type="submit"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
                 </form>
               </div>
