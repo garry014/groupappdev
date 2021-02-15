@@ -30,6 +30,19 @@
                                         <li><a href="{{ url_for('targetSales') }}">Change Target</a></li>
                                     </ul>
                                 </li>
+                                <li><a href="{{ url_for('vieworders') }}"> Orders <i class="fa fa-angle-down"></i></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ url_for('vieworders') }}">View Orders</a></li>
+                                        <li><a href="{{ url_for('custChart') }}">Customer Chart</a></li>
+                                        <li><a href="{{ url_for('availability') }}">Change Availability</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="{{ url_for('voucherList') }}"> Vouchers <i class="fa fa-angle-down"></i></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ url_for('voucherList') }}">View Vouchers</a></li>
+                                        <li><a href="{{ url_for('addVouchers') }}">Add Vouchers</a></li>
+                                    </ul>
+                                </li>
                                 <li><a href="{{ url_for('advertise') }}">Advertise <i class="fa fa-angle-down"></i></a>
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('advertise') }}">Advertise</a></li>
