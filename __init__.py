@@ -941,10 +941,11 @@ def viewshopitem(name, productid):
 
     return render_template('viewshopitem.html', shop_dict=catalogue_dict[name], review_dict=review_dict, name=name, productid=productid, prod=prod, form=createOrder)
 
-@app.route('/cart', methods=['GET', 'POST'])
-def cart():
+@app.route('/my_cart', methods=['GET', 'POST'])
+def customer_cart():
     print(session["cart_session"])
-    return render_template('cart-page.html')
+    return render_template('customer_cart.html')
+
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
 def contact(name):
@@ -2480,10 +2481,133 @@ def availability():
 
     return render_template('availability.html', form=updateavail)
 ######################################## End of Kai Jie's code #####################################
+@app.route('/my_orders')
+def customer_orders():
+    transaction_dict = {}
+    try:
+        db = shelve.open('transaction_orders', 'r')
+        transaction_dict = db['Transaction_Orders']
+    except:
+        print("error!")
 
-@app.route('/my_cart')
-def customer_cart():
-    return render_template('customer_cart.html')
+    for key, value in transaction_dict.items():
+        print(value[0]) #Example Get store name
+
+    return render_template('customer_orders.html', transaction_orders=transaction_dict)
+
+
+@app.route('/transaction_complete')
+def transaction_complete():
+    #Retrieve Example
+    try:
+        transaction_dict = {}
+        db = shelve.open('transaction_orders', 'r')
+        transaction_dict = db['Transaction_Orders']
+    except:
+        print("error!")
+
+    # for key, value in transaction_dict.items():
+    #     print(value[0]) #Example Get store name
+
+    return render_template('transaction_complete.html')
+
+
+@app.route('/customers_checkout', methods=['GET', 'POST'])
+def customers_checkout():
+    # user_id = session['customer_account']
+    # if user_id is not None:
+
+
+    # Issue 3 - if session cart is empty, must redirect them, if not they will see the attribute error.
+    if session.get('cart_session') is None:
+        return redirect(url_for('general_error', errorid=4))
+    else:
+        # Here you go for your total.
+        total = 0
+        for key, value in session["cart_session"].items():
+            total += value[4] * value[3]
+            print(session['cart_session'])
+    # customer_checkout = Customer_Checkout(request.form)
+    # user_id = session['customer_account']
+    delivery_details = Deliver_Options(request.form)
+    user_id = session['customer_account']
+    if request.method == 'POST' and delivery_details.validate():
+        customer_dict = {}
+        transaction_dict = {}
+        db = shelve.open('customer.db', 'w')
+        customer_dict = db['Customer']
+        try:
+            db = shelve.open('transaction_orders', 'c')
+            transaction_dict = db['Transaction_Orders']
+        except:
+            print("error!")
+
+        for key, value in session["cart_session"].items():
+            value.append(delivery_details.firstname.data + ' ' + delivery_details.lastname.data)
+            value.append(delivery_details.address1.data + ' ' + delivery_details.address2.data +',' + delivery_details.city.data + '' + delivery_details.postal_code.data)
+            value.append(delivery_details.email.data)
+            value.append(delivery_details.phone_number.data)
+            value.append(delivery_details.order_notes.data)
+            value.append(delivery_details.delivery_options.data)
+            value.append(delivery_details.delivery_time.data)
+            value.append(delivery_details.delivery_date.data)
+        # Issue 5 your old script doesnt rename the key, so if the same keys are written into the db, they will be overwritten.
+        # This part will resolve the replicated key issue
+        for key, value in session["cart_session"].items():
+            try:
+                count_id = max(transaction_dict, key=int) + 1
+            except:
+                count_id = 1
+            transaction_dict[count_id] = value
+
+        # Issue 4, don't need to set your customer details, you not updating your customer db.
+        # user = customer_dict.get(user_id)
+        # user.set_firstname(customer_checkout.firstname.data)
+        # user.set_lastname(customer_checkout.lastname.data)
+        # user.set_address1(customer_checkout.address1.data)
+        # user.set_address2(customer_checkout.address2.data)
+        # user.set_postal_code(customer_checkout.postal_code.data)
+        # user.set_city(customer_checkout.city.data)
+        # user.set_email(customer_checkout.email.data)
+        # user.set_phone_number(customer_checkout.phone_number.data)
+
+        db['Transaction_Orders'] = transaction_dict
+        print("db", db['Transaction_Orders'])
+        db.close()
+
+        session.pop('cart_session', None)
+        session.pop('cart_id', None)
+        return redirect(url_for('transaction_complete'))
+        # Issue 2 return render_template('customer_checkout.html', form=customer_checkout)
+    else:
+        customer_dict = {}
+        db = shelve.open('customer.db', 'r')
+        customer_dict = db['Customer']
+        db.close()
+
+        user = customer_dict.get(user_id)
+        delivery_details.firstname.data = user.get_firstname()
+        delivery_details.lastname.data = user.get_lastname()
+        delivery_details.address1.data = user.get_address1()
+        delivery_details.address2.data = user.get_address2()
+        delivery_details.postal_code.data = user.get_postal_code()
+        delivery_details.city.data = user.get_city()
+        delivery_details.email.data = user.get_email()
+        delivery_details.phone_number.data = user.get_phone_number()
+        return render_template('customer_checkout.html', form=delivery_details, total=total)
+
+    # else:
+    #     return render_template('404.html')
+
+
+@app.route('/deleteCartItem/<id>', methods=['GET', 'POST'])
+def delete_cartitem(id):
+    cart_dict = session.get("cart_session")
+    cart_dict.pop(id)
+    session["cart_session"] = cart_dict
+    session["cart_id"] -= 1
+    return redirect(url_for('customers_checkout'))
+
 
 if __name__ == '__main__':
     app.debug = True
