@@ -1039,7 +1039,8 @@ def chat_page(chat, chatid):
         elif session.get('temp_user') is not None:
             username = session['temp_user']
         elif session.get('tailor_identity') is not None:
-            username = session['tailor_identity']
+            username = get_userdata("tailor").get_store_name()
+            print("tailor", username)
         elif session.get('rider_identity') is not None:
             username = session['rider_identity']
 
