@@ -7,7 +7,8 @@ from cregform import *
 from orderform import *
 from targetform import *
 from availform import *
-import os, pathlib, re, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability, Customer
+from vform import *
+import os, pathlib, re, shelve, Ads, CustRegister, Catalogue, Chat, Notification, Reviews, Orders, Target, Availability, Customer, Vouchers
 from datetime import datetime as dt
 from werkzeug.utils import secure_filename
 
@@ -2359,23 +2360,17 @@ def thankyou():
 
 @app.route('/vieworders')
 def vieworders():
-    ordersDict = {}
+    transaction_dict = {}
     try:
-        db = shelve.open('orders.db', 'r')
-        ordersDict = db['orders']
-        db.close()
+        db = shelve.open('transaction_orders', 'r')
+        transaction_dict = db['Transaction_Orders']
     except:
-        return redirect(url_for('general_error', errorid=0))
-    print(ordersDict)
-    order_list = []
-    for key in ordersDict:
-        custOrder = ordersDict.get(key)
-        order_list.append(custOrder)
+        print("error!")
 
     #for i in order_list:
         #print (i.get_order_id())
 
-    return render_template('vieworders.html',count=len(order_list), order_list=order_list)
+    return render_template('vieworders.html', transaction_orders=transaction_dict)
 
 @app.route('/completedOrders/<int:id>', methods=['POST'])
 def completedOrders(id):
