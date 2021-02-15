@@ -2778,10 +2778,6 @@ def delete_cartitem(id):
     session["cart_id"] -= 1
     return redirect(url_for('customers_checkout'))
 
-@app.route('/delivery_orders')
-def riders_delivery():
-    return render_template('delivery_orders.html')
-
 
 @app.route('/order_listings')
 def riders_listings():
