@@ -83,8 +83,8 @@
                                     {% if 'rider_account' is not in session %}
                                     <li><a href="/register_riders">Register</a></li>
                                     {% endif %}
-                                    {% if 'customer_account' in session %}
-                                 <li>{{  session.get('customer_identity') }}</li>
+                                    {% if 'rider_account' in session %}
+                                 <li>{{  session.get('rider_identity') }}</li>
                                     {% endif %}
                                     {% if 'rider_account' is in session %}
                                     <li><a href="wishlist.html">Wishlist  </a></li>
