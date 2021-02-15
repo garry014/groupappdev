@@ -4,28 +4,21 @@ from wtforms.validators import *
 
 class CreateCourseForm(Form):
     title = StringField(
-        "Course Title" ,[validators.DataRequired()]
+        "Course Title*" ,[validators.DataRequired(message="Please fill in your title.")]
     )
 
-    #tailor = StringField(        #should be get name from when they made acct
-    #    "Tailor" ,[validators.DataRequired()]
-    #)
-
-    #video = FileField(
-    #    "Course Video Content" ,[validators.Optional()]
-    #)
 
     material = TextAreaField(
-        "Materials Needed" ,[validators.DataRequired()]
+        "Materials Needed*" ,[validators.DataRequired(message="Please fill the materials needed for the course.")]
     )
 
     language = SelectField(
-        "Language" ,[validators.DataRequired()],
+        "Language*" ,[validators.DataRequired()],
         choices=[("English", "English"), ("Chinese", "Chinese")]
     )
 
     livecourse = SelectField(
-        "Day", [validators.DataRequired()],
+        "Day*", [validators.DataRequired()],
         choices=[("Mondays","Mondays"), ("Tuesdays","Tuesdays"), ("Wednesdays","Wednesdays"), ("Thursdays","Thursdays"), ("Fridays","Fridays"), ("Saturdays","Saturdays"), ("Sundays","Sundays")]
     )
 
@@ -34,9 +27,9 @@ class CreateCourseForm(Form):
     )
 
     price = DecimalField(
-        "Price" ,[validators.DataRequired()]
+        "Price*" ,[validators.DataRequired(message="Price must be between $1 and $500 only."), validators.NumberRange(min=1, max=500)],
     )
 
     tbnail = FileField(
-       "Course Image Thumbnail"
+       "Course Image Thumbnail*"
     )
