@@ -1025,26 +1025,26 @@ def chat_page(chat, chatid):
 
         user_chat = {}
         for item in chat_dict:
-            if username == "" and session['temp_user'] != None:
+            if session['customer_identity'] == None and session['temp_user'] != None:
                 if chat_dict[item].get_sender() == session['temp_user']:
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "inbox":
-                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
+                if chat_dict[item].get_sender() == session['customer_identity'] and chat_dict[item].get_sender_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
-                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() != "Archive":
+                elif chat_dict[item].get_recipient() == session['customer_identity'] and chat_dict[item].get_recipient_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "archive":
-                if chat_dict[item].get_sender() == username  and chat_dict[item].get_sender_status() == "Archive":
+                if chat_dict[item].get_sender() == session['customer_identity']  and chat_dict[item].get_sender_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
-                elif chat_dict[item].get_recipient() == username  and chat_dict[item].get_recipient_status() == "Archive":
+                elif chat_dict[item].get_recipient() == session['customer_identity']  and chat_dict[item].get_recipient_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             else:
                 return redirect(url_for('general_error', errorid=2))
 
-        if username == "Admin":
+        if session['customer_identity'] == "Admin":
             user_chat = chat_dict
 
-    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=username)
+    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=session['customer_identity'])
 
 @app.route('/chat/<action>/<int:id>', methods=['GET', 'POST'])
 def update_chatstatus(action, id):
