@@ -1115,12 +1115,13 @@ def review(shop, itemid):
                                                  str(count_id) + file_extension[1])
             else:
                 thisreview = Reviews.Reviews(count_id, shop, itemid, session['customer_identity'], starsgiven, createReview.review.data, "")
-            review_dict[count_id] = thisreview
-            db2['Review'] = review_dict
 
-            db2.close()
+            if error is None:
+                review_dict[count_id] = thisreview
+                db2['Review'] = review_dict
+                db2.close()
+                return redirect(url_for('viewshopitem', name=shop, productid=itemid))
 
-            return redirect(url_for('viewshopitem', name=shop, productid=itemid))
     else:
         catalogue_dict = {}
         try:
