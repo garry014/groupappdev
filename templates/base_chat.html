@@ -24,11 +24,18 @@
     <!-- Modernizer JS -->
     <script src="{{url_for('static',filename='/js/vendor/modernizr-2.8.3.min.js')}}"></script>
 </head>
-{% if active_page != "home" %}
 {% block navbar %}
+{% if 'customer_account' is in session %}
     {% include 'includes/_navbar.html' %}
-{% endblock %}
+{% elif 'temp_user' is in session %}
+    {% include 'includes/_navbar.html' %}
+{% elif 'tailor_account' is in session %}
+    {% include 'includes/_navbar_tailors.html' %}
+{% else %}
+    {% include 'includes/_navbar_riders.html' %}
 {% endif %}
+{% endblock %}
+
 <body>
 
 {% block content %}
