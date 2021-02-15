@@ -15,12 +15,15 @@
                         <nav>
                             <ul>
                                 <li><a href="{{ url_for('view_shops') }}">View Shops <i class="fa fa-angle-down"></i></a>
+                                    {% if 'tailor_account' is in session %}
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
                                         <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
                                         <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
                                     </ul>
+                                    {% endif %}
                                 </li>
+                                {% if 'tailor_account' is in session %}
                                 <li><a href="{{ url_for('viewcourse') }}">Courses <i class="fa fa-angle-down"></i></a>
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('viewcourse') }}">View Course offered by me</a></li>
@@ -39,6 +42,7 @@
                                         <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
                                     </ul>
                                 </li>
+                                {% endif %}
                             </ul>
                         </nav>
                     </div>
