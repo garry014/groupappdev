@@ -1918,6 +1918,7 @@ def log_out_customers():
 ########################################## Start of Stacey's code ##########################################
 @app.route('/CreateCourse', methods=['GET', 'POST'])
 def CreateCourse():
+    error = None
     if session['tailor_account'] != "":
         createcourse = CreateCourseForm(request.form)
 
@@ -1937,36 +1938,43 @@ def CreateCourse():
                 print("error reading course.db")
 
 
+            if 'image' not in request.files:
+                error = 'Something went wrong, please refresh page.'
+
             file = request.files[createcourse.tbnail.name]
+            print(file.filename)
+            if file.filename == '':
+                error = 'Please upload a file.'
+            else:
+                app.config['UPLOAD_FOLDER'] = './static/uploads/courseban/'
+
+                filename = secure_filename(file.filename)
+                if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                if not allowed_course_file(file.filename):
+                    error = 'The file format must be in jpg, jpeg, png or gif.'
+
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file_extension = os.path.splitext(filename)  # get file type
+                os.rename('static/uploads/courseban/' + filename, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
+
+                #if error is None:
+                course = Course.Course(createcourse.title.data, tailor_storename, createcourse.material.data,
+                                   createcourse.language.data, createcourse.livecourse.data,createcourse.note.data,
+                                   createcourse.price.data, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
+
+                courseid_count = courseid_count + 1
+                course.set_courseid(courseid_count)
+                db["courseid_count"] = courseid_count
+
+                courseDict[course.get_courseid()] = course
+                db["course"] = courseDict
+                db.close()
 
 
-            app.config['UPLOAD_FOLDER'] = './static/uploads/courseban/'
-            filename = secure_filename(file.filename)
-            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            file_extension = os.path.splitext(filename)  # get file type
-            os.rename('static/uploads/courseban/' + filename, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
+                return redirect(url_for('viewcourse', error=error))  #??? what
 
-            course = Course.Course(createcourse.title.data, tailor_storename, createcourse.material.data, createcourse.language.data, createcourse.livecourse.data,createcourse.note.data, createcourse.price.data, 'static/uploads/courseban/' + str(courseid_count) + file_extension[1])
-
-            courseid_count = courseid_count + 1
-            course.set_courseid(courseid_count)
-            db["courseid_count"] = courseid_count
-
-            courseDict[course.get_courseid()] = course
-            db["course"] = courseDict
-            db.close()
-
-            #tailor_storename = "Admin Store Lah"
-            #if session['tailor_identity'] != "Admin":
-            #    tailor_storename = get_userdata("tailor").get_store_name()
-
-            return redirect(url_for('viewcourse'))  #??? what
-    else:
-        return redirect(url_for('register_tailors'))
-
-    return render_template('CreateCourse.html', form=createcourse)
+    return render_template('CreateCourse.html', form=createcourse, error=error)
 
 
 @app.route('/ViewCourse')
@@ -2204,28 +2212,35 @@ def AddContent(id):
            print("error reading content.db")
 
         course = courseDict.get(id)
+
+        if 'video' not in request.files:
+            error = 'Something went wrong, please refresh page.'
+
         vidfile = request.files[addcontent.video.name]
+        #print(vidfile.filename)
+        if vidfile.filename == '':
+            error = 'Please upload a file.'
+        else:
+            app.config['UPLOAD_FOLDER'] = './static/uploads/coursevideo/' + str(id)
+            if not os.path.exists('./static/uploads/coursevideo/' + str(id)): #??
+                os.makedirs('./static/uploads/coursevideo/' + str(id))
+            if not allowed_course_file(vidfile.filename):
+                error = 'The file format must be in .mp4 or .mov .'
 
-        app.config['UPLOAD_FOLDER'] = './static/uploads/coursevideo/' + str(id)
-        if not os.path.exists('./static/uploads/coursevideo/' + str(id)): #??
-            os.makedirs('./static/uploads/coursevideo/' + str(id))
-        if not allowed_course_file(vidfile.filename):
-            error = 'The file format must be in .mp4 or .mov .'
+            filename = secure_filename(vidfile.filename)
+            if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+               os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            vidfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        filename = secure_filename(vidfile.filename)
-        if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
-           os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        vidfile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            if error is None:
+                content = Content.Content(addcontent.topic.data, filename, id)
 
-        if error is None:
-            content = Content.Content(addcontent.topic.data, filename, id)
+                db[addcontent.topic.data] = content
+                contentDict[content.get_topic()] = content
+                db['content'] = contentDict
+                db.close()
 
-            db[addcontent.topic.data] = content
-            contentDict[content.get_topic()] = content
-            db['content'] = contentDict
-            db.close()
-
-            return redirect(url_for('AddContent', id=id, error=error))  #??? what
+                return redirect(url_for('AddContent', id=id, error=error))  #??? what
 
     return render_template('AddContent.html',form=addcontent, count=len(contentList), contentList=contentList, id=id, error=error)
 
@@ -2274,19 +2289,6 @@ def edplatform():
     db1.close()
     db.close()
 
-    #if session['customer_account'] == courseCart.get_customerid():
-    #    #print(courseCart)
-    #    #print(signedCourses)
-    #
-    #    signedcourseList = []
-    #    for key in courseCart:
-    #        signedcourse = courseCart.get(key)  # key is user id
-    #        signedcourseList.append(signedcourse)
-    #
-    #    courseList = []
-    #    for key in courseDict:
-    #        course = courseDict.get(key)  # key is user id
-    #        courseList.append(course)
 
     return render_template('EdPlatform.html', customer_courses=customer_courses, courseDict=courseDict) #, courseDict=courseDict, count=len(courseList), #courseList=courseList, signedcourseList=signedcourseList, courseCart=courseCart )
 
@@ -2319,6 +2321,7 @@ def EdPlatCourseContent(id, topic):
     # print(contentDict[t].get_topic())
 
     return render_template('EdPlatCourseContent.html' ,id=str(id), contentDict=actualContent, courseDict=courseDict, topic=topic)
+
 
 ######################################## End of Stacey's code #####################################
 
