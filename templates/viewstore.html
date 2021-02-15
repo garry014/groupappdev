@@ -25,12 +25,7 @@
                 <div class="shop-top-bar mb-35">
                     <div class="select-shoing-wrap">
                         <div class="shop-select">
-                            <select>
-                                <option value="">Sort by newness</option>
-                                <option value="">A to Z</option>
-                                <option value=""> Z to A</option>
-                                <option value="">In stock</option>
-                            </select>
+                            <a href="{{ url_for('contact', name=name) }}"><i class="pe-7s-chat"></i> Seek assistance from {{ name }}</a>
                         </div>
                     </div>
                     <div class="filter-active">

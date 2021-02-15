@@ -44,7 +44,7 @@
                     <form class="contact-form-style" action="" method="post">
                         <div class="row">
                             <div class="col-lg-12">
-                                {% if username == "" %}
+                                {% if username == none %}
                                 <label for="email">Email Address:*</label>
                                     {{ render_field(form.email, class="form-control", type="email") }}
                                     <br>

@@ -842,7 +842,6 @@ def view_shops():
             error = "Sorry! We could not find the store you are looking for, try searching another store or changing your filter requirements."
 
         if search == '' and not cbList and (price1 == 6 and price2 == 300):
-            print("imhere")
             return redirect(url_for('view_shops'))
 
         return render_template('viewshops.html', shop_dict=shop_dict, review_dict=review_dict, address_dict=address_dict, error=error)
@@ -952,7 +951,8 @@ def customer_cart():
 
 @app.route('/contact/<name>', methods=['GET', 'POST'])
 def contact(name):
-    username = ""
+    username = None
+    session.pop('temp_user', None)
     if session.get('customer_identity') is not None:
         username = session['customer_identity']
     elif session.get('temp_user') is not None:
