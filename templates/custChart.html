@@ -24,7 +24,7 @@
                         <form action="{{ url_for('availability') }}" method="post">
                              {% for avail in avail_list %}
                             <h4 style="font-weight: bold; text-align: center">Availability:<br></h4>
-                            <div style="text-align: center"> Start Time:  {{ avail.get_availstart() }}<br> End Time: {{ avail.get_availend() }}<br><br><br> </div>
+                            <div style="text-align: center"> Start Time:  {{ avail.get_availstart() }}<br> End Time: {{ avail.get_availend() }}<br> </div>
                              {% endfor %}
                             <div class="button-box" style="text-align: center">
                                 <br>
