@@ -7,6 +7,9 @@
                     <a href="{{ url_for('home_page') }}">
                         <img alt="" src="{{url_for('static',filename='img/logo/logo.png')}}">
                     </a>
+                    {% if 'customer_account' in session %}
+                                <li>{{  session.get('customer_identity') }}</li>
+                                {% endif %}
                 </div>
             </div>
             <div class="col-xl-8 col-lg-8 d-none d-lg-block">
