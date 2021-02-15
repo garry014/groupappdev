@@ -7,9 +7,9 @@ class CreateCourseForm(Form):
         "Course Title" ,[validators.DataRequired()]
     )
 
-    tailor = StringField(        #should be get name from when they made acct
-        "Tailor" ,[validators.DataRequired()]
-    )
+    #tailor = StringField(        #should be get name from when they made acct
+    #    "Tailor" ,[validators.DataRequired()]
+    #)
 
     #video = FileField(
     #    "Course Video Content" ,[validators.Optional()]
