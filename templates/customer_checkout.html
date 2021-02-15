@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Check Out{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<div class="breadcrumb-area pt-35 pb-35 bg-gray-3">
+    <div class="container">
+        <div class="breadcrumb-content text-center">
+            <ul>
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="active">Checkout </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="checkout-area pt-95 pb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="billing-info-wrap">
+                    <form method="POST" id="thisForm" action="" >
+                    <h3>Billing Details</h3>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.firstname, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="billing-info mb-20">
+                               {{ render_field(form.lastname, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.address1, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.address2, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                               {{ render_field(form.city, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.postal_code, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                               {{ render_field(form.email, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.phone_number, class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+<!--                    <div class="checkout-account mb-50">-->
+<!--                        <input class="checkout-toggle2" type="checkbox">-->
+<!--                        <span>Create an account?</span>-->
+<!--                    </div>-->
+<!--                    <div class="checkout-account-toggle open-toggle2 mb-30">-->
+<!--                        <input placeholder="Email address" type="email">-->
+<!--                        <input placeholder="Password" type="password">-->
+<!--                        <button class="btn-hover checkout-btn" type="submit">register</button>-->
+<!--                    </div>-->
+                    <div class="additional-info-wrap">
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.order_notes, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.delivery_options, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.delivery_time, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="billing-info mb-20">
+                                {{ render_field(form.delivery_date, class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="checkout-account-toggle open-toggle2 mb-30">
+                        <button class="btn-hover checkout-btn" type="submit">Confirm</button>
+                        </div>
+                    </div>
+                    </form>
+                    <div class="checkout-account mt-25">
+                        <input class="checkout-toggle" type="checkbox">
+                        <span>Ship to a different address?</span>
+                    </div>
+                    <div class="different-address open-toggle mt-30">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>First Name</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>Last Name</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="billing-info mb-20">
+                                    <label>Company Name</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="billing-select mb-20">
+                                    <label>Country</label>
+                                    <select>
+                                        <option>Select a country</option>
+                                        <option>Azerbaijan</option>
+                                        <option>Bahamas</option>
+                                        <option>Bahrain</option>
+                                        <option>Bangladesh</option>
+                                        <option>Barbados</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="billing-info mb-20">
+                                    <label>Street Address</label>
+                                    <input class="billing-address" placeholder="House number and street name" type="text">
+                                    <input placeholder="Apartment, suite, unit etc." type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="billing-info mb-20">
+                                    <label>Town / City</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>State / County</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>Postcode / ZIP</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>Phone</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="billing-info mb-20">
+                                    <label>Email Address</label>
+                                    <input type="text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="your-order-area">
+                    <h3>Your order</h3>
+                    <div class="your-order-wrap gray-bg-4">
+                        <div class="your-order-product-info">
+                            <div class="your-order-top">
+                                <ul>
+                                    <li>Product</li>
+                                    <li>Total</li>
+                                </ul>
+                            </div>
+                             <div class="your-order-middle">
+                                {% for key,value in session["cart_session"].items() %}
+                                <ul>
+                                    <li><span class="order-middle-left">{{ value[1] }} <a href="{{ url_for('delete_cartitem', id=key) }}"><i class="fa fa-times"></i></a></span> <span class="order-price">${{ value[4] * value[3] }}</span></li>
+                                </ul>
+                                {% endfor %}
+                            <div class="your-order-total">
+                                <ul>
+                                    <li class="order-total">Total</li>
+                                    <li>${{ total }}</li>
+                                </ul>
+                            </div>
+<!--                                 <p>Note: Self Collection is available only from 9am-6pm from monday to friday.</p>-->
+                        </div>
+                    </div>
+                        </div>
+                    <div class="Place-order mt-25">
+                       <div id="smart-button-container">
+                          <div style="text-align: center;">
+                            <div id="paypal-button-container"></div>
+                          </div>
+                        </div>
+                          <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=SGD" data-sdk-integration-source="button-factory"></script>
+                          <script>
+                            function initPayPalButton() {
+                              paypal.Buttons({
+                                style: {
+                                  shape: 'rect',
+                                  color: 'gold',
+                                  layout: 'vertical',
+                                  label: 'checkout',
+
+                                },
+
+                                createOrder: function(data, actions) {
+                                  return actions.order.create({
+                                    purchase_units: [{"amount":{"currency_code":"SGD","value":{{ total }} }}]
+                                  });
+                                },
+
+                                onApprove: function(data, actions) {
+                                  return actions.order.capture().then(function(details) {
+                                    alert('Transaction completed by ' + details.payer.name.given_name + '!');
+                                    // Issue 1
+                                    document.getElementById("thisForm").submit();
+                                  });
+                                },
+
+                                onError: function(err) {
+                                  console.log(err);
+                                }
+                              }).render('#paypal-button-container');
+                            }
+                            initPayPalButton();
+                          </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
