@@ -62,6 +62,12 @@
                                 {{ render_field(form.video, class="form-control") }}
                             </div>
 
+                            <div class="col-lg-12">
+                                {% if error %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endif %}
+                            </div>
+
                             <div class="button-box">
                                 <!-- <button class="submit" type="submit">Save</button> -->
                                 <button type="submit">Add Topic</button> <!--class="submit"-->
