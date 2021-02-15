@@ -13,17 +13,16 @@
                 <div class="col-xl-8 col-lg-8 d-none d-lg-block">
                     <div class="main-menu">
                         <nav>
+
                             <ul>
+                                {% if 'tailor_account' is in session %}
                                 <li><a href="{{ url_for('view_shops') }}">View Shops <i class="fa fa-angle-down"></i></a>
-                                    {% if 'tailor_account' is in session %}
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('view_shops') }}">View Shops</a></li>
                                         <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
                                         <li><a href="{{ url_for('catalogue') }}">Manage Products</a></li>
                                     </ul>
-                                    {% endif %}
                                 </li>
-                                {% if 'tailor_account' is in session %}
                                 <li><a href="{{ url_for('viewcourse') }}">Courses <i class="fa fa-angle-down"></i></a>
                                     <ul class="submenu">
                                         <li><a href="{{ url_for('viewcourse') }}">View Course offered by me</a></li>
@@ -42,8 +41,11 @@
                                         <li><a href="{{ url_for('manage_ads') }}">Manage Ads</a></li>
                                     </ul>
                                 </li>
-                                {% endif %}
+                                {% else %}
+                                <li><a href="/login_tailors">Welcome to TailorNow, please login to proceed.</a></li>
                             </ul>
+
+                            {% endif %}
                         </nav>
                     </div>
                 </div>
@@ -127,10 +129,6 @@
                             <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><i class="pe-7s-chat"></i></a>
                         </div>
                         <div class="same-style cart-wrap">
-                            <button class="icon-cart">
-                                <i class="pe-7s-shopbag"></i>
-                                <span class="count-style">02</span>
-                            </button>
                             <div class="shopping-cart-content">
                                 <ul>
                                     <li class="single-shopping-cart">

@@ -1058,14 +1058,14 @@ def update_chatstatus(action, id):
         if action == "resolved":
             chat_dict[id].set_recipient_status("Resolved")
         elif action == "delete":
-            if username == "Admin":
+            if session['customer_identity'] == "Admin":
                 chat_dict.pop(id)
             elif username == chat_dict[id].get_recipient:
                 chat_dict[id].set_recipient_status("Hidden")
             else:
                 chat_dict[id].set_sender_status("Hidden")
         elif action == "archive":
-            if username == chat_dict[id].get_recipient:
+            if session['customer_identity'] == chat_dict[id].get_recipient:
                 chat_dict[id].set_recipient_status("Archive")
             else:
                 chat_dict[id].set_sender_status("Archive")

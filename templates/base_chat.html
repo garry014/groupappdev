@@ -1,0 +1,60 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static',filename='img/icon.png')}}">
+
+    <!-- CSS
+	============================================ -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/bootstrap.min.css')}}">
+    <!-- Icon Font CSS -->
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/icons.min.css')}}">
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/plugins.css')}}">
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/style.css')}}">
+    <!-- Modernizer JS -->
+    <script src="{{url_for('static',filename='/js/vendor/modernizr-2.8.3.min.js')}}"></script>
+</head>
+{% if active_page != "home" %}
+{% block navbar %}
+    {% include 'includes/_navbar.html' %}
+{% endblock %}
+{% endif %}
+<body>
+
+{% block content %}
+{% endblock %}
+
+{% block scripts %}
+<!-- All JS is here
+============================================ -->
+<!-- jQuery JS -->
+<script src="{{url_for('static',filename='js/vendor/jquery-v3.4.1.min.js')}}"></script>
+<!-- Popper JS -->
+<script src="{{url_for('static',filename='js/popper.min.js')}}"></script>
+<!-- Bootstrap JS -->
+<script src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+<!-- Plugins JS -->
+<script src="{{url_for('static',filename='js/plugins.js')}}"></script>
+<!-- Ajax Mail -->
+<script src="{{url_for('static',filename='js/ajax-mail.js')}}"></script>
+<!-- Main JS -->
+<script src="{{url_for('static',filename='js/main.js')}}"></script>
+{% endblock %}
+</body>
+
+{% if active_page != "home" %}
+{% block footer %}
+    {% include 'includes/_footer.html' %}
+{% endblock %}
+{% endif %}
+</html>
