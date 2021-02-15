@@ -2377,6 +2377,19 @@ def vieworders():
 
     return render_template('vieworders.html',count=len(order_list), order_list=order_list)
 
+@app.route('/completedOrders/<int:id>', methods=['POST'])
+def completedOrders(id):
+    ordersDict = {}
+    db = shelve.open('orders.db', 'w')
+    ordersDict = db['orders']
+
+    ordersDict.pop(id)
+
+    db['orders'] = ordersDict
+    db.close()
+
+    return redirect(url_for('vieworders'))
+
 @app.route('/salesChart', methods=['GET', 'POST'])
 def salesChart():
     targetDict = {}
@@ -2386,11 +2399,19 @@ def salesChart():
         db.close()
     except:
         return redirect(url_for('general_error', errorid=0))
+
+    tailor_storename = "Admin Store Lah"
+    if session['tailor_identity'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
+
     print(targetDict)
     target_list = []
-    for key in targetDict:
-        ttarget = targetDict.get(key)
-        target_list.append(ttarget)
+    print(tailor_storename)
+    for key,value in targetDict.items():
+        print(value.get_store_name())
+        if value.get_store_name() == tailor_storename:
+            ttarget = targetDict.get(key)
+            target_list.append(ttarget)
     labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     data = ['1165', '1135']
     updatetarget = updateTarget(request.form)
@@ -2401,34 +2422,47 @@ def salesChart():
 @app.route('/targetSales', methods=['GET', 'POST'])
 def targetSales():
     updatetarget = updateTarget(request.form)
+    tailor_storename = "Admin Store Lah"
+    if session['tailor_identity'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
 
     if request.method == 'POST' and updatetarget.validate():
         targetDict = {}
         try:
             db = shelve.open('target.db', 'w')
-            try:
-                targetDict = db['target']
-            except:
-                print("error reading target.db")
-
-            ttarget = Target.Target(updatetarget.target.data)
-            targetDict[ttarget.get_target_id()] = ttarget
-            db['target'] = targetDict
-            db.close()
-            return redirect(url_for('salesChart'))
+            targetDict = db['target']
         except:
-            db = shelve.open('target.db', 'c')
-            try:
-                targetDict = db['target']
+            print("db error")
 
-            except:
-                print("error reading target.db")
+        try:
+            count_id = max(targetDict, key=int) + 1
+        except:
+            count_id = 1
 
-            ttarget = Target.Target(updatetarget.target.data)
-            targetDict[ttarget.get_target_id()] = ttarget
+        check_count = 0
+        if len(targetDict) >0:
+            for key,value in targetDict.items():
+                if value.get_store_name() == tailor_storename:
+                    value.set_target(updatetarget.target.data)
+                    check_count += 1
             db['target'] = targetDict
             db.close()
-            return redirect(url_for('salesChart'))
+
+        print(check_count)
+        if check_count == 0:
+            try:
+                db = shelve.open('target.db', 'c')
+                targetDict = db['target']
+            except:
+                print("db error")
+
+            ttarget = Target.Target(updatetarget.target.data, tailor_storename)
+            targetDict[count_id] = ttarget
+            db['target'] = targetDict
+            db.close()
+
+        return redirect(url_for('salesChart'))
+
 
     return render_template('targetSales.html', form=updatetarget)
 
@@ -2441,11 +2475,19 @@ def custChart():
         db.close()
     except:
         return redirect(url_for('general_error', errorid=0))
+
+    tailor_storename = "Admin Store Lah"
+    if session['tailor_identity'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
+
     print(availDict)
     avail_list = []
-    for key in availDict:
-        avail = availDict.get(key)
-        avail_list.append(avail)
+    for key, value in availDict.items():
+        print(value.get_store_name())
+        if value.get_store_name() == tailor_storename:
+            avail = availDict.get(key)
+            avail_list.append(avail)
+
     labels = ['week 1', 'week 2', 'week 3', 'week 4']
     updateavail = updateAvail(request.form)
     if request.method == 'POST' and updateavail.validate():
@@ -2455,36 +2497,144 @@ def custChart():
 @app.route('/availability', methods=['GET', 'POST'])
 def availability():
     updateavail = updateAvail(request.form)
+    tailor_storename = "Admin Store Lah"
+    if session['tailor_identity'] != "Admin":
+        tailor_storename = get_userdata("tailor").get_store_name()
 
     if request.method == 'POST' and updateavail.validate():
         availDict = {}
         try:
             db = shelve.open('avail.db', 'w')
-            try:
-                availDict = db['avail']
-            except:
-                print("error reading avail.db")
-
-            avail = Availability.Availability(updateavail.availstart.data, updateavail.availend.data)
-            availDict[avail.get_avail_id()] = avail
-            db['avail'] = availDict
-            db.close()
-            return redirect(url_for('custChart'))
+            availDict = db['avail']
         except:
-            db = shelve.open('avail.db', 'c')
-            try:
-                availDict = db['avail']
+            print("db error")
 
-            except:
-                print("error reading avail.db")
+        try:
+            count_id = max(availDict, key=int) + 1
+        except:
+            count_id = 1
 
-            avail = Availability.Availability(updateavail.availstart.data, updateavail.availend.data)
-            availDict[avail.get_avail_id()] = avail
+        check_count = 0
+        if len(availDict) >0:
+            for key,value in availDict.items():
+                if value.get_store_name() == tailor_storename:
+                    value.set_availstart(updateavail.availstart.data)
+                    value.set_availend(updateavail.availend.data)
+                    check_count += 1
             db['avail'] = availDict
             db.close()
-            return redirect(url_for('custChart'))
+
+        print(check_count)
+        if check_count == 0:
+            try:
+                db = shelve.open('avail.db', 'c')
+                availDict = db['avail']
+            except:
+                print("db error")
+
+            avail = Availability.Availability(updateavail.availstart.data, updateavail.availend.data, tailor_storename)
+            availDict[count_id] = avail
+            db['avail'] = availDict
+            db.close()
+
+        return redirect(url_for('custChart'))
 
     return render_template('availability.html', form=updateavail)
+
+@app.route('/addVoucher', methods=['GET', 'POST'])
+def add_voucher():
+    AddVoucher = addVoucher(request.form)
+
+    if request.method == 'POST' and AddVoucher.validate():
+        voucherDict = {}
+        voucher_count_id = 0
+        db = shelve.open('vouchers.db', 'c')
+        try:
+            voucherDict = db['vouchers']
+            voucher_count_id = int(db['voucher_count_id'])
+        except:
+            print("error reading voucher.db")
+
+        voucher = Vouchers.Vouchers(AddVoucher.code.data, AddVoucher.description.data, AddVoucher.discount.data, AddVoucher.minpurchase.data,
+                                    AddVoucher.quantity.data, AddVoucher.vstartdate.data, AddVoucher.vexpirydate.data,)
+
+        voucher_count_id = voucher_count_id + 1
+        voucher.set_voucher_id(voucher_count_id)
+        db['voucher_count_id'] = voucher_count_id
+        voucherDict[voucher.get_voucher_id()] = voucher
+        db['vouchers'] = voucherDict
+        db.close()
+        return redirect(url_for('voucherList'))
+
+    return render_template('addVouchers.html', form=AddVoucher)
+
+@app.route('/voucherList')
+def voucherList():
+    voucherDict = {}
+    try:
+        db = shelve.open('vouchers.db', 'r')
+        voucherDict = db['vouchers']
+        db.close()
+    except:
+        return redirect(url_for('dberror'))
+
+    voucher_list = []
+    for key in voucherDict:
+        voucher = voucherDict.get(key)
+        voucher_list.append(voucher)
+
+    return render_template('voucherList.html',count=len(voucher_list), voucher_list=voucher_list)
+
+@app.route('/updateVoucher/<int:id>/', methods=['GET', 'POST'])
+def update_voucher(id):
+    UpdateVoucher = addVoucher(request.form)
+    if request.method == 'POST' and UpdateVoucher.validate():
+        voucherDict = {}
+        db = shelve.open('vouchers.db', 'w')
+        voucherDict = db['vouchers']
+
+        voucher = voucherDict.get(id)
+        voucher.set_code(UpdateVoucher.code.data)
+        voucher.set_description(UpdateVoucher.description.data)
+        voucher.set_discount(UpdateVoucher.discount.data)
+        voucher.set_minpurchase(UpdateVoucher.minpurchase.data)
+        voucher.set_quantity(UpdateVoucher.quantity.data)
+        voucher.set_vstartdate(UpdateVoucher.vstartdate.data)
+        voucher.set_vexpirydate(UpdateVoucher.vexpirydate.data)
+
+        db['vouchers'] = voucherDict
+        db.close()
+
+        return redirect(url_for('voucherList'))
+    else:
+        voucherDict = {}
+        db = shelve.open('vouchers.db', 'r')
+        voucherDict = db['vouchers']
+        db.close()
+
+        voucher = voucherDict.get(id)
+        UpdateVoucher.code.data = voucher.get_code()
+        UpdateVoucher.description.data = voucher.get_description()
+        UpdateVoucher.discount.data = voucher.get_discount()
+        UpdateVoucher.minpurchase.data = voucher.get_minpurchase()
+        UpdateVoucher.quantity.data = voucher.get_quantity()
+        UpdateVoucher.vstartdate.data = voucher.get_vstartdate()
+        UpdateVoucher.vexpirydate.data = voucher.get_vexpirydate()
+
+        return render_template('updateVouchers.html', form=UpdateVoucher)
+
+@app.route('/deleteVoucher/<int:id>', methods=['POST'])
+def deleteVoucher(id):
+    voucherDict = {}
+    db = shelve.open('vouchers.db', 'w')
+    voucherDict = db['vouchers']
+
+    voucherDict.pop(id)
+
+    db['vouchers'] = voucherDict
+    db.close()
+
+    return redirect(url_for('voucherList'))
 ######################################## End of Kai Jie's code #####################################
 @app.route('/my_orders')
 def customer_orders():
