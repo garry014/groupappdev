@@ -70,6 +70,12 @@
                                 {{ render_field(form.tbnail, class="form-control") }}
                             </div>
 
+                            <div class="col-lg-12">
+                                {% if error %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endif %}
+                            </div>
+
 
 
                             <div class="button-box">
