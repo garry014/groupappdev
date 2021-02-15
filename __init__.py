@@ -957,8 +957,9 @@ def contact(name):
             count_id = 1  # if no dictionary exist, set id as 1
 
         msg_from = ""
-        if username != "":
-            msg_from = username
+        session['customer_account']
+        if session.get('customer_identity') is not None:
+            msg_from = session['customer_identity']
         else:
             msg_from = create_chat.email.data
             session['temp_user'] = create_chat.email.data
@@ -987,12 +988,12 @@ def chat_page(chat, chatid):
             return redirect(url_for('general_error'), errorid=0)
 
         if send_msg.validate():
-            if username != "":
-                msg_from = username
+            if session.get('customer_identity') is not None:
+                msg_from = session['customer_identity']
             else:
                 msg_from = chat_dict[chatid].get_sender()
 
-            if chat_dict[chatid].get_sender() == username:
+            if session.get('customer_identity') is not None and chat_dict[chatid].get_sender() == session['customer_identity']:
                 chat_dict[chatid].set_sender_status("Replied")
                 chat_dict[chatid].set_recipient_status("Unreplied")
             else:
