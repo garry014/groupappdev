@@ -1499,48 +1499,56 @@ def delete_rider(id):
 @app.route('/login_riders', methods=['GET', 'POST'])
 def login_riders():
     error = None
-    if request.method == 'POST':
-        users_dict = {}
-        db = shelve.open('storage.db', 'r')
-        users_dict = db['Users']
+    try:
+        if request.method == 'POST':
+            users_dict = {}
+            db = shelve.open('storage.db', 'r')
+            users_dict = db['Users']
 
-        if session.get('tailor_account') is not None:
-            session.pop('tailor_account')
-            session.pop('tailor_identity')
-        elif session.get('customer_account') is not None:
-            session.pop('customer_account')
-            session.pop('customer_identity')
-        elif session.get('rider_account') is not None:
-            session.pop('rider_account')
-            session.pop('rider_identity')
+            if session.get('tailor_account') is not None:
+                session.pop('tailor_account')
+                session.pop('tailor_identity')
+            elif session.get('customer_account') is not None:
+                session.pop('customer_account')
+                session.pop('customer_identity')
+            elif session.get('rider_account') is not None:
+                session.pop('rider_account')
+                session.pop('rider_identity')
 
-        for user_id in users_dict:
-            user = users_dict.get(user_id)
-            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
-                session['rider_account'] = user.get_user_id()
-                session['rider_identity'] = user.get_user_name()
-                return redirect(url_for('riders_home'))
-            elif request.form['user-name'] == 'admin' and request.form['user-password'] == 'admin':
-                return redirect(url_for('retrieve_riders'))
-            else:
-                error = 'Invalid Credentials. Please try again.'
+            for user_id in users_dict:
+                user = users_dict.get(user_id)
+                if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                    session['rider_account'] = user.get_user_id()
+                    session['rider_identity'] = user.get_user_name()
+                    return redirect(url_for('riders_home'))
+                elif request.form['user-name'] == 'admin' and request.form['user-password'] == 'admin':
+                    return redirect(url_for('retrieve_riders'))
+                else:
+                    error = 'Invalid Credentials. Please try again.'     
+            db.close()
+    except:
+        print("Error")
 
     return render_template('login_riders.html', error=error)
 
 @app.route('/log_out')
 def log_out():
     error = None
-    db = shelve.open('storage.db', 'r')
-    users_dict = db['Users']
-    for user_id in users_dict:
-        user = users_dict.get(user_id)
-        session['rider_account'] = user.get_user_id()
-        session['rider_identity'] = user.get_user_name()
-    if session['rider_account'] != error:
-        session.pop('rider_account')
-        session.pop('rider_identity')
-
-
+    try:
+        db = shelve.open('storage.db', 'r')
+        users_dict = db['Users']
+        for user_id in users_dict:
+            user = users_dict.get(user_id)
+            session['rider_account'] = user.get_user_id()
+            session['rider_identity'] = user.get_user_name()
+        if session['rider_account'] != error:
+            session.pop('rider_account')
+            session.pop('rider_identity')
+        db.close()
+         
+    except:
+        print("Error")
+        
     return redirect(url_for('riders_home'))
 
 @app.route('/riders_account', methods=['GET', 'POST'])
@@ -1713,36 +1721,39 @@ def delete_tailor(id):
 @app.route('/login_tailors', methods=['GET', 'POST'])
 def tailors_login():
     error = None
-    if request.method == 'POST':
-        tailor_dict = {}
-        db = shelve.open('tailor_storage.db', 'r')
-        tailor_dict = db['Tailors']
-        db.close()
+    try:
+        if request.method == 'POST':
+            tailor_dict = {}
+            db = shelve.open('tailor_storage.db', 'r')
+            tailor_dict = db['Tailors']
+            db.close()
 
-        if session.get('tailor_account') is not None:
-            session.pop('tailor_account')
-            session.pop('tailor_identity')
-        elif session.get('customer_account') is not None:
-            session.pop('customer_account')
-            session.pop('customer_identity')
-        elif session.get('rider_account') is not None:
-            session.pop('rider_account')
-            session.pop('rider_identity')
+            if session.get('tailor_account') is not None:
+                session.pop('tailor_account')
+                session.pop('tailor_identity')
+            elif session.get('customer_account') is not None:
+                session.pop('customer_account')
+                session.pop('customer_identity')
+            elif session.get('rider_account') is not None:
+                session.pop('rider_account')
+                session.pop('rider_identity')
 
-        for user_id in tailor_dict:
-            user = tailor_dict.get(user_id)
-            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
-                session['tailor_account'] = user.get_user_id()
-                session['tailor_identity'] = user.get_user_name()
-                return redirect(url_for('tailors_home'))
-            # Do this for the rest of the admins
-            elif (request.form['user-name'] == 'Admin') and request.form['user-password'] == tailor_dict.get(3).get_password():
-                session['tailor_account'] = 3
-                session['tailor_identity'] = 'Admin'
-                return redirect(url_for('retrieve_tailors'))
-            else:
-                error = 'Invalid Credentials. Please try again.'
-
+            for user_id in tailor_dict:
+                user = tailor_dict.get(user_id)
+                if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                    session['tailor_account'] = user.get_user_id()
+                    session['tailor_identity'] = user.get_user_name()
+                    return redirect(url_for('tailors_home'))
+                # Do this for the rest of the admins
+                elif (request.form['user-name'] == 'Admin') and request.form['user-password'] == tailor_dict.get(3).get_password():
+                    session['tailor_account'] = 3
+                    session['tailor_identity'] = 'Admin'
+                    return redirect(url_for('retrieve_tailors'))
+                else:
+                    error = 'Invalid Credentials. Please try again.'
+            db.close()
+    except:
+        print("Error")
 
     return render_template('login_tailors.html', error=error)
 
@@ -1750,21 +1761,23 @@ def tailors_login():
 @app.route('/log_out_tailors')
 def log_out_tailors():
     error = None
-    db = shelve.open('tailor_storage.db', 'r')
-    tailor_dict = db['Tailors']
-    for user_id in tailor_dict:
-        user = tailor_dict.get(user_id)
-        session['tailor_account'] = user.get_user_id()
-        session['tailor_identity'] = user.get_user_name()
-    if session['tailor_account'] != error:
-        session.pop('tailor_account')
-        session.pop('tailor_identity')
-    if session.get('tailor_account') is not None:
-        session.pop('tailor_account')
-        session.pop('tailor_identity')
-
-    db.close()
-
+    try:
+        db = shelve.open('tailor_storage.db', 'r')
+        tailor_dict = db['Tailors']
+        for user_id in tailor_dict:
+            user = tailor_dict.get(user_id)
+            session['tailor_account'] = user.get_user_id()
+            session['tailor_identity'] = user.get_user_name()
+        if session['tailor_account'] != error:
+            session.pop('tailor_account')
+            session.pop('tailor_identity')
+        if session.get('tailor_account') is not None:
+            session.pop('tailor_account')
+            session.pop('tailor_identity')
+        db.close()
+    except:
+        print("Error")
+    
     return redirect(url_for('tailors_home'))
 
 
@@ -1924,31 +1937,36 @@ def delete_customer(id):
 @app.route('/login_customers', methods=['GET', 'POST'])
 def login_customers():
     error = None
-    if request.method == 'POST':
-        customer_dict = {}
-        db = shelve.open('customer.db', 'r')
-        customer_dict = db['Customer']
+    try:
+        if request.method == 'POST':
+            customer_dict = {}
+            db = shelve.open('customer.db', 'r')
+            customer_dict = db['Customer']
 
-        if session.get('tailor_account') is not None:
-            session.pop('tailor_account')
-            session.pop('tailor_identity')
-        elif session.get('customer_account') is not None:
-            session.pop('customer_account')
-            session.pop('customer_identity')
-        elif session.get('rider_account') is not None:
-            session.pop('rider_account')
-            session.pop('rider_identity')
+            if session.get('tailor_account') is not None:
+                session.pop('tailor_account')
+                session.pop('tailor_identity')
+            elif session.get('customer_account') is not None:
+                session.pop('customer_account')
+                session.pop('customer_identity')
+            elif session.get('rider_account') is not None:
+                session.pop('rider_account')
+                session.pop('rider_identity')
 
-        for user_id in customer_dict:
-            user = customer_dict.get(user_id)
-            if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
-                session['customer_account'] = user.get_user_id()
-                session['customer_identity'] = user.get_user_name()
-                return redirect(url_for('home_page'))
-            elif request.form['user-name'] == 'customer_admin' and request.form['user-password'] == 'customer_admin':
-                return redirect(url_for('retrieve_customers'))
-            else:
-                error = 'Invalid Credentials. Please try again.'
+            for user_id in customer_dict:
+                user = customer_dict.get(user_id)
+                if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
+                    session['customer_account'] = user.get_user_id()
+                    session['customer_identity'] = user.get_user_name()
+                    return redirect(url_for('home_page'))
+                elif request.form['user-name'] == 'customer_admin' and request.form['user-password'] == 'customer_admin':
+                    return redirect(url_for('retrieve_customers'))
+                else:
+                    error = 'Invalid Credentials. Please try again.'
+            db.close()
+            
+        except:
+            print("Error")
 
     return render_template('login_customers.html', error=error)
 
@@ -2001,18 +2019,22 @@ def update_customers_details():
 @app.route('/log_out_customers')
 def log_out_customers():
     error = None
-    db = shelve.open('customer.db', 'r')
-    customer_dict = db['Customer']
-    for user_id in customer_dict:
-        user = customer_dict.get(user_id)
-        session['customer_account'] = user.get_user_id()
-        session['customer_identity'] = user.get_user_name()
-    if session['customer_account'] != error:
-        session.pop('customer_account')
-        session.pop('customer_identity')
-    if session.get('customer_account') is not None:
-        session.pop('customer_account')
-        session.pop('customer_identity')
+    try:
+        db = shelve.open('customer.db', 'r')
+        customer_dict = db['Customer']
+        for user_id in customer_dict:
+            user = customer_dict.get(user_id)
+            session['customer_account'] = user.get_user_id()
+            session['customer_identity'] = user.get_user_name()
+        if session['customer_account'] != error:
+            session.pop('customer_account')
+            session.pop('customer_identity')
+        if session.get('customer_account') is not None:
+            session.pop('customer_account')
+            session.pop('customer_identity')
+        db.close()
+    except:
+        print("Error")
 
     return redirect(url_for('home'))
 
