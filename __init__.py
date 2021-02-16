@@ -324,11 +324,34 @@ def advertise():
                 db['Ads'] = ads_dict
 
                 db.close()
-
-                return redirect(url_for('manage_ads'))
+                session["adpayment"] = cost
+                return redirect(url_for('adpayment', id=ad.get_ad_id()))
                 #return redirect(url_for('static', filename=backoflink))
 
     return render_template('advertise.html', form=create_ad, error=error)
+
+@app.route('/adpayment/<int:id>', methods=['GET', 'POST'])
+def adpayment(id):
+    if session.get("adpayment") is None:
+        return redirect(url_for('general_error', errorid=0))
+    else:
+        cost = session.get("adpayment")
+
+    if request.method == 'POST':
+        try:
+            ads_dict = {}
+            db = shelve.open('ads.db', 'w')
+            ads_dict = db['Ads']
+        except:
+            return redirect(url_for('general_error', errorid=0))
+
+        ad = ads_dict.get(id)
+        ad.set_status("Pending Approval")
+        db['Ads'] = ads_dict
+        db.close()
+        return redirect(url_for('manage_ads'))
+
+    return render_template('adpayment.html', cost=cost)
 
 @app.route('/manage_ads')
 def manage_ads():
@@ -340,7 +363,7 @@ def manage_ads():
         db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
 
     ads_list = []
     for key in ads_dict:
@@ -393,7 +416,7 @@ def updateAd(id, updatewhat):
             db = shelve.open('ads.db', 'w')
             ads_dict = db['Ads']
         except:
-            return redirect(url_for('general_error'), errorid=0)
+            return redirect(url_for('general_error', errorid=0))
         ad = ads_dict.get(id)
         ad.set_status("Approved")
 
@@ -411,7 +434,7 @@ def updateAd(id, updatewhat):
                 db = shelve.open('ads.db', 'w')
                 ads_dict = db['Ads']
             except:
-                return redirect(url_for('general_error'), errorid=0)
+                return redirect(url_for('general_error', errorid=0))
 
             ad = ads_dict.get(id)
             ad.set_start_date(update_ad.startdate.data)
@@ -487,7 +510,7 @@ def delete_ad(id):
         db = shelve.open('ads.db', 'w')
         ads_dict = db['Ads']
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
     else:
         # test script
         storename_loginuser = get_otheruserdata("tailor", session['tailor_account'])
@@ -621,7 +644,7 @@ def catalogue():
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
 
     tailor_storename = "Admin Store Lah"
     if session['tailor_identity'] != "Admin":
@@ -639,7 +662,7 @@ def delete_product(name, id):
         db = shelve.open('catalogue.db', 'w')
         catalogue_dict = db['Catalogue']
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
     else:
         for product in catalogue_dict[name]:
             if product.get_id() == id:
@@ -661,7 +684,7 @@ def updateProduct(name, id):
             db = shelve.open('catalogue.db', 'w')
             catalogue_dict = db['Catalogue']
         except:
-            return redirect(url_for('general_error'), errorid=0)
+            return redirect(url_for('general_error', errorid=0))
         for product in catalogue_dict[name]:
             if product.get_id() == id:
                 product.set_name(update_prod.name.data)
@@ -715,7 +738,7 @@ def updateProduct(name, id):
             catalogue_dict = db['Catalogue']
             db.close()
         except:
-            return redirect(url_for('general_error'), errorid=0)
+            return redirect(url_for('general_error', errorid=0))
 
         for product in catalogue_dict[name]:
             if product.get_id() == id:
@@ -742,7 +765,7 @@ def view_shops():
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
 
     review_dict = {}
     try:
@@ -859,7 +882,7 @@ def viewstore(name):
         catalogue_dict = db['Catalogue']
         db.close()
     except:
-        return redirect(url_for('general_error'), errorid=0)
+        return redirect(url_for('general_error', errorid=0))
     #disc_price_dict[item.get_id()] = float(item.get_price()) * ((100 - float(item.get_discount()))/100) #Calculate item discount
 
     review_dict = {}

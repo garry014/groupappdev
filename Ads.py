@@ -6,7 +6,7 @@ class Ads:
         self.__end_date = end_date
         self.__start_date = start_date
         self.__adtext = adtext
-        self.__status = "Pending Approval"
+        self.__status = "Pending Payment"
 
     def get_ad_id(self):
         return self.__ad_id
