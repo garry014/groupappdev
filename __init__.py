@@ -1506,6 +1506,7 @@ def log_out():
         session.pop('rider_account')
         session.pop('rider_identity')
 
+
     return redirect(url_for('riders_home'))
 
 @app.route('/riders_account', methods=['GET', 'POST'])
@@ -1711,6 +1712,9 @@ def log_out_tailors():
         session['tailor_account'] = user.get_user_id()
         session['tailor_identity'] = user.get_user_name()
     if session['tailor_account'] != error:
+        session.pop('tailor_account')
+        session.pop('tailor_identity')
+    if session.get('tailor_account') is not None:
         session.pop('tailor_account')
         session.pop('tailor_identity')
 
@@ -1948,6 +1952,9 @@ def log_out_customers():
         session['customer_account'] = user.get_user_id()
         session['customer_identity'] = user.get_user_name()
     if session['customer_account'] != error:
+        session.pop('customer_account')
+        session.pop('customer_identity')
+    if session.get('customer_account') is not None:
         session.pop('customer_account')
         session.pop('customer_identity')
 

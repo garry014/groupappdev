@@ -15,12 +15,14 @@
                         <ul>
 
                             <li><a href="{{ url_for('view_shops') }}">View Shops</i></a></li>
+                            {% if 'customer_account' is in session %}
                             <li><a href="{{ url_for('viewshopscourse') }}">Courses <i class="fa fa-angle-down"></i></i></a>
                                 <ul class="submenu">
                                     <li><a href="{{ url_for('viewshopscourse') }}">View Courses Available</a></li>
                                     <li><a href="{{ url_for('edplatform') }}">My Courses</a></li>
                                 </ul>
                             </li>
+                            {% endif %}
                             <li><a href="{{ url_for('contact', name='tailornow') }}">Help </a></li>
                         </ul>
                     </nav>
