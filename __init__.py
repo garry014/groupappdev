@@ -1040,7 +1040,6 @@ def chat_page(chat, chatid):
             username = session['temp_user']
         elif session.get('tailor_identity') is not None:
             username = get_userdata("tailor").get_store_name()
-            print("tailor", username)
         elif session.get('rider_identity') is not None:
             username = session['rider_identity']
 
@@ -1050,22 +1049,30 @@ def chat_page(chat, chatid):
                 if chat_dict[item].get_sender() == session['temp_user']:
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "inbox":
-                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
+                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() == "Hidden":
+                    pass
+                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() == "Hidden":
+                    pass
+                elif chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
                 elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() != "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             elif chat == "archive":
-                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() == "Archive":
+                if chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() == "Hidden":
+                    pass
+                elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() == "Hidden":
+                    pass
+                elif chat_dict[item].get_sender() == username and chat_dict[item].get_sender_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
                 elif chat_dict[item].get_recipient() == username and chat_dict[item].get_recipient_status() == "Archive":
                     user_chat[chat_dict[item].get_id()] = chat_dict[item]
             else:
                 return redirect(url_for('general_error', errorid=2))
 
-        if session.get('customer_identity') is not None and session['customer_identity'] == "Admin":
+        if username == "Admin":
             user_chat = chat_dict
 
-    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=username)
+    return render_template('chat.html', user_chat=user_chat, chatid=chatid, form=send_msg, username=username, chat=chat)
 
 @app.route('/chat/<action>/<int:id>', methods=['GET', 'POST'])
 def update_chatstatus(action, id):
@@ -1076,17 +1083,27 @@ def update_chatstatus(action, id):
     except:
         return redirect(url_for('general_error'), errorid=0)
     else:
+        username = ""
+        if session.get('customer_identity') is not None:
+            username = session['customer_identity']
+        elif session.get('temp_user') is not None:
+            username = session['temp_user']
+        elif session.get('tailor_identity') is not None:
+            username = get_userdata("tailor").get_store_name()
+        elif session.get('rider_identity') is not None:
+            username = session['rider_identity']
+
         if action == "resolved":
             chat_dict[id].set_recipient_status("Resolved")
         elif action == "delete":
-            if session['customer_identity'] == "Admin":
+            if username == "Admin":
                 chat_dict.pop(id)
             elif username == chat_dict[id].get_recipient:
                 chat_dict[id].set_recipient_status("Hidden")
             else:
                 chat_dict[id].set_sender_status("Hidden")
         elif action == "archive":
-            if session['customer_identity'] == chat_dict[id].get_recipient:
+            if username == chat_dict[id].get_recipient:
                 chat_dict[id].set_recipient_status("Archive")
             else:
                 chat_dict[id].set_sender_status("Archive")

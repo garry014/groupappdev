@@ -86,9 +86,9 @@
                 {% endif %}
               {% endif %}
 
-              {% if (user_chat[chatid].get_sender == username) and (user_chat[chatid].get_sender_status() != "Archive") %}
+              {% if (user_chat[chatid].get_sender() == username) and (user_chat[chatid].get_sender_status() != "Archive") %}
               <a href="/chat/archive/{{ chatid }}" title="Mark as archive" style="float: right;"><i class="fa fa-archive"></i> Archive</a>
-              {% elif (user_chat[chatid].get_recipient == username) and (user_chat[chatid].get_recipient_status() != "Archive") %}
+              {% elif (user_chat[chatid].get_recipient() == username) and (user_chat[chatid].get_recipient_status() != "Archive") %}
               <a href="/chat/archive/{{ chatid }}" title="Mark as archive" style="float: right;"><i class="fa fa-archive"></i> Archive</a>
               {% endif %}
 
@@ -171,7 +171,11 @@
           <div class="inbox_people">
             <div class="headind_srch">
               <div class="recent_heading">
-                <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><h4>Recent</h4></a> | <a href="{{ url_for('chat_page', chat='archive', chatid=0) }}"><h4>Archives</h4></a>
+                {% if chat=="inbox" %}
+                <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><u><h4>Recent</h4></u></a> | <a href="{{ url_for('chat_page', chat='archive', chatid=0) }}"><h4>Archives</h4></a>
+                {% else %}
+                <a href="{{ url_for('chat_page', chat='inbox', chatid=0) }}"><h4>Recent</h4></a> | <a href="{{ url_for('chat_page', chat='archive', chatid=0) }}"><u><h4>Archives</h4></u></a>
+                {% endif %}
               </div>
               <div class="srch_bar">
                 <div class="stylish-input-group">
