@@ -1503,6 +1503,17 @@ def login_riders():
         users_dict = {}
         db = shelve.open('storage.db', 'r')
         users_dict = db['Users']
+
+        if session.get('tailor_account') is not None:
+            session.pop('tailor_account')
+            session.pop('tailor_identity')
+        elif session.get('customer_account') is not None:
+            session.pop('customer_account')
+            session.pop('customer_identity')
+        elif session.get('rider_account') is not None:
+            session.pop('rider_account')
+            session.pop('rider_identity')
+
         for user_id in users_dict:
             user = users_dict.get(user_id)
             if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
@@ -1707,6 +1718,17 @@ def tailors_login():
         db = shelve.open('tailor_storage.db', 'r')
         tailor_dict = db['Tailors']
         db.close()
+
+        if session.get('tailor_account') is not None:
+            session.pop('tailor_account')
+            session.pop('tailor_identity')
+        elif session.get('customer_account') is not None:
+            session.pop('customer_account')
+            session.pop('customer_identity')
+        elif session.get('rider_account') is not None:
+            session.pop('rider_account')
+            session.pop('rider_identity')
+
         for user_id in tailor_dict:
             user = tailor_dict.get(user_id)
             if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
@@ -1906,6 +1928,17 @@ def login_customers():
         customer_dict = {}
         db = shelve.open('customer.db', 'r')
         customer_dict = db['Customer']
+
+        if session.get('tailor_account') is not None:
+            session.pop('tailor_account')
+            session.pop('tailor_identity')
+        elif session.get('customer_account') is not None:
+            session.pop('customer_account')
+            session.pop('customer_identity')
+        elif session.get('rider_account') is not None:
+            session.pop('rider_account')
+            session.pop('rider_identity')
+
         for user_id in customer_dict:
             user = customer_dict.get(user_id)
             if request.form['user-name'] == user.get_user_name() and request.form['user-password'] == user.get_password():
