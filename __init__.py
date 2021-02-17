@@ -1118,12 +1118,12 @@ def update_chatstatus(action, id):
         elif action == "delete":
             if username == "Admin":
                 chat_dict.pop(id)
-            elif username == chat_dict[id].get_recipient:
+            elif username == chat_dict[id].get_recipient():
                 chat_dict[id].set_recipient_status("Hidden")
             else:
                 chat_dict[id].set_sender_status("Hidden")
         elif action == "archive":
-            if username == chat_dict[id].get_recipient:
+            if username == chat_dict[id].get_recipient():
                 chat_dict[id].set_recipient_status("Archive")
             else:
                 chat_dict[id].set_sender_status("Archive")
