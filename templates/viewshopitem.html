@@ -26,6 +26,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-md-6">
+                <a href="{{ url_for('contact', name=name) }}"><i class="pe-7s-chat"></i> Seek help from {{ name }}</a>
                 <div class="product-details dec-img-wrap">
                     <img src="{{ url_for('static',filename='uploads/shops/'+ name +'/'+ prod.get_image()) }}" alt="">
                 </div>

@@ -1111,7 +1111,6 @@ def update_chatstatus(action, id):
             username = get_userdata("tailor").get_store_name()
         elif session.get('rider_identity') is not None:
             username = session['rider_identity']
-        print(username)
 
         if action == "resolved":
             chat_dict[id].set_recipient_status("Resolved")

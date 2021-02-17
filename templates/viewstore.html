@@ -25,11 +25,11 @@
                 <div class="shop-top-bar mb-35">
                     <div class="select-shoing-wrap">
                         <div class="shop-select">
-
+                            <a href="{{ url_for('contact', name=name) }}"><i class="pe-7s-chat"></i> Seek help from {{ name }}</a>
                         </div>
                     </div>
                     <div class="filter-active">
-                        <p>Showing 1–12 of 20 result</p>
+
                     </div>
                 </div>
                 {% if shop_dict|length == 0 %}
