@@ -80,11 +80,7 @@
           <div class="mesgs">
             <div class="heading_msg">
               {{ user_chat[chatid].get_recipient() }}
-              {% if username == user_chat[chatid].get_recipient() %}
-                {% if user_chat[chatid].get_recipient_status() != "Resolved" %}
-                  <a href="/chat/resolved/{{ chatid }}" title="Mark as resolved"><i class="fa fa-check"></i> Mark as Resolved</a>
-                {% endif %}
-              {% endif %}
+
 
               {% if (user_chat[chatid].get_sender() == username) and (user_chat[chatid].get_sender_status() != "Archive") %}
               <a href="/chat/archive/{{ chatid }}" title="Mark as archive" style="float: right;"><i class="fa fa-archive"></i> Archive</a>
