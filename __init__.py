@@ -514,8 +514,6 @@ def delete_ad(id):
     else:
         # test script
         storename_loginuser = get_otheruserdata("tailor", session['tailor_account'])
-        print(storename_loginuser)
-        print(ads_dict[id].get_store_name())
 
         if session.get('tailor_account') is None:  # For restricted functions.
             return redirect(url_for('tailors_login'))
@@ -1021,6 +1019,18 @@ def contact(name):
 @app.route('/<string:chat>/<int:chatid>', methods=['GET', 'POST'])
 def chat_page(chat, chatid):
     send_msg = SendMsg(request.form)
+
+    username = ""
+    if session.get('customer_identity') is not None:
+        username = session['customer_identity']
+    elif session.get('temp_user') is not None:
+        username = session['temp_user']
+    elif session.get('tailor_identity') is not None:
+        username = get_userdata("tailor").get_store_name()
+    elif session.get('rider_identity') is not None:
+        username = session['rider_identity']
+    print(username)
+
     if request.method == 'POST':
         chat_dict = {}
         try:
@@ -1030,10 +1040,6 @@ def chat_page(chat, chatid):
             return redirect(url_for('general_error'), errorid=0)
 
         if send_msg.validate():
-            if session.get('customer_identity') is not None:
-                msg_from = session['customer_identity']
-            else:
-                msg_from = chat_dict[chatid].get_sender()
 
             if session.get('customer_identity') is not None and chat_dict[chatid].get_sender() == session['customer_identity']:
                 chat_dict[chatid].set_sender_status("Replied")
@@ -1041,7 +1047,7 @@ def chat_page(chat, chatid):
             else:
                 chat_dict[chatid].set_sender_status("Unreplied")
 
-            message = Chat.Message(send_msg.message.data, msg_from, dt.today().strftime("%d %b %Y %H:%M"))
+            message = Chat.Message(send_msg.message.data, username, dt.today().strftime("%d %b %Y %H:%M"))
             chat_dict[chatid].set_messages(message)
         db['Chats'] = chat_dict
         db.close()
@@ -1055,16 +1061,6 @@ def chat_page(chat, chatid):
             db.close()
         except:
             return redirect(url_for('general_error'), errorid=0)
-
-        username = ""
-        if session.get('customer_identity') is not None:
-            username = session['customer_identity']
-        elif session.get('temp_user') is not None:
-            username = session['temp_user']
-        elif session.get('tailor_identity') is not None:
-            username = get_userdata("tailor").get_store_name()
-        elif session.get('rider_identity') is not None:
-            username = session['rider_identity']
 
         user_chat = {}
         for item in chat_dict:
@@ -1115,6 +1111,7 @@ def update_chatstatus(action, id):
             username = get_userdata("tailor").get_store_name()
         elif session.get('rider_identity') is not None:
             username = session['rider_identity']
+        print(username)
 
         if action == "resolved":
             chat_dict[id].set_recipient_status("Resolved")
@@ -1500,9 +1497,13 @@ def delete_rider(id):
 def login_riders():
     error = None
     if request.method == 'POST':
-        users_dict = {}
-        db = shelve.open('storage.db', 'r')
-        users_dict = db['Users']
+        try:
+            users_dict = {}
+            db = shelve.open('storage.db', 'r')
+            users_dict = db['Users']
+            db.close()
+        except:
+            print("error")
 
         if session.get('tailor_account') is not None:
             session.pop('tailor_account')
@@ -1714,10 +1715,13 @@ def delete_tailor(id):
 def tailors_login():
     error = None
     if request.method == 'POST':
-        tailor_dict = {}
-        db = shelve.open('tailor_storage.db', 'r')
-        tailor_dict = db['Tailors']
-        db.close()
+        try:
+            tailor_dict = {}
+            db = shelve.open('tailor_storage.db', 'r')
+            tailor_dict = db['Tailors']
+            db.close()
+        except:
+            print("error")
 
         if session.get('tailor_account') is not None:
             session.pop('tailor_account')
@@ -1925,9 +1929,12 @@ def delete_customer(id):
 def login_customers():
     error = None
     if request.method == 'POST':
-        customer_dict = {}
-        db = shelve.open('customer.db', 'r')
-        customer_dict = db['Customer']
+        try:
+            customer_dict = {}
+            db = shelve.open('customer.db', 'r')
+            customer_dict = db['Customer']
+        except:
+            print("error")
 
         if session.get('tailor_account') is not None:
             session.pop('tailor_account')
