@@ -39,41 +39,41 @@
             </div>
             <div class="inbox_chat">
               {% for msg in user_chat %}
-              {% if chatid == user_chat[msg].get_id() %}
-              <div class="chat_list active_chat">
-                <div class="chat_people">
-                  <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                  <div class="chat_ib">
-                    <h5>{% if username ==  user_chat[msg].get_recipient() %}{{ user_chat[msg].get_sender() }}{% else %}{{ user_chat[msg].get_recipient() }}{% endif %} <span class="chat_date">{{ user_chat[msg].get_messages()[-1].get_timestamp() }}</span></h5>
-                    <p>
-                      {% if user_chat[msg].get_messages()[-1].get_message() |length > 70 %}
-                        {{ user_chat[msg].get_messages()[-1].get_message()[0:70] }}...
-                      {% else %}
-                        {{ user_chat[msg].get_messages()[-1].get_message() }}
-                      {% endif %}
-                    </p>
+                {% if chatid == user_chat[msg].get_id() %}
+                <div class="chat_list active_chat">
+                  <div class="chat_people">
+                    <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                    <div class="chat_ib">
+                      <h5>{% if username ==  user_chat[msg].get_recipient() %}{{ user_chat[msg].get_sender() }}{% else %}{{ user_chat[msg].get_recipient() }}{% endif %} <span class="chat_date">{{ user_chat[msg].get_messages()[-1].get_timestamp() }}</span></h5>
+                      <p>
+                        {% if user_chat[msg].get_messages()[-1].get_message() |length > 70 %}
+                          {{ user_chat[msg].get_messages()[-1].get_message()[0:70] }}...
+                        {% else %}
+                          {{ user_chat[msg].get_messages()[-1].get_message() }}
+                        {% endif %}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {% else %}
-              <a href="{{url_for('chat_page', chat='inbox', chatid=user_chat[msg].get_id())}}">
-              <div class="chat_list">
-                <div class="chat_people">
-                  <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                  <div class="chat_ib">
-                    <h5>{% if username ==  user_chat[msg].get_recipient() %}{{ user_chat[msg].get_sender() }}{% else %}{{ user_chat[msg].get_recipient() }}{% endif %} <span class="chat_date">{{ user_chat[msg].get_messages()[-1].get_timestamp() }}</span></h5>
-                    <p>
-                      {% if user_chat[msg].get_messages()[-1].get_message() |length > 70 %}
-                        {{ user_chat[msg].get_messages()[-1].get_message()[0:70] }}...
-                      {% else %}
-                        {{ user_chat[msg].get_messages()[-1].get_message() }}
-                      {% endif %}
-                    </p>
+                {% else %}
+                <a href="{{url_for('chat_page', chat=chat, chatid=user_chat[msg].get_id())}}">
+                <div class="chat_list">
+                  <div class="chat_people">
+                    <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                    <div class="chat_ib">
+                      <h5>{% if username ==  user_chat[msg].get_recipient() %}{{ user_chat[msg].get_sender() }}{% else %}{{ user_chat[msg].get_recipient() }}{% endif %} <span class="chat_date">{{ user_chat[msg].get_messages()[-1].get_timestamp() }}</span></h5>
+                      <p>
+                        {% if user_chat[msg].get_messages()[-1].get_message() |length > 70 %}
+                          {{ user_chat[msg].get_messages()[-1].get_message()[0:70] }}...
+                        {% else %}
+                          {{ user_chat[msg].get_messages()[-1].get_message() }}
+                        {% endif %}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              </a>
-              {% endif %}
+                </a>
+                {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -187,7 +187,7 @@
             </div>
             <div class="inbox_chat">
               {% for msg in user_chat %}
-              <a href="{{url_for('chat_page', chat='inbox', chatid=user_chat[msg].get_id())}}">
+              <a href="{{url_for('chat_page', chat=chat, chatid=user_chat[msg].get_id())}}">
               <div class="chat_list">
                 <div class="chat_people">
                   <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
